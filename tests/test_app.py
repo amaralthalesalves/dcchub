@@ -308,12 +308,97 @@ class ServerTest(unittest.TestCase):
         finally:
             app.ACCESS_CODES = original
 
+    def test_email_login_ufmg(self):
+        """Link mágico só para @ufmg.br: sem conta, sem guardar o e-mail, uso único, revogável."""
+        import email_login
+        original = (app.ACCESS_CODES, app.EMAIL.enabled, app.EMAIL.epoch, app.EMAIL.public_url, app.email_login.send_async)
+        sent = []
+        app.ACCESS_CODES, app.EMAIL.enabled, app.EMAIL.public_url = [], True, "https://dcchub.exemplo"
+        app.email_login.send_async = lambda cfg, to, url: sent.append((to, url))
+        try:
+            c = self.client()
+            status, data, _ = c.get("/api/bootstrap")
+            self.assertEqual((status, data.get("gate"), data.get("methods")), (401, True, ["email"]))
+            self.assertEqual(c.post("/api/access", {"code": "qualquer"})[0], 403, "sem códigos, só e-mail")
+            for bad in ("nao-e-email", "ana@gmail.com", "ana@dcc.ufmg.br", "ana@ufmg.br.evil.com", "ana@xufmg.br",
+                        "ana@ufmg.br\r\nBcc: x@ufmg.br", "", None, 42):
+                app.limiter.events.clear()
+                status, data, _ = c.post("/api/access/email", {"email": bad})
+                self.assertEqual(status, 400, f"{bad!r} deveria ser recusado")
+            self.assertEqual(sent, [], "domínio errado (inclusive @dcc.ufmg.br, dos docentes) não dispara e-mail")
+            app.limiter.events.clear()
+
+            status, data, _ = c.post("/api/access/email", {"email": "  Aluna.Exemplo@UFMG.br "})
+            self.assertEqual(status, 200)
+            self.assertEqual(sent[0][0], "aluna.exemplo@ufmg.br")
+            url = sent[0][1]
+            self.assertTrue(url.startswith("https://dcchub.exemplo/#/entrar?t="), "base fixa, nunca do cabeçalho Host")
+            token = url.split("t=", 1)[1]
+            self.assertNotIn("aluna", token)
+            self.assertEqual(c.get("/api/bootstrap")[0], 401, "pedir o link não dá acesso")
+
+            for forged in ("", "l1.1.a.b", token[:-1] + ("0" if token[-1] != "0" else "1"),
+                           email_login._token("l1", app.SECRET, -10), email_login._token("l1", "outra-chave", 900),
+                           email_login.access_token(app.SECRET, app.EMAIL.epoch)):
+                self.assertEqual(c.post("/api/access/email/verify", {"token": forged})[0], 400, forged)
+            status, _, res = c.post("/api/access/email/verify", {"token": token})
+            self.assertEqual(status, 200)
+            cookie = [h for h in res.getheaders() if h[0] == "Set-Cookie" and "dcchub_access=" in h[1]][0][1]
+            self.assertIn("HttpOnly", cookie)
+            self.assertIn("SameSite=Strict", cookie)
+            self.assertNotIn("aluna", cookie.lower())
+            c.cookie = cookie.split(";")[0]
+            self.assertEqual(c.get("/api/bootstrap")[0], 200)
+            self.assertEqual(self.client().post("/api/access/email/verify", {"token": token})[0], 400, "link de uso único")
+
+            # o e-mail não fica em lugar nenhum do banco
+            with app.connect() as conn:
+                conn.execute("PRAGMA wal_checkpoint(FULL)")
+            for f in app.DB.parent.glob(app.DB.name + "*"):
+                self.assertNotIn(b"aluna", f.read_bytes().lower(), f.name)
+
+            # limite por endereço: a resposta é igual, mas nada além de 3 envios por hora
+            app.limiter.events.clear()
+            for _ in range(4):
+                self.assertEqual(self.client().post("/api/access/email", {"email": "outra@ufmg.br"})[0], 200)
+            self.assertEqual(sum(1 for to, _ in sent if to == "outra@ufmg.br"), 3)
+            # limite por IP
+            statuses = [self.client().post("/api/access/email", {"email": f"p{i}@ufmg.br"})[0] for i in range(6)]
+            self.assertIn(429, statuses)
+
+            app.EMAIL.epoch = "2"  # revoga todos os acessos por e-mail
+            self.assertEqual(c.get("/api/bootstrap")[0], 401)
+
+            app.ACCESS_CODES = ["codigo"]  # os dois caminhos juntos
+            self.assertEqual(self.client().get("/api/bootstrap")[1]["methods"], ["email", "code"])
+        finally:
+            app.ACCESS_CODES, app.EMAIL.enabled, app.EMAIL.epoch, app.EMAIL.public_url, app.email_login.send_async = original
+
+    def test_email_login_disabled_by_default(self):
+        self.assertEqual(self.client().post("/api/access/email", {"email": "a@ufmg.br"})[0], 404)
+        self.assertEqual(self.client().post("/api/access/email/verify", {"token": "x"})[0], 404)
+
     def test_unknown_professor_is_404(self):
         status, data, _ = self.client().get("/api/professors/fulano")
         self.assertEqual(status, 404)
         self.assertIn("error", data)
 
     # ---------------------------------------------------------------- criação
+    def test_review_dates_are_stored_by_day(self):
+        """Hora exata permitiria cruzar a avaliação com o horário de envio do link de acesso."""
+        c = self.client()
+        self.assertEqual(c.post("/api/reviews", review())[0], 201)
+        with app.connect() as conn:
+            created = conn.execute("SELECT created_at FROM reviews").fetchone()[0]
+            self.assertEqual((created - app.BRT) % 86400, 0, "só o dia (meia-noite de Brasília)")
+            self.assertEqual(created, app.review_day())
+            conn.execute("UPDATE reviews SET created_at = created_at + 51234, updated_at = created_at + 777")  # banco antigo
+        app.init_db()
+        with app.connect() as conn:
+            created, updated = conn.execute("SELECT created_at, updated_at FROM reviews").fetchone()
+        self.assertEqual(((created - app.BRT) % 86400, (updated - app.BRT) % 86400), (0, 0), "datas antigas arredondadas")
+        self.assertEqual(app.review_day(1_767_236_400 + 23 * 3600), 1_767_236_400, "23h em Brasília ainda é o mesmo dia")
+
     def test_publish_review_and_aggregate(self):
         c = self.client()
         status, data, _ = c.post("/api/reviews", review())

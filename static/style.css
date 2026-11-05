@@ -730,6 +730,17 @@ body.gated { padding-bottom: 0; }
 .gate-card p { margin: 0; color: var(--ink-2); }
 .gate-form { width: 100%; display: grid; gap: 10px; text-align: left; }
 .gate-form .btn { width: 100%; }
+.gate-form[hidden], .gate-sent[hidden] { display: none; }
+.gate-sent { width: 100%; display: grid; gap: 8px; justify-items: center; padding: 18px 16px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface-2); }
+.gate-sent-icon { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; background: var(--primary-soft); color: var(--primary); }
+.gate-sent-icon .ico { width: 20px; height: 20px; }
+.gate-sent-msg { font-weight: 600; color: var(--ink) !important; }
+.gate-sent .link-btn { padding: 0 2px; font-size: inherit; }
+.gate-alt { width: 100%; text-align: left; border-top: 1px solid var(--line); padding-top: 12px; }
+.gate-alt summary { cursor: pointer; color: var(--muted); font-size: 13.5px; text-align: center; list-style: none; }
+.gate-alt summary::-webkit-details-marker { display: none; }
+.gate-alt summary:hover { color: var(--primary); }
+.gate-alt[open] summary { margin-bottom: 10px; }
 
 /* ---------- avisos do filtro de moderação no formulário */
 .mod-hints { margin-top: 8px; padding: 10px 12px; border-radius: 10px; font-size: 13.5px; line-height: 1.5; border: 1px solid; }

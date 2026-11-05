@@ -18,6 +18,15 @@ const store = {
   del(key) { try { localStorage.removeItem(key); } catch (_) { /* idem */ } },
 };
 
+// avaliações guardam só o dia (meia-noite de Brasília): "hoje", "ontem", "há 3 dias"…
+function dayAgo(ts) {
+  const BRT = 3 * 3600, today = Math.floor((Date.now() / 1000 - BRT) / 86400);
+  const days = today - Math.floor((ts - BRT) / 86400);
+  if (days <= 0) return 'hoje';
+  if (days === 1) return 'ontem';
+  return timeAgo(ts);
+}
+
 function timeAgo(ts) {
   const s = Math.max(1, Math.floor(Date.now() / 1000 - ts));
   const steps = [[60, 'segundo'], [3600, 'minuto', 60], [86400, 'hora', 3600], [2592000, 'dia', 86400], [31536000, 'mês', 2592000], [Infinity, 'ano', 31536000]];
@@ -218,6 +227,7 @@ async function router() {
   const token = ++renderToken;
   const { path, params, anchor } = parseHash();
   $$('#nav a[data-nav]').forEach((a) => a.toggleAttribute('aria-current', a.dataset.nav ? path.startsWith(a.dataset.nav) : path === ''));
+  if (path === 'entrar') { await viewEnter(params); return; } // link mágico: roda antes do catálogo (que exige acesso)
   for (const [re, view] of routes) {
     const m = path.match(re);
     if (!m) continue;
@@ -230,7 +240,7 @@ async function router() {
       else if (!history.state?.keepScroll) window.scrollTo(0, 0);
     } catch (err) {
       if (token !== renderToken) return;
-      if (err.data?.gate) { viewGate(); return; }
+      if (err.data?.gate) { viewGate(err.data.methods); return; }
       main.innerHTML = errorBlock(err);
     }
     return;
@@ -238,39 +248,101 @@ async function router() {
   main.innerHTML = `<section class="page narrow empty-state"><h1>Página não encontrada</h1><p>O endereço não existe ou mudou.</p><a class="btn" href="#/">Voltar ao início</a></section>`;
 }
 
-// Tela de acesso: o servidor só entrega dados a quem digitou o código da comunidade (DCCHUB_ACCESS_CODES)
-function viewGate() {
+// Tela de acesso: o servidor só entrega dados a quem entrou com o e-mail @ufmg.br (link mágico, sem conta) ou com
+// o código da comunidade. methods vem do servidor: ['email'], ['code'] ou os dois.
+function viewGate(methods = ['code']) {
   setTitle('Acesso da comunidade');
   document.body.classList.add('gated');
+  const email = methods.includes('email'), code = methods.includes('code');
+  const codeForm = `<form id="gate-code" class="gate-form">
+        <label class="field">Código de acesso<input name="code" autocomplete="off" autocapitalize="off" spellcheck="false" required placeholder="Digite o código"></label>
+        <button class="btn ${email ? 'btn-ghost' : 'btn-lg'}" type="submit">Entrar com código</button>
+        <p class="err" role="alert"></p>
+      </form>`;
   main.innerHTML = `<section class="page narrow gate">
     <div class="gate-card">
       <span class="brand-logo" aria-hidden="true">D</span>
       <h1>DCC<span>Hub</span></h1>
       <p>Espaço da comunidade estudantil do DCC/UFMG: avaliações anônimas de turmas, oferta do semestre, materiais e oportunidades.</p>
-      <form id="gate-form" class="gate-form">
-        <label class="field">Código de acesso<input name="code" autocomplete="off" autocapitalize="off" spellcheck="false" required placeholder="Digite o código"></label>
-        <button class="btn btn-lg" type="submit">Entrar</button>
-        <p class="err" id="gate-err" role="alert"></p>
+      ${email ? `<form id="gate-email" class="gate-form" novalidate>
+        <label class="field">E-mail da UFMG<input name="email" type="email" autocomplete="email" autocapitalize="off" spellcheck="false" required placeholder="voce@ufmg.br"></label>
+        <button class="btn btn-lg" type="submit">Receber link de acesso</button>
+        <p class="err" role="alert"></p>
       </form>
-      <p class="small muted">O código é divulgado nos canais dos estudantes (centro acadêmico, grupos de turma). Ele não identifica você: o acesso continua anônimo.</p>
+      <div class="gate-sent" id="gate-sent" hidden>
+        <span class="gate-sent-icon" aria-hidden="true"><svg class="ico"><use href="#i-mail"/></svg></span>
+        <p class="gate-sent-msg" role="status"></p>
+        <p class="small muted">Não chegou? Confira o spam ou <button class="link-btn" type="button" id="gate-retry">tente de novo</button>.</p>
+      </div>
+      <p class="small muted">Sem conta e sem senha: o e-mail só é usado para enviar o link e <b>não fica guardado</b>. Seu acesso não tem ligação com as avaliações que você escreve, que continuam anônimas.</p>
+      ${code ? `<details class="gate-alt"><summary>Tenho um código de acesso</summary>${codeForm}</details>` : ''}`
+    : `${codeForm}
+      <p class="small muted">O código é divulgado nos canais dos estudantes (centro acadêmico, grupos de turma). Ele não identifica você: o acesso continua anônimo.</p>`}
       <p class="small muted">Projeto independente de estudantes, sem vínculo com o DCC ou com a UFMG.</p>
     </div>
   </section>`;
-  $('#gate-form').addEventListener('submit', async (e) => {
+  const enter = () => { document.body.classList.remove('gated'); state.boot = null; router(); };
+  $('#gate-code')?.addEventListener('submit', async (e) => {
     e.preventDefault();
     const btn = $('button', e.target);
     btn.disabled = true;
     try {
       await api('/api/access', { method: 'POST', body: { code: new FormData(e.target).get('code').trim() } });
-      document.body.classList.remove('gated');
-      state.boot = null;
-      router();
+      enter();
     } catch (err) {
-      $('#gate-err').textContent = err.message;
+      $('.err', e.target).textContent = err.message;
       btn.disabled = false;
     }
   });
-  $('input[name=code]').focus();
+  const form = $('#gate-email');
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = $('button', form), err = $('.err', form);
+    const value = new FormData(form).get('email').trim();
+    err.textContent = '';
+    if (!/^[^@\s]+@[^@\s]+$/.test(value)) { err.textContent = 'Digite um e-mail válido.'; return; }
+    if (!value.toLowerCase().endsWith('@ufmg.br')) { err.textContent = 'Use seu e-mail @ufmg.br.'; return; }
+    btn.disabled = true;
+    try {
+      const res = await api('/api/access/email', { method: 'POST', body: { email: value } });
+      $('.gate-sent-msg').textContent = res.message;
+      form.hidden = true;
+      $('#gate-sent').hidden = false;
+    } catch (e2) {
+      err.textContent = e2.message;
+    }
+    btn.disabled = false;
+  });
+  $('#gate-retry')?.addEventListener('click', () => { $('#gate-sent').hidden = true; form.hidden = false; $('input', form).focus(); });
+  $(email ? 'input[name=email]' : 'input[name=code]').focus();
+}
+
+// Destino do link enviado por e-mail (#/entrar?t=…). O token fica no fragmento da URL, que não vai para o servidor
+// quando o link é aberto: antivírus de e-mail que "visitam" links não conseguem gastar o token de uso único.
+async function viewEnter(params) {
+  const token = params.get('t') || '';
+  history.replaceState(null, '', '#/'); // tira o token da barra de endereço e do histórico
+  setTitle('Entrando…');
+  main.innerHTML = `<section class="page narrow gate"><div class="gate-card"><span class="brand-logo" aria-hidden="true">D</span><p>Entrando…</p></div></section>`;
+  try {
+    await api('/api/access/email/verify', { method: 'POST', body: { token } });
+    document.body.classList.remove('gated');
+    state.boot = null;
+    toast('Pronto! Este navegador tem acesso por 180 dias.');
+    router();
+  } catch (err) {
+    // link velho aberto num navegador que já tem acesso: só segue para o site
+    const hasAccess = await api('/api/provas').then(() => true, () => false);
+    if (hasAccess) { document.body.classList.remove('gated'); router(); return; }
+    document.body.classList.add('gated');
+    main.innerHTML = `<section class="page narrow gate"><div class="gate-card">
+      <span class="brand-logo" aria-hidden="true">D</span>
+      <h1>Link inválido</h1>
+      <p>${esc(err.message)}</p>
+      <button class="btn btn-lg" type="button" id="enter-retry">Pedir um novo link</button>
+    </div></section>`;
+    $('#enter-retry').addEventListener('click', () => router());
+  }
 }
 
 function errorBlock(err) {
@@ -372,7 +444,7 @@ function reviewCard(r, { show = 'course' } = {}) {
       <div>
         <h3>${heading}</h3>
         <p class="muted small">${esc(r.term)}${r.verified ? ' · <span class="verified" title="Esta turma consta na oferta oficial publicada pelo DCC">✓ turma confirmada</span>' : ''}
-          · ${timeAgo(r.createdAt)}${r.updatedAt ? ' · editada' : ''}${r.status === 'held' ? ' · <span class="badge badge-warn">em revisão</span>' : ''}</p>
+          · ${dayAgo(r.createdAt)}${r.updatedAt ? ' · editada' : ''}${r.status === 'held' ? ' · <span class="badge badge-warn">em revisão</span>' : ''}</p>
       </div>
     </header>
     <ul class="review-metrics">
@@ -419,10 +491,10 @@ function wireReviewList(reviews, show) {
   const redraw = () => {
     const sorted = reviews.filter((r) => !filter || r.course === filter || r.professor === filter);
     const by = {
-      helpful: (a, b) => b.helpful - a.helpful || b.createdAt - a.createdAt,
-      recent: (a, b) => b.createdAt - a.createdAt,
-      high: (a, b) => b.ratings.overall - a.ratings.overall || b.createdAt - a.createdAt,
-      low: (a, b) => a.ratings.overall - b.ratings.overall || b.createdAt - a.createdAt,
+      helpful: (a, b) => b.helpful - a.helpful || b.createdAt - a.createdAt || b.id - a.id,
+      recent: (a, b) => b.createdAt - a.createdAt || b.id - a.id,
+      high: (a, b) => b.ratings.overall - a.ratings.overall || b.createdAt - a.createdAt || b.id - a.id,
+      low: (a, b) => a.ratings.overall - b.ratings.overall || b.createdAt - a.createdAt || b.id - a.id,
     }[sort];
     list.innerHTML = sorted.sort(by).map((r) => reviewCard(r, { show })).join('') || '<p class="muted">Nenhuma avaliação com esse filtro.</p>';
   };
@@ -1116,7 +1188,7 @@ async function viewReviewForm({ params, isCurrent }) {
   })();
   main.innerHTML = `<section class="page narrow">
     <div class="page-head"><p class="eyebrow">${existing ? 'Editar' : 'Sua vez'}</p><h1>${existing ? 'Editar avaliação' : 'Como foi a turma?'}</h1>
-      <p class="lead-sm">Sem login e sem dados pessoais. Fale sobre a disciplina e as práticas de ensino — não sobre a vida pessoal de ninguém.</p></div>
+      <p class="lead-sm">Anônimo e sem dados pessoais. Fale sobre a disciplina e as práticas de ensino — não sobre a vida pessoal de ninguém.</p></div>
     <form id="review-form" class="review-form" novalidate>
       <fieldset class="form-step"><legend><span>1</span> Turma</legend>
         <label class="field">Docente
@@ -1386,7 +1458,9 @@ async function viewAbout() {
 
     <h2 id="privacidade">Privacidade</h2>
     <ul>
-      <li>Sem cadastro: não pedimos nome, e-mail ou matrícula.</li>
+      ${b.emailAccess
+        ? `<li>Sem cadastro e sem conta. O e-mail @ufmg.br serve só para enviar o link de acesso: <b>não é guardado</b> (nem no banco, nem em logs), e o acesso que ele libera não tem nenhuma ligação com as avaliações que você escreve. Não pedimos nome nem matrícula.</li>`
+        : '<li>Sem cadastro: não pedimos nome, e-mail ou matrícula.</li>'}
       <li>Seu navegador recebe um identificador aleatório (cookie <code>HttpOnly</code>). O banco guarda apenas um <abbr title="HMAC-SHA256 com chave secreta do servidor">hash</abbr> dele — usado só para impedir avaliações repetidas e permitir edição.</li>
       <li>O servidor não registra endereços IP em logs. O IP é usado apenas em memória, por alguns minutos, para limitar abusos.</li>
       <li>Sem Google Fonts, analytics ou qualquer recurso de terceiros: fotos e dados são servidos pelo próprio site.</li>

@@ -10,7 +10,7 @@ O DCCHub é um único processo Python com SQLite (~30 MB de RAM). Qualquer VM m�
 |---|---|
 | `docker-compose.yml` | DCCHub + [Caddy](https://caddyserver.com) com HTTPS automático (Let's Encrypt) |
 | `Caddyfile` | Proxy reverso para o app |
-| `.env.example` | `DOMAIN`, `DCCHUB_ADMIN_TOKEN`, `DCCHUB_ACCESS_CODES` |
+| `.env.example` | `DOMAIN`, `DCCHUB_ADMIN_TOKEN`, `DCCHUB_ACCESS_CODES`, acesso por e-mail e SMTP |
 | `cron.example` | Atualização diária/semanal dos dados e backup diário |
 | `backup.sh` | Cópia consistente do banco + chave, guarda 14 dias |
 | `fly.toml` | Alternativa no Fly.io (pago, ~US$ 2–3/mês) |
@@ -65,11 +65,29 @@ git clone git@github.com:amaralthalesalves/dcchub.git /opt/dcchub
 cd /opt/dcchub/deploy
 cp .env.example .env
 python3 -c "import secrets; print(secrets.token_urlsafe(32))"   # → DCCHUB_ADMIN_TOKEN
-nano .env                                                        # DOMAIN, token, código de acesso
+nano .env                                                        # DOMAIN, token, código de acesso e/ou e-mail
 docker compose up -d --build
 docker compose logs -f caddy                                     # espere "certificate obtained"
 ```
 Abra `https://seu.dominio` — deve aparecer a tela do código de acesso.
+
+### Envio de e-mail (acesso por @ufmg.br)
+Para o login por e-mail, configure um serviço de envio — VMs na nuvem normalmente bloqueiam o envio direto (porta 25), e e-mail sem SPF/DKIM cai no spam.
+
+1. Crie uma conta num serviço com plano grátis, por exemplo o **Brevo** (~300 e-mails/dia).
+2. No serviço, **verifique o seu domínio**: ele mostra registros DNS (SPF, DKIM, às vezes DMARC) para você criar onde o domínio está registrado.
+3. Gere uma credencial SMTP e preencha no `.env`:
+   ```bash
+   DCCHUB_EMAIL_LOGIN=1
+   DCCHUB_SMTP_HOST=smtp-relay.brevo.com
+   DCCHUB_SMTP_PORT=587
+   DCCHUB_SMTP_USER=...            # login SMTP do serviço
+   DCCHUB_SMTP_PASSWORD=...        # chave SMTP do serviço
+   DCCHUB_SMTP_FROM=DCCHub <acesso@seu.dominio>
+   ```
+4. `docker compose up -d` e teste com o seu `@ufmg.br`. Se não chegar, veja `docker compose logs app` — falhas de envio aparecem lá (sem o endereço).
+
+O `DCCHUB_PUBLIC_URL` já vem do `DOMAIN` no `docker-compose.yml`. Sem domínio próprio (ex.: sslip.io) não dá para configurar SPF/DKIM; nesse caso, use só o código de acesso.
 
 ### 6. Atualização dos dados e backup
 ```bash

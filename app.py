@@ -14,6 +14,10 @@ Variáveis de ambiente (todas opcionais):
     DCCHUB_TRUST_PROXY  "1" para usar X-Forwarded-For como IP (somente atrás de proxy confiável)
     DCCHUB_ACCESS_CODES códigos de acesso da comunidade, separados por vírgula; se definido, os dados só saem
                         para navegadores que digitaram um código válido (trocar o código revoga os acessos antigos)
+    DCCHUB_EMAIL_LOGIN  "1" para liberar o acesso por link enviado ao e-mail @ufmg.br (ver email_login.py); o e-mail
+                        não é guardado. Configuração do envio: DCCHUB_PUBLIC_URL, DCCHUB_SMTP_HOST/PORT/USER/PASSWORD/
+                        FROM/TLS; sem SMTP, o link aparece no terminal (desenvolvimento). DCCHUB_EMAIL_EPOCH: trocar
+                        o valor revoga todos os acessos feitos por e-mail
   Os nomes antigos (AVALIA_DCC_*) continuam aceitos.
     HOST / PORT             endereço de escuta (padrão 0.0.0.0:8000)
 """
@@ -43,6 +47,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, unquote, urlparse
 
+import email_login
 import moderation
 
 ROOT = Path(__file__).resolve().parent
@@ -60,6 +65,8 @@ TRUST_PROXY = env("TRUST_PROXY") == "1"
 ADMIN_TOKEN = env("ADMIN_TOKEN", "") or ""
 ACCESS_COOKIE = "dcchub_access"
 ACCESS_CODES = [c.strip() for c in (env("ACCESS_CODES") or "").split(",") if c.strip()]
+EMAIL = email_login.Config(env)
+GATE_FREE = {"/api/access", "/api/access/email", "/api/access/email/verify"}
 MAX_BODY = 16_384
 ACTIVE_TERMS = 4  # disciplina sem oferta nos últimos 4 semestres publicados (2 anos) = fora de oferta
 
@@ -116,6 +123,16 @@ def fold(text: str) -> str:
 def moderation_flags(comment: str, professor: str | None = None) -> list[str]:
     """Motivos (mensagens) apontados pelo filtro automático — ver moderation.py. Lista vazia = publica direto."""
     return [i.message for i in moderation.analyze(comment, professor)]
+
+
+BRT = 3 * 3600  # Brasília (UTC-3, sem horário de verão desde 2019)
+
+
+def review_day(ts: float | None = None) -> int:
+    """Data de avaliações guardada só com precisão de dia (meia-noite de Brasília). Hora e minuto exatos permitiriam
+    cruzar uma avaliação com registros externos — por exemplo, o horário em que um link de acesso foi enviado."""
+    ts = int(time.time() if ts is None else ts)
+    return (ts - BRT) // 86400 * 86400 + BRT
 
 
 def token_hash(token: str) -> str:
@@ -308,6 +325,10 @@ CREATE TABLE IF NOT EXISTS class_reports (
   created_at INTEGER NOT NULL,
   PRIMARY KEY (term, professor, course, reporter_hash)
 );
+CREATE TABLE IF NOT EXISTS used_links (
+  nonce TEXT PRIMARY KEY,
+  expires_at INTEGER NOT NULL
+);
 CREATE TABLE IF NOT EXISTS reports (
   review_id INTEGER NOT NULL REFERENCES reviews(id) ON DELETE CASCADE,
   reporter_hash TEXT NOT NULL,
@@ -342,6 +363,10 @@ def init_db() -> None:
         if legacy and "overall" not in legacy["sql"]:
             conn.execute("ALTER TABLE reviews RENAME TO reviews_v1")  # versão antiga preservada, não migrada
         conn.executescript(SCHEMA)
+        # avaliações antigas, de antes da data por dia: arredonda também (idempotente)
+        conn.execute(f"UPDATE reviews SET created_at = (created_at - {BRT}) / 86400 * 86400 + {BRT}, "
+                     f"updated_at = CASE WHEN updated_at IS NULL THEN NULL ELSE (updated_at - {BRT}) / 86400 * 86400 + {BRT} END "
+                     f"WHERE (created_at - {BRT}) % 86400 != 0 OR (updated_at IS NOT NULL AND (updated_at - {BRT}) % 86400 != 0)")
     migrate_aliases()
 
 
@@ -437,7 +462,7 @@ class RateLimiter:
             return True
 
 
-LIMITS = {"check": (120, 60), "access": (10, 600), "classreport": (20, 600), "review": (6, 600), "vote": (60, 60), "report": (10, 600), "restore": (10, 600), "admin": (30, 60)}
+LIMITS = {"check": (120, 60), "access": (10, 600), "login": (5, 600), "classreport": (20, 600), "review": (6, 600), "vote": (60, 60), "report": (10, 600), "restore": (10, 600), "admin": (30, 60)}
 limiter = RateLimiter()
 
 
@@ -461,6 +486,16 @@ def gzip_cached(etag: str, data: bytes) -> bytes:
 
 CSP = ("default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self'; "
        "font-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'")
+
+
+def gate_methods() -> list[str]:
+    return (["email"] if EMAIL.enabled else []) + (["code"] if ACCESS_CODES else [])
+
+
+def public_url(handler: "App") -> str:
+    """Base dos links enviados por e-mail. Vem da configuração, nunca do cabeçalho Host (um Host forjado faria o
+    link de outra pessoa apontar para um site de terceiros). Sem DCCHUB_PUBLIC_URL, só serve para desenvolvimento."""
+    return EMAIL.public_url or f"http://localhost:{handler.server.server_address[1]}"
 
 
 class App(BaseHTTPRequestHandler):
@@ -581,6 +616,8 @@ class App(BaseHTTPRequestHandler):
 
     ROUTES = [
         ("POST", r"/api/access", "post_access"),
+        ("POST", r"/api/access/email", "post_access_email"),
+        ("POST", r"/api/access/email/verify", "post_access_email_verify"),
         ("GET", r"/api/bootstrap", "get_bootstrap"),
         ("GET", r"/api/offerings", "get_offerings"),
         ("GET", r"/api/professors/([a-z0-9-]+)", "get_professor"),
@@ -626,9 +663,9 @@ class App(BaseHTTPRequestHandler):
             if method in ("GET", "HEAD"):
                 return self.serve_static(path)
             return self.send_json({"error": "Método não permitido."}, 405)
-        if ACCESS_CODES and path != "/api/access" and not self.has_access():
-            # nada de dados sem o código da comunidade; o front mostra a tela de acesso
-            return self.send_json({"error": "Acesso restrito à comunidade. Digite o código de acesso.", "gate": True}, 401)
+        if (ACCESS_CODES or EMAIL.enabled) and path not in GATE_FREE and not self.has_access():
+            # nada de dados sem o código da comunidade ou o e-mail @ufmg.br; o front mostra a tela de acesso
+            return self.send_json({"error": "Acesso restrito à comunidade.", "gate": True, "methods": gate_methods()}, 401)
         try:
             for route_method, pattern, handler in self.ROUTES:
                 m = re.fullmatch(pattern, path)
@@ -761,6 +798,7 @@ class App(BaseHTTPRequestHandler):
             "comment": {"min": COMMENT_MIN, "max": COMMENT_MAX},
             "totals": {"reviews": totals["n"], "reviewers": totals["people"], "pending": pending},
             "moderation": bool(ADMIN_TOKEN),
+            "emailAccess": EMAIL.enabled,
         })
 
     def get_offerings(self) -> None:
@@ -776,8 +814,8 @@ class App(BaseHTTPRequestHandler):
         self.send_json({"term": term, "offerings": out})
 
     def reviews_where(self, conn: sqlite3.Connection, where: str, args: list, sort: str = "helpful", limit: int = 500, offset: int = 0) -> list[dict]:
-        order = {"recent": "r.created_at DESC", "helpful": "helpful DESC, r.created_at DESC",
-                 "high": "r.overall DESC, r.created_at DESC", "low": "r.overall ASC, r.created_at DESC"}.get(sort, "helpful DESC, r.created_at DESC")
+        order = {"recent": "r.created_at DESC, r.id DESC", "helpful": "helpful DESC, r.created_at DESC, r.id DESC",
+                 "high": "r.overall DESC, r.created_at DESC, r.id DESC", "low": "r.overall ASC, r.created_at DESC, r.id DESC"}.get(sort, "helpful DESC, r.created_at DESC, r.id DESC")
         rows = conn.execute(f"""SELECT r.*, (SELECT COUNT(*) FROM votes v WHERE v.review_id=r.id) helpful
                                 FROM reviews r WHERE r.status='published' AND {where} ORDER BY {order} LIMIT ? OFFSET ?""",
                             [*args, limit, offset]).fetchall()
@@ -944,7 +982,7 @@ class App(BaseHTTPRequestHandler):
                 cur = conn.execute(
                     f"INSERT INTO reviews ({', '.join(REVIEW_COLUMNS)}, status, held_reason, reviewer_hash, created_at) "
                     f"VALUES ({', '.join('?' * (len(REVIEW_COLUMNS) + 4))})",
-                    [*(review[c] for c in REVIEW_COLUMNS), status, "; ".join(flags) or None, viewer, int(time.time())])
+                    [*(review[c] for c in REVIEW_COLUMNS), status, "; ".join(flags) or None, viewer, review_day()])
                 review_id = cur.lastrowid
         except sqlite3.IntegrityError:
             with connect() as conn:
@@ -1002,7 +1040,7 @@ class App(BaseHTTPRequestHandler):
                     raise ApiError(409, "Você já tem outra avaliação para esta combinação de docente e disciplina.")
             status = "held" if flags else "published"
             conn.execute(f"UPDATE reviews SET {', '.join(f'{c}=?' for c in REVIEW_COLUMNS)}, status=?, held_reason=?, updated_at=? WHERE id=?",
-                         [*(review[c] for c in REVIEW_COLUMNS), status, "; ".join(flags) or None, int(time.time()), row["id"]])
+                         [*(review[c] for c in REVIEW_COLUMNS), status, "; ".join(flags) or None, review_day(), row["id"]])
         self.send_json({"id": row["id"], "status": status, "held": status == "held",
                         "message": "Avaliação atualizada." if status == "published" else "Avaliação atualizada e enviada para revisão."})
 
@@ -1051,7 +1089,7 @@ class App(BaseHTTPRequestHandler):
         if not viewer:
             return self.send_json({"reviews": [], "hasIdentity": False})
         with connect() as conn:
-            rows = conn.execute("SELECT * FROM reviews WHERE reviewer_hash=? AND status!='removed' ORDER BY created_at DESC", (viewer,)).fetchall()
+            rows = conn.execute("SELECT * FROM reviews WHERE reviewer_hash=? AND status!='removed' ORDER BY created_at DESC, id DESC", (viewer,)).fetchall()
             helpful = helpful_counts(conn, [r["id"] for r in rows])
         self.send_json({"reviews": [review_out(r, viewer, set(), helpful) for r in rows], "hasIdentity": True})
 
@@ -1159,19 +1197,64 @@ class App(BaseHTTPRequestHandler):
         except Exception:  # noqa: BLE001
             return False
         given = cookies[ACCESS_COOKIE].value if ACCESS_COOKIE in cookies else ""
-        # o cookie guarda um HMAC do código: remover/trocar o código em DCCHUB_ACCESS_CODES revoga quem entrou com ele
-        return bool(given) and any(hmac.compare_digest(given, self.access_token(c)) for c in ACCESS_CODES)
+        if not given:
+            return False
+        # entrada por e-mail: token assinado e com validade, sem nada do e-mail (DCCHUB_EMAIL_EPOCH revoga todos)
+        if EMAIL.enabled and given.startswith("e1."):
+            return email_login.check_access(SECRET, EMAIL.epoch, given)
+        # entrada por código: o cookie guarda um HMAC do código; trocar DCCHUB_ACCESS_CODES revoga quem entrou com ele
+        return any(hmac.compare_digest(given, self.access_token(c)) for c in ACCESS_CODES)
+
+    def set_access_cookie(self, value: str, max_age: int) -> None:
+        secure = "; Secure" if self.secure_request() else ""
+        self.access_cookie = f"{ACCESS_COOKIE}={value}; Path=/; Max-Age={max_age}; HttpOnly; SameSite=Strict{secure}"
 
     def post_access(self) -> None:
         if not ACCESS_CODES:
+            if EMAIL.enabled:
+                raise ApiError(403, "O acesso é pelo e-mail @ufmg.br.")
             return self.send_json({"ok": True})
         self.limit("access")
         code = clean_line(self.read_json().get("code"), 120)
         match = next((c for c in ACCESS_CODES if hmac.compare_digest(code.lower().encode(), c.lower().encode())), None)
         if not match:
             raise ApiError(403, "Código inválido. Peça o código atual nos canais dos estudantes.")
-        secure = "; Secure" if self.secure_request() else ""
-        self.access_cookie = f"{ACCESS_COOKIE}={self.access_token(match)}; Path=/; Max-Age=15552000; HttpOnly; SameSite=Strict{secure}"
+        self.set_access_cookie(self.access_token(match), 15552000)
+        self.send_json({"ok": True})
+
+    def post_access_email(self) -> None:
+        """Envia o link de acesso. O e-mail só passa pela memória: não vai para banco nem log."""
+        if not EMAIL.enabled:
+            raise ApiError(404, "Acesso por e-mail desativado.")
+        self.limit("login")
+        address = email_login.normalize(self.read_json().get("email"))
+        if not address:
+            raise ApiError(400, "Digite um e-mail válido.", fields={"email": ["Digite um e-mail válido."]})
+        if not email_login.allowed(address, EMAIL.domain):
+            msg = f"Use seu e-mail @{EMAIL.domain}."
+            raise ApiError(400, msg, fields={"email": [msg]})
+        # no máximo 3 links por endereço por hora (chave HMAC só em memória). Acima disso a resposta é a mesma,
+        # mas nada é enviado: ninguém usa o site para encher a caixa de outra pessoa.
+        if limiter.hit("login-addr", email_login.address_key(SECRET, address), 3, 3600):
+            email_login.send_async(EMAIL, address, f"{public_url(self)}/#/entrar?t={email_login.link_token(SECRET)}")
+        self.send_json({"ok": True, "message": f"Enviamos um link de acesso para {address}. Ele vale por "
+                        f"{email_login.LINK_TTL // 60} minutos e funciona em qualquer navegador."})
+
+    def post_access_email_verify(self) -> None:
+        if not EMAIL.enabled:
+            raise ApiError(404, "Acesso por e-mail desativado.")
+        self.limit("access")
+        nonce = email_login.check_link(SECRET, self.read_json().get("token"))
+        if not nonce:
+            raise ApiError(400, "Link inválido ou expirado. Peça um novo.")
+        now = int(time.time())
+        with connect() as conn:
+            conn.execute("DELETE FROM used_links WHERE expires_at < ?", (now,))
+            try:  # uso único
+                conn.execute("INSERT INTO used_links (nonce, expires_at) VALUES (?, ?)", (nonce, now + email_login.LINK_TTL))
+            except sqlite3.IntegrityError:
+                raise ApiError(400, "Este link já foi usado. Peça um novo.") from None
+        self.set_access_cookie(email_login.access_token(SECRET, EMAIL.epoch), email_login.ACCESS_TTL)
         self.send_json({"ok": True})
 
     def require_admin(self) -> None:
@@ -1186,7 +1269,7 @@ class App(BaseHTTPRequestHandler):
             rows = conn.execute("""SELECT r.*, (SELECT COUNT(*) FROM reports p WHERE p.review_id=r.id AND p.resolved=0) nreports
                                    FROM reviews r WHERE r.status='held'
                                       OR EXISTS (SELECT 1 FROM reports p WHERE p.review_id=r.id AND p.resolved=0)
-                                   ORDER BY r.created_at DESC LIMIT 200""").fetchall()
+                                   ORDER BY r.created_at DESC, r.id DESC LIMIT 200""").fetchall()
             reasons = defaultdict(list)
             for rep in conn.execute("SELECT review_id, reason, detail FROM reports WHERE resolved=0"):
                 reasons[rep["review_id"]].append({"reason": rep["reason"], "detail": rep["detail"]})
@@ -1233,6 +1316,12 @@ if __name__ == "__main__":
     print(f"DCCHub em http://localhost:{port}  ({len(CATALOG.professors)} docentes, {len(CATALOG.courses)} disciplinas)")
     if not ADMIN_TOKEN:
         print("Moderação desativada: defina DCCHUB_ADMIN_TOKEN para habilitar o painel /#/moderacao.")
+    if EMAIL.enabled:
+        print(f"Acesso por e-mail @{EMAIL.domain} ativo." + ("" if EMAIL.smtp_host else
+              " SMTP não configurado: os links aparecem aqui no terminal (só para desenvolvimento)."))
+        if not EMAIL.public_url:
+            print("Aviso: defina DCCHUB_PUBLIC_URL (ex.: https://seu.dominio) para os links enviados por e-mail.")
+
     def stop(*_: object) -> None:
         raise KeyboardInterrupt
 

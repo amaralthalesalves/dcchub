@@ -17,7 +17,7 @@
 **DCCHub** reúne num só lugar o que estudantes do Departamento de Ciência da Computação da UFMG procuram a cada semestre: **avaliações anônimas** de docentes e disciplinas ligadas à oferta oficial, **montador de grade** com conflitos de horário, **materiais** (provas antigas) e **oportunidades** de pesquisa, bolsas e estágios.
 
 > [!IMPORTANT]
-> Projeto **independente** de estudantes, sem vínculo com o DCC ou a UFMG. Feito para uso da comunidade estudantil: acesso por código, fora de buscadores. Veja [Comunidade e privacidade](docs/comunidade-e-privacidade.md).
+> Projeto **independente** de estudantes, sem vínculo com o DCC ou a UFMG. Feito para uso da comunidade estudantil: acesso pelo e-mail `@ufmg.br` (sem conta, e o e-mail não é guardado) ou por código, fora de buscadores. Veja [Comunidade e privacidade](docs/comunidade-e-privacidade.md).
 
 <img alt="Página inicial do DCCHub" src="docs/img/inicio.webp" width="100%">
 
@@ -81,10 +81,10 @@ python3 tests/seed_demo.py /tmp/demo.db
 DCCHUB_DB=/tmp/demo.db python3 app.py
 ```
 
-Com o painel de moderação (`/#/moderacao`) e o código de acesso da comunidade:
+Com o painel de moderação (`/#/moderacao`) e o acesso restrito à comunidade — por e-mail `@ufmg.br` (sem SMTP configurado, o link aparece no terminal) e/ou por código:
 
 ```bash
-DCCHUB_ADMIN_TOKEN=um-token-longo DCCHUB_ACCESS_CODES=codigo-do-semestre python3 app.py
+DCCHUB_ADMIN_TOKEN=um-token-longo DCCHUB_EMAIL_LOGIN=1 DCCHUB_ACCESS_CODES=codigo-do-semestre python3 app.py
 ```
 
 Todas as variáveis estão em [Desenvolvimento → Configuração](docs/desenvolvimento.md#configuração).
@@ -106,7 +106,7 @@ O servidor recarrega o catálogo sozinho quando os arquivos mudam. Detalhes de c
 Uma VM mínima com Docker basta (o app usa ~30 MB de RAM). `deploy/` tem `docker-compose.yml` com HTTPS automático via Caddy, cron de atualização e backup. Passo a passo para **Azure for Students**, **Oracle Cloud** ou qualquer VPS em [Deploy](docs/deploy.md).
 
 ```bash
-cd deploy && cp .env.example .env   # DOMAIN, DCCHUB_ADMIN_TOKEN, DCCHUB_ACCESS_CODES
+cd deploy && cp .env.example .env   # DOMAIN, DCCHUB_ADMIN_TOKEN, acesso por e-mail/código, SMTP
 docker compose up -d --build
 ```
 
@@ -114,7 +114,7 @@ docker compose up -d --build
 
 - [**Dados**](docs/dados.md) — de onde vem cada informação, como nomes e versões de disciplina são resolvidos, auditoria.
 - [**Moderação**](docs/moderacao.md) — as três decisões, categorias, burlas cobertas, como foi avaliado e limites.
-- [**Comunidade e privacidade**](docs/comunidade-e-privacidade.md) — código de acesso, anonimato, o que o banco guarda.
+- [**Comunidade e privacidade**](docs/comunidade-e-privacidade.md) — acesso por e-mail @ufmg.br e por código, anonimato, o que o banco guarda.
 - [**Deploy**](docs/deploy.md) — VM com Docker, HTTPS, cron, backup e atualização.
 - [**Desenvolvimento**](docs/desenvolvimento.md) — arquitetura, configuração, API, testes.
 
