@@ -41,8 +41,9 @@ ok(termGroups[0]?.startsWith('Turmas confirmadas'), 'semestres confirmados suger
 await ev(`document.querySelector('#review-form').requestSubmit()`); await sleep(200);
 await sleep(300);
 ok((await ev(`return document.querySelector('[data-err="overall"]')?.textContent || ''`)).length > 0, 'validação no cliente aponta notas faltando');
+ok((await ev(`return document.querySelector('[data-err="passing"]')?.textContent || ''`)).length > 0, 'dificuldade para passar é pergunta separada e obrigatória');
 await ev(`const t=document.querySelector('#f-term'); t.value=t.querySelector('optgroup option').value;
-  for (const [k,v] of Object.entries({overall:5,didactics:4,fairness:5,difficulty:3,workload:4})) document.querySelector('input[name='+k+'][value="'+v+'"]').click();
+  for (const [k,v] of Object.entries({overall:5,didactics:4,fairness:5,difficulty:3,passing:2,workload:4})) document.querySelector('input[name='+k+'][value="'+v+'"]').click();
   document.querySelector('input[name=retake][value=true]').click();
   [...document.querySelectorAll('input[name=tags]')].slice(0,2).forEach(x=>x.click());
   const c=document.querySelector('#f-comment'); c.value='Ótima disciplina, provas coerentes com as listas e professor muito disponível.'; c.dispatchEvent(new Event('input',{bubbles:true}));
@@ -53,7 +54,7 @@ ok(await ev(`return !!document.querySelector('.review .review-foot a[href^="#/av
 // 3) repetir dá 409 com link de edição
 await go('#/avaliar?professor=renato-vimieiro&course=DCC207'); await sleep(800);
 await ev(`const t=document.querySelector('#f-term'); t.value='2024.1';
-  for (const k of ['overall','didactics','fairness','difficulty','workload']) document.querySelector('input[name='+k+'][value="3"]').click();
+  for (const k of ['overall','didactics','fairness','difficulty','passing','workload']) document.querySelector('input[name='+k+'][value="3"]').click();
   const c=document.querySelector('#f-comment'); c.value='Segunda tentativa de avaliação da mesma turma pelo mesmo navegador.'; document.querySelector('#review-form').requestSubmit();`);
 await sleep(1200);
 ok((await ev(`return document.querySelector('#form-message').innerHTML`)).includes('edit='), 'duplicada oferece editar a existente');

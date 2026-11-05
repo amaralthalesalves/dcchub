@@ -327,11 +327,13 @@ function courseRow(c) {
 }
 function firstNameLast(name) { const p = name.split(' '); return p.length > 1 ? `${p[0]} ${p[p.length - 1]}` : name; }
 
-function bars(avg, criteria) {
+function bars(avg, criteria, { answered = {}, count = 0 } = {}) {
   return `<dl class="bars">${criteria.map((c) => {
     const v = avg?.[c.key];
-    return `<div class="bar-row" title="${esc(c.hint)}">
-      <dt>${esc(c.label)}</dt>
+    const partial = answered[c.key] != null && answered[c.key] < count; // ex.: "passar" não existia nas avaliações antigas
+    const note = partial ? (answered[c.key] ? ` <small class="muted">(${answered[c.key]} de ${count})</small>` : ' <small class="muted">(ainda sem respostas)</small>') : '';
+    return `<div class="bar-row" title="${esc(c.hint)}${partial ? ' — pergunta nova: as avaliações anteriores não a respondiam' : ''}">
+      <dt>${esc(c.label)}${note}</dt>
       <dd><span class="bar"><span class="bar-fill ${scoreClass(v, c.neutral)}" style="width:${v ? (v / 5) * 100 : 0}%"></span></span><b>${fmt(v)}</b></dd>
     </div>`;
   }).join('')}</dl>`;
@@ -353,7 +355,7 @@ function summaryBlock(summary, { subject = 'docente' } = {}) {
       <span class="muted small">${plural(summary.count, 'avaliação', 'avaliações')}</span>
       ${summary.retake != null ? `<span class="retake"><b>${summary.retake}%</b> faria de novo</span>` : ''}
     </div>
-    <div class="summary-bars">${bars(summary.avg, crit.filter((c) => c.key !== 'overall'))}</div>
+    <div class="summary-bars">${bars(summary.avg, crit.filter((c) => c.key !== 'overall'), { answered: summary.answered, count: summary.count })}</div>
     <div class="summary-dist" aria-label="Distribuição das notas gerais">
       ${[5, 4, 3, 2, 1].map((n) => `<div class="dist-row"><span>${n}★</span><span class="bar"><span class="bar-fill ${scoreClass(n)}" style="width:${(dist[n] / max) * 100}%"></span></span><span class="muted">${dist[n]}</span></div>`).join('')}
     </div>
@@ -387,7 +389,7 @@ function reviewCard(r, { show = 'course' } = {}) {
       </div>
     </header>
     <ul class="review-metrics">
-      ${crit.map((c) => `<li><span>${esc(c.label)}</span>${pill(r.ratings[c.key], { neutral: c.neutral })}</li>`).join('')}
+      ${crit.filter((c) => r.ratings[c.key] != null).map((c) => `<li><span>${esc(c.label)}</span>${pill(r.ratings[c.key], { neutral: c.neutral })}</li>`).join('')}
       ${r.wouldRetake != null ? `<li><span>Faria de novo</span><b class="${r.wouldRetake ? 'yes' : 'no'}">${r.wouldRetake ? 'Sim' : 'Não'}</b></li>` : ''}
       ${r.grade ? `<li><span>Conceito</span><b>${esc(r.grade)}</b></li>` : ''}
     </ul>
@@ -679,7 +681,8 @@ async function viewProfessors({ params }) {
         <option value="name">Nome (A–Z)</option>
         <option value="score" ${params.get('sort') === 'score' ? 'selected' : ''}>Melhor avaliados</option>
         <option value="count" ${params.get('sort') === 'count' ? 'selected' : ''}>Mais avaliados</option>
-        <option value="easy" ${params.get('sort') === 'easy' ? 'selected' : ''}>Menor dificuldade</option>
+        <option value="easy" ${params.get('sort') === 'easy' ? 'selected' : ''}>Mais fácil de aprender</option>
+        <option value="pass" ${params.get('sort') === 'pass' ? 'selected' : ''}>Mais fácil de passar</option>
       </select></label>
     </form>
     <p class="result-count muted" id="result-count" aria-live="polite"></p>
@@ -704,6 +707,7 @@ async function viewProfessors({ params }) {
       score: (x, y) => (y.stats?.score ?? -1) - (x.stats?.score ?? -1) || x.name.localeCompare(y.name),
       count: (x, y) => (y.stats?.count ?? 0) - (x.stats?.count ?? 0) || x.name.localeCompare(y.name),
       easy: (x, y) => (x.stats?.difficulty ?? 9) - (y.stats?.difficulty ?? 9) || x.name.localeCompare(y.name),
+      pass: (x, y) => (x.stats?.passing ?? 9) - (y.stats?.passing ?? 9) || x.name.localeCompare(y.name),
     }[sort];
     list = list.sort(by);
     $('#result-count').textContent = plural(list.length, 'docente', 'docentes');
@@ -775,12 +779,12 @@ async function viewProfessor({ args, isCurrent }) {
     <section class="block">
       <div class="section-head"><h2>Disciplinas</h2><span class="muted small">segundo a oferta oficial do DCC</span></div>
       ${activeCourses.length ? `<div class="table-wrap"><table class="table">
-        <thead><tr><th>Disciplina</th><th>Semestres</th><th>Geral</th><th>Didática</th><th>Dificuldade</th><th>Carga</th><th></th></tr></thead>
+        <thead><tr><th>Disciplina</th><th>Semestres</th><th>Geral</th><th>Didática</th><th title="Dificuldade para aprender">Aprender</th><th title="Dificuldade para passar">Passar</th><th>Carga</th><th></th></tr></thead>
         <tbody>${activeCourses.map((c) => `<tr>
           <td><a href="#/disciplina/${encodeURIComponent(c.id)}"><b>${esc(c.name)}</b></a><br><span class="code">${esc(courseCode(c))}</span></td>
           <td>${c.terms.length ? `${c.terms.length}× <span class="muted small">(último ${esc(c.terms[c.terms.length - 1])})</span>` : '<span class="muted small">—</span>'}</td>
           <td>${pill(c.stats?.overall)} <span class="muted small">${c.stats ? c.stats.count : ''}</span></td>
-          <td>${pill(c.stats?.didactics)}</td><td>${pill(c.stats?.difficulty, { neutral: true })}</td><td>${pill(c.stats?.workload, { neutral: true })}</td>
+          <td>${pill(c.stats?.didactics)}</td><td>${pill(c.stats?.difficulty, { neutral: true })}</td><td>${pill(c.stats?.passing, { neutral: true })}</td><td>${pill(c.stats?.workload, { neutral: true })}</td>
           <td>${c.active ? `<a class="link-btn" href="#/avaliar?professor=${slug}&course=${encodeURIComponent(c.id)}">Avaliar</a>` : '<span class="small muted">fora de oferta</span>'}</td>
         </tr>`).join('')}</tbody></table></div>` : '<p class="muted">Nenhuma disciplina em oferta nos últimos semestres.</p>'}
       ${oldCourses.length ? `<p class="small muted old-courses">Também lecionou, em currículos ou temas que não são mais ofertados: ${oldCourses.map((c) => `<a href="#/disciplina/${encodeURIComponent(c.id)}">${esc(c.name)}</a> (${esc(c.terms[c.terms.length - 1])})`).join(', ')}.</p>` : ''}
@@ -915,7 +919,7 @@ async function viewCourse({ args, isCurrent }) {
       <div class="section-head"><h2>Comparar docentes</h2><span class="muted small">notas apenas desta disciplina</span></div>
       ${data.professors.length ? `<div class="table-wrap"><table class="table compare" id="compare">
         <thead><tr><th data-k="name">Docente</th><th data-k="sections" class="num">Turmas</th><th data-k="last">Último</th>
-          ${crit.map((k) => `<th data-k="${k.key}" class="num" title="${esc(k.hint)}">${esc(k.label.replace('Avaliação geral', 'Geral').replace('Avaliações justas', 'Justiça').replace('Carga de trabalho', 'Carga'))}</th>`).join('')}
+          ${crit.map((k) => `<th data-k="${k.key}" class="num" title="${esc(k.hint)}">${esc(k.short || k.label)}</th>`).join('')}
           <th data-k="retake" class="num">Faria de novo</th><th data-k="count" class="num">Aval.</th></tr></thead>
         <tbody></tbody></table></div>
         <p class="small muted">Clique no cabeçalho para ordenar. Dificuldade e carga: valores maiores = mais pesada.</p>`
@@ -956,7 +960,7 @@ async function viewCourse({ args, isCurrent }) {
     $('thead', table).addEventListener('click', (e) => {
       const th = e.target.closest('th');
       if (!th) return;
-      if (key === th.dataset.k) dir = -dir; else { key = th.dataset.k; dir = key === 'name' || key === 'difficulty' || key === 'workload' ? 1 : -1; }
+      if (key === th.dataset.k) dir = -dir; else { key = th.dataset.k; dir = key === 'name' || key === 'difficulty' || key === 'passing' || key === 'workload' ? 1 : -1; }
       draw();
     });
     draw();

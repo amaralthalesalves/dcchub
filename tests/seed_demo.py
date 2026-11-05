@@ -40,10 +40,11 @@ with app.connect() as conn:
         overall = rng.randint(2, 5)
         comment = rng.choice(comments)
         conn.execute(  # id aleatório e chave do comentário, como o app grava
-            "INSERT OR IGNORE INTO reviews (id, professor, course, term, overall, didactics, fairness, difficulty, workload, would_retake,"
-            " grade, tags, comment, comment_key, status, reviewer_hash, created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+            "INSERT OR IGNORE INTO reviews (id, professor, course, term, overall, didactics, fairness, difficulty, passing, workload, would_retake,"
+            " grade, tags, comment, comment_key, status, reviewer_hash, created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
             (app.new_review_id(lambda n: conn.execute("SELECT 1 FROM reviews WHERE id=?", (n,)).fetchone() is not None),
              prof, course, term, overall, clamp(overall + rng.randint(-1, 1)), clamp(overall + rng.randint(-1, 1)), rng.randint(1, 5),
+             rng.choice([None, *range(1, 6)]),  # vazio = avaliação de antes de separar aprender/passar
              rng.randint(1, 5), rng.choice([1, 1, 0, None]), rng.choice(["A", "B", "C", "D", None]),
              json.dumps(rng.sample(app.ALL_TAGS, rng.randint(0, 3)), ensure_ascii=False), comment, app.comment_key(comment), "published",
              f"demo-{i}", app.review_day(time.time() - rng.randint(0, 90 * 86400))))

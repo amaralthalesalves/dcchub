@@ -82,7 +82,7 @@ app.CATALOG = app.Catalog(CATALOG_PATH)
 
 def review(**over):
     data = {"professor": "ana-silva", "course": "DCC206", "term": "2025.1",
-            "ratings": {"overall": 4, "didactics": 5, "fairness": 4, "difficulty": 3, "workload": 3},
+            "ratings": {"overall": 4, "didactics": 5, "fairness": 4, "difficulty": 3, "passing": 2, "workload": 3},
             "wouldRetake": True, "grade": "B", "tags": ["Listas de exercícios"],
             "comment": "Aulas claras e listas que preparam bem para as provas da disciplina."}
     data.update(over)
@@ -356,6 +356,40 @@ class ServerTest(unittest.TestCase):
         stats = next(p for p in course["professors"] if p["slug"] == "ana-silva")["stats"]
         self.assertEqual(stats["count"], 1)
 
+    def test_learning_and_passing_difficulty_are_separate(self):
+        """Dificuldade para aprender ≠ para passar. Avaliações antigas (pergunta única) ficam com "passar" vazio."""
+        crit = {c["key"]: c for c in self.client().get("/api/bootstrap")[1]["criteria"]}
+        self.assertEqual((crit["difficulty"]["label"], crit["passing"]["label"]), ("Dificuldade para aprender", "Dificuldade para passar"))
+        status, data, _ = self.client().post("/api/reviews", review(ratings={"overall": 4, "didactics": 4, "fairness": 4, "difficulty": 3, "workload": 3}))
+        self.assertEqual((status, list(data["fields"])), (400, ["passing"]), "obrigatória nas avaliações novas")
+
+        with app.connect() as conn:  # avaliação antiga, de antes da separação
+            conn.execute("""INSERT INTO reviews (id, professor, course, term, overall, didactics, fairness, difficulty, workload, comment, status, reviewer_hash, created_at)
+                            VALUES (777, 'ana-silva', 'DCC206', '2025.1', 2, 2, 2, 5, 4, 'Avaliação antiga com a pergunta de dificuldade única.', 'published', 'antiga', ?)""",
+                         (app.review_day(),))
+        self.assertEqual(self.client().post("/api/reviews", review(ratings={"overall": 4, "didactics": 4, "fairness": 4, "difficulty": 1, "passing": 4, "workload": 2}))[0], 201)
+
+        _, prof, _ = self.client().get("/api/professors/ana-silva")
+        summary = prof["summary"]
+        self.assertEqual(summary["count"], 2)
+        self.assertEqual(summary["avg"]["difficulty"], 3.0, "aprender: média das duas")
+        self.assertEqual(summary["avg"]["passing"], 4.0, "passar: só quem respondeu")
+        self.assertEqual(summary["answered"]["passing"], 1)
+        old = next(r for r in prof["reviews"] if r["id"] == 777)
+        self.assertIsNone(old["ratings"]["passing"])
+        course = next(c for c in prof["courses"] if c["id"] == "DCC206")
+        self.assertEqual((course["stats"]["difficulty"], course["stats"]["passing"]), (3.0, 4.0))
+        _, boot, _ = self.client().get("/api/bootstrap")
+        stats = next(p for p in boot["professors"] if p["slug"] == "ana-silva")["stats"]
+        self.assertEqual((stats["count"], stats["difficulty"], stats["passing"]), (2, 3.0, 4.0))
+
+        with app.connect() as conn:  # só avaliações antigas: "passar" fica sem média, sem quebrar nada
+            conn.execute("DELETE FROM reviews WHERE id != 777")
+        _, prof, _ = self.client().get("/api/professors/ana-silva")
+        self.assertIsNone(prof["summary"]["avg"]["passing"])
+        self.assertEqual(prof["summary"]["avg"]["difficulty"], 5.0)
+        self.assertEqual(self.client().get("/api/offerings?term=2025.1")[0], 200)
+
     def test_unverified_pair_is_accepted_but_not_marked(self):
         c = self.client()
         status, data, _ = c.post("/api/reviews", review(professor="bruno-costa", course="DCC011", term="2024.2"))
@@ -437,7 +471,7 @@ class ServerTest(unittest.TestCase):
         rid = created["id"]
         status, _, _ = other.request("PUT", f"/api/reviews/{rid}", review(comment="Tentando alterar a avaliação de outra pessoa aqui."))
         self.assertEqual(status, 404)
-        status, data, _ = owner.request("PUT", f"/api/reviews/{rid}", review(ratings={"overall": 2, "didactics": 2, "fairness": 2, "difficulty": 5, "workload": 5}, comment="Mudei de ideia depois da prova final da disciplina."))
+        status, data, _ = owner.request("PUT", f"/api/reviews/{rid}", review(ratings={"overall": 2, "didactics": 2, "fairness": 2, "difficulty": 5, "passing": 5, "workload": 5}, comment="Mudei de ideia depois da prova final da disciplina."))
         self.assertEqual(status, 200, data)
         _, prof, _ = owner.get("/api/professors/ana-silva")
         self.assertEqual(prof["reviews"][0]["ratings"]["overall"], 2)
@@ -574,7 +608,9 @@ class ServerTest(unittest.TestCase):
         import sqlite3
         old_db = Path(TMP.name) / "antigo.db"
         old_db.unlink(missing_ok=True)
-        schema = app.SCHEMA.replace(" WITHOUT ROWID", "").replace("  comment_key TEXT,\n", "")
+        schema = (app.SCHEMA.replace(" WITHOUT ROWID", "").replace("  comment_key TEXT,\n", "")
+                  .replace("  passing INTEGER CHECK(passing BETWEEN 1 AND 5),\n", ""))
+        self.assertNotIn("passing", schema, "banco antigo, sem a coluna nova")
         conn = sqlite3.connect(old_db)
         conn.executescript(schema)
         cols = "professor, course, term, overall, didactics, fairness, difficulty, workload, would_retake, grade, tags, comment, status, reviewer_hash, created_at"
@@ -599,6 +635,7 @@ class ServerTest(unittest.TestCase):
                 self.assertIn("número 2", by_id[voted], "o voto segue na avaliação certa")
                 self.assertIn("número 1", by_id[reported], "a denúncia segue na avaliação certa")
                 self.assertTrue(all(r["comment_key"] for r in rows.values()), "chave do comentário preenchida")
+                self.assertEqual([r[0] for r in conn.execute("SELECT passing FROM reviews")], [None, None], "\"passar\" não é inventado")
                 self.assertEqual(conn.execute("PRAGMA user_version").fetchone()[0], 3)
                 self.assertEqual(conn.execute("PRAGMA foreign_key_check").fetchall(), [])
             app.init_db()  # idempotente: não renumera de novo
@@ -640,7 +677,7 @@ class ServerTest(unittest.TestCase):
         with app.connect() as conn:
             for i in range(app.BURST_REVIEWS):
                 conn.execute(f"INSERT INTO reviews ({', '.join(app.REVIEW_COLUMNS)}, status, reviewer_hash, created_at) "
-                             "VALUES ('ana-silva', 'DCC206', '2025.1', 1, 1, 1, 3, 3, 0, NULL, '[]', 'x', NULL, 'published', ?, ?)",
+                             "VALUES ('ana-silva', 'DCC206', '2025.1', 1, 1, 1, 3, 3, 3, 0, NULL, '[]', 'x', NULL, 'published', ?, ?)",
                              (f"h{i}", app.review_day()))
         _, data, _ = self.client().get("/api/admin/queue", headers={"Authorization": "Bearer admin-teste"})
         self.assertEqual(data["bursts"], [{"professor": "ana-silva", "day": app.review_day(), "count": app.BURST_REVIEWS, "avg": 1.0}])

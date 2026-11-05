@@ -86,13 +86,20 @@ SECRET = load_secret()
 
 # --------------------------------------------------------------------------- definições do formulário
 CRITERIA = [
-    {"key": "overall", "label": "Avaliação geral", "hint": "Sua experiência como um todo", "low": "Péssima", "high": "Excelente"},
-    {"key": "didactics", "label": "Didática", "hint": "Clareza das explicações e organização das aulas", "low": "Confusa", "high": "Muito clara"},
-    {"key": "fairness", "label": "Avaliações justas", "hint": "Provas e trabalhos coerentes com o que foi ensinado", "low": "Nada justas", "high": "Muito justas"},
-    {"key": "difficulty", "label": "Dificuldade", "hint": "Quão difícil foi aprender e ser aprovado", "low": "Muito fácil", "high": "Muito difícil", "neutral": True},
-    {"key": "workload", "label": "Carga de trabalho", "hint": "Tempo exigido fora da sala de aula", "low": "Leve", "high": "Muito pesada", "neutral": True},
+    {"key": "overall", "label": "Avaliação geral", "short": "Geral", "hint": "Sua experiência como um todo", "low": "Péssima", "high": "Excelente"},
+    {"key": "didactics", "label": "Didática", "short": "Didática", "hint": "Clareza das explicações e organização das aulas", "low": "Confusa", "high": "Muito clara"},
+    {"key": "fairness", "label": "Avaliações justas", "short": "Justiça", "hint": "Provas e trabalhos coerentes com o que foi ensinado", "low": "Nada justas", "high": "Muito justas"},
+    # aprender e passar são coisas diferentes: matéria difícil com avaliação tranquila, ou o contrário
+    {"key": "difficulty", "label": "Dificuldade para aprender", "short": "Aprender", "hint": "Quão difícil foi entender o conteúdo",
+     "low": "Muito fácil", "high": "Muito difícil", "neutral": True},
+    {"key": "passing", "label": "Dificuldade para passar", "short": "Passar", "hint": "Quão difícil foi tirar nota e ser aprovado",
+     "low": "Muito fácil", "high": "Muito difícil", "neutral": True},
+    {"key": "workload", "label": "Carga de trabalho", "short": "Carga", "hint": "Tempo exigido fora da sala de aula", "low": "Leve", "high": "Muito pesada", "neutral": True},
 ]
 CRITERIA_KEYS = [c["key"] for c in CRITERIA]
+# avaliações anteriores à separação de "dificuldade" em aprender/passar têm "passing" vazio (NULL): a pergunta antiga
+# misturava as duas coisas, então a nota antiga ficou em "aprender" e "passar" não é inventado. Médias ignoram vazios.
+OPTIONAL_CRITERIA = {"passing"}
 TAGS = {
     "positivo": ["Explica muito bem", "Aulas organizadas", "Bom material de apoio", "Acessível fora da aula", "Dá bons feedbacks",
                  "Exemplos práticos", "Aulas gravadas", "Inspira os alunos", "Respeitoso(a)"],
@@ -291,6 +298,7 @@ CREATE TABLE IF NOT EXISTS reviews (
   didactics INTEGER NOT NULL CHECK(didactics BETWEEN 1 AND 5),
   fairness INTEGER NOT NULL CHECK(fairness BETWEEN 1 AND 5),
   difficulty INTEGER NOT NULL CHECK(difficulty BETWEEN 1 AND 5),
+  passing INTEGER CHECK(passing BETWEEN 1 AND 5),
   workload INTEGER NOT NULL CHECK(workload BETWEEN 1 AND 5),
   would_retake INTEGER CHECK(would_retake IN (0, 1)),
   grade TEXT,
@@ -367,9 +375,13 @@ def init_db() -> None:
         for table in ("votes", "reports", "class_reports"):
             conn.execute(f"UPDATE {table} SET created_at = (created_at - {BRT}) / 86400 * 86400 + {BRT} "
                          f"WHERE (created_at - {BRT}) % 86400 != 0")
+        columns = {r["name"] for r in conn.execute("PRAGMA table_info(reviews)")}
         # chave do comentário normalizado, indexada: a checagem de duplicata não varre mais a tabela
-        if "comment_key" not in {r["name"] for r in conn.execute("PRAGMA table_info(reviews)")}:
+        if "comment_key" not in columns:
             conn.execute("ALTER TABLE reviews ADD COLUMN comment_key TEXT")
+        # "dificuldade para passar", separada de "para aprender": vazia nas avaliações anteriores
+        if "passing" not in columns:
+            conn.execute("ALTER TABLE reviews ADD COLUMN passing INTEGER CHECK(passing BETWEEN 1 AND 5)")
         for row in conn.execute("SELECT id, comment FROM reviews WHERE comment_key IS NULL").fetchall():
             conn.execute("UPDATE reviews SET comment_key=? WHERE id=?", (comment_key(row["comment"]), row["id"]))
         conn.execute("CREATE INDEX IF NOT EXISTS idx_reviews_comment_key ON reviews(comment_key)")
@@ -476,18 +488,25 @@ def helpful_counts(conn: sqlite3.Connection, ids: list[int]) -> dict[int, int]:
     return {r[0]: r[1] for r in conn.execute(f"SELECT review_id, COUNT(*) FROM votes WHERE review_id IN ({marks}) GROUP BY review_id", ids)}
 
 
+def mean_of(values: list) -> float | None:
+    """Média dos valores respondidos (ignora vazios); None se ninguém respondeu."""
+    given = [v for v in values if v is not None]
+    return round(sum(given) / len(given), 2) if given else None
+
+
 def aggregate(rows: list[sqlite3.Row]) -> dict:
     """Médias por critério, % que faria de novo, tags e distribuição de notas."""
     n = len(rows)
     if not n:
         return {"count": 0}
-    avg = {k: round(sum(r[k] for r in rows) / n, 2) for k in CRITERIA_KEYS}
+    avg = {k: mean_of([r[k] for r in rows]) for k in CRITERIA_KEYS}
+    answered = {k: sum(r[k] is not None for r in rows) for k in OPTIONAL_CRITERIA}
     retake = [r["would_retake"] for r in rows if r["would_retake"] is not None]
     tags = Counter(t for r in rows for t in json.loads(r["tags"] or "[]"))
     grades = Counter(r["grade"] for r in rows if r["grade"] in GRADES[:6])
     dist = Counter(r["overall"] for r in rows)
     return {
-        "count": n, "avg": avg,
+        "count": n, "avg": avg, "answered": answered,
         "retake": round(100 * sum(retake) / len(retake)) if retake else None,
         "tags": [{"tag": t, "count": c} for t, c in tags.most_common(8)],
         "grades": {g: grades.get(g, 0) for g in GRADES[:6]},
@@ -823,7 +842,7 @@ class App(BaseHTTPRequestHandler):
 
     # ---- leitura
     def all_stats(self, conn: sqlite3.Connection) -> tuple[dict, dict, dict]:
-        rows = conn.execute(f"""SELECT professor, course, COUNT(*) n, {', '.join(f'AVG({k}) {k}' for k in CRITERIA_KEYS)},
+        rows = conn.execute(f"""SELECT professor, course, COUNT(*) n, {', '.join(f'AVG({k}) {k}, COUNT({k}) n_{k}' for k in CRITERIA_KEYS)},
                                        AVG(would_retake) retake, COUNT(would_retake) nretake
                                 FROM reviews WHERE status='published' GROUP BY professor, course""").fetchall()
         total = sum(r["n"] for r in rows)
@@ -831,21 +850,24 @@ class App(BaseHTTPRequestHandler):
         by_prof: dict[str, dict] = {}
         by_course: dict[str, dict] = {}
         for target, key in ((by_prof, "professor"), (by_course, "course")):
-            acc: dict[str, dict] = defaultdict(lambda: {"n": 0, **{k: 0.0 for k in CRITERIA_KEYS}, "retake": 0.0, "nretake": 0})
+            acc: dict[str, dict] = defaultdict(lambda: {"n": 0, **{k: 0.0 for k in CRITERIA_KEYS}, **{f"n_{k}": 0 for k in CRITERIA_KEYS},
+                                                        "retake": 0.0, "nretake": 0})
             for r in rows:
                 a = acc[r[key]]
                 a["n"] += r["n"]
                 for k in CRITERIA_KEYS:
-                    a[k] += r[k] * r["n"]
+                    if r[f"n_{k}"]:
+                        a[k] += r[k] * r[f"n_{k}"]
+                        a[f"n_{k}"] += r[f"n_{k}"]
                 if r["nretake"]:
                     a["retake"] += r["retake"] * r["nretake"]
                     a["nretake"] += r["nretake"]
             for k, a in acc.items():
                 n = a["n"]
-                target[k] = {"count": n, **{c: round(a[c] / n, 2) for c in CRITERIA_KEYS},
+                target[k] = {"count": n, **{c: round(a[c] / a[f"n_{c}"], 2) if a[f"n_{c}"] else None for c in CRITERIA_KEYS},
                              "retake": round(100 * a["retake"] / a["nretake"]) if a["nretake"] else None,
                              "score": bayes(a["overall"] / n, n, prior)}
-        pair = {(r["professor"], r["course"]): {"count": r["n"], **{c: round(r[c], 2) for c in CRITERIA_KEYS},
+        pair = {(r["professor"], r["course"]): {"count": r["n"], **{c: None if r[c] is None else round(r[c], 2) for c in CRITERIA_KEYS},
                                                  "retake": round(100 * r["retake"]) if r["nretake"] else None} for r in rows}
         return by_prof, by_course, pair
 
