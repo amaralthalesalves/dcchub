@@ -78,6 +78,19 @@ await ev(`document.querySelectorAll('.offer-row:not(.on) [data-pick]')[0].click(
 ok((await ev(`return document.querySelectorAll('.offer-row.on').length`)) === 2, 'segunda turma adicionada (um clique = uma ação)');
 const clash = await ev(`return document.querySelectorAll('.week-cell.clash').length`);
 console.log('  células em conflito:', clash);
+// 6b) exportar a grade para .ics (gerado no navegador; captura o Blob em vez de baixar)
+const ics = await ev(`
+  let blob = null; const orig = URL.createObjectURL; URL.createObjectURL = (b) => { blob = b; return orig.call(URL, b); };
+  document.querySelector('#ics-export').open = true;
+  const f = document.querySelector('#ics-form');
+  f.start.value = '2026-08-10'; f.end.value = '2026-12-12';
+  f.requestSubmit();
+  await new Promise((r) => setTimeout(r, 300));
+  URL.createObjectURL = orig;
+  return blob ? { type: blob.type, text: await blob.text() } : null;`);
+ok(ics && ics.type.startsWith('text/calendar') && (ics.text.match(/BEGIN:VEVENT/g) || []).length >= 2 && /RRULE:FREQ=WEEKLY;UNTIL=20261213T025959Z/.test(ics.text), 'grade exportada para .ics com eventos semanais');
+await go('#/oferta'); await sleep(800);
+ok((await ev(`document.querySelector('#ics-export').open = true; return document.querySelector('#ics-form').start.value`)) === '2026-08-10', 'datas das aulas lembradas neste navegador');
 // 7) minhas avaliações + código
 await go('#/minhas'); await sleep(800);
 ok((await ev(`return document.querySelectorAll('.review').length`)) === 1, 'minhas avaliações lista 1');

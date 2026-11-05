@@ -1,0 +1,93 @@
+# Atualiza os dados públicos versionados em data/ (catálogo, ofertas, oportunidades, materiais) e abre um PR
+# quando algo mudou. O servidor já roda os mesmos scripts por cron (deploy/cron.example); isto mantém o
+# repositório em dia, para que uma imagem Docker nova não suba com dados velhos.
+#
+# Requer em Settings → Actions → General: "Allow GitHub Actions to create and approve pull requests".
+# PRs abertos com o GITHUB_TOKEN não disparam o workflow de CI; por isso os testes rodam aqui antes do PR.
+name: Sync dos dados
+
+on:
+  schedule:
+    - cron: "30 9 * * 1"  # segunda 6h30 em Brasília (UTC-3), como no cron do servidor
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: sync-dados
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45  # ~13 min num dia normal: os scripts esperam entre requisições, por educação com os sites
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      # cada sync é independente: se um site estiver fora do ar, os outros seguem
+      - name: Catálogo e ofertas (site do DCC)
+        id: dcc
+        continue-on-error: true
+        run: python3 scripts/sync_dcc.py
+      - name: Oportunidades
+        id: opp
+        continue-on-error: true
+        run: python3 scripts/sync_oportunidades.py
+      - name: Materiais (acervo no Drive)
+        id: provas
+        continue-on-error: true
+        run: python3 scripts/sync_provas.py
+
+      - name: O que mudou
+        id: diff
+        run: |
+          # todo sync regrava "generatedAt": arquivo em que só isso mudou volta ao que estava (senão haveria PR toda semana)
+          for f in $(git diff --name-only -- data); do
+            if ! git diff -U0 -- "$f" | grep -E '^[-+]' | grep -vE '^(\+\+\+|---)' | grep -vq '"generatedAt"'; then
+              git checkout -- "$f"
+            fi
+          done
+          git status --porcelain -- data static/photos
+          if [ -n "$(git status --porcelain -- data static/photos)" ]; then echo "changed=1" >> "$GITHUB_OUTPUT"; fi
+
+      # dados novos só viram PR se os testes (inclusive a consistência do catálogo real) passarem
+      - name: Testes com os dados novos
+        if: steps.diff.outputs.changed == '1'
+        run: python -m unittest discover -s tests
+
+      - name: Abrir PR
+        if: steps.diff.outputs.changed == '1'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          branch="sync/dados-$(date -u +%Y-%m-%d)"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$branch"
+          git add data static/photos
+          git commit -m "Dados públicos atualizados ($(date -u +%Y-%m-%d))"
+          git push --force origin "$branch"
+          if ! gh pr view "$branch" --json state -q .state 2>/dev/null | grep -q OPEN; then
+            gh pr create --base main --head "$branch" \
+              --title "Dados públicos atualizados ($(date -u +%Y-%m-%d))" \
+              --body "Gerado pelo workflow **Sync dos dados**. Os testes (inclusive a consistência do catálogo real) passaram com estes dados.
+
+          | Sync | Resultado |
+          |---|---|
+          | Catálogo e ofertas | ${{ steps.dcc.outcome }} |
+          | Oportunidades | ${{ steps.opp.outcome }} |
+          | Materiais | ${{ steps.provas.outcome }} |
+
+          Confira o diff antes de fazer o merge."
+          fi
+
+      - name: Algum sync falhou
+        if: steps.dcc.outcome == 'failure' || steps.opp.outcome == 'failure' || steps.provas.outcome == 'failure'
+        run: |
+          echo "::error::Sync com falha — catálogo: ${{ steps.dcc.outcome }}, oportunidades: ${{ steps.opp.outcome }}, materiais: ${{ steps.provas.outcome }}. O site pode ter mudado de formato."
+          exit 1
