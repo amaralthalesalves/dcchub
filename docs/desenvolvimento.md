@@ -65,7 +65,7 @@ Linguagem visual sóbria e institucional: superfícies neutras, **um** azul de d
 | `DCCHUB_PUBLIC_URL` | `http://localhost:PORT` | Endereço público usado nos links enviados (ex.: `https://dcchub.com.br`). Nunca vem do cabeçalho `Host`. |
 | `DCCHUB_SMTP_HOST` · `_PORT` · `_USER` · `_PASSWORD` · `_FROM` · `_TLS` | porta 587, `starttls` (`ssl` na 465) | Envio dos links. Sem `SMTP_HOST`, o link aparece no terminal (desenvolvimento). |
 | `DCCHUB_EMAIL_EPOCH` | `1` | Trocar o valor revoga todos os acessos feitos por e-mail. |
-| `DCCHUB_TRUST_PROXY` | — | `1` atrás de um proxy confiável: usa `X-Forwarded-For` e marca o cookie como `Secure`. |
+| `DCCHUB_TRUST_PROXY` | — | `1` atrás de um proxy confiável: usa o **último** item de `X-Forwarded-For` (o que o proxy viu; os anteriores podem ser forjados), marca o cookie como `Secure` e envia HSTS. |
 | `HOST` / `PORT` | `0.0.0.0` / `8000` | Endereço de escuta. |
 
 Os nomes antigos (`AVALIA_DCC_*`) continuam aceitos. O cookie (`avalia_dcc`) e as chaves do navegador (`avalie-*`) mantêm o nome antigo **de propósito**: trocá-los desconectaria todo mundo da própria identidade anônima e apagaria rascunhos e grades salvos.
@@ -85,7 +85,7 @@ Todas as rotas respondem JSON. Com `DCCHUB_ACCESS_CODES` ou `DCCHUB_EMAIL_LOGIN`
 | POST · PUT · DELETE | `/api/reviews` · `/api/reviews/{id}` | Criar · editar · apagar (só quem escreveu) |
 | POST | `/api/reviews/{id}/helpful` · `/api/reviews/{id}/report` | Voto útil (alterna) · denúncia |
 | POST | `/api/moderation/check` | Avisos de moderação para um rascunho de comentário |
-| GET · POST | `/api/me` · `/api/me/code` · `/api/me/restore` | Minhas avaliações e código de recuperação |
+| GET · POST · POST | `/api/me` · `/api/me/code` · `/api/me/restore` | Minhas avaliações · mostrar o código de recuperação (só POST JSON da própria origem, com limite) · recuperar |
 | POST · DELETE | `/api/class-reports` | Informar/desfazer "docente X dá a disciplina Y" (só sem oferta oficial) |
 | GET | `/api/provas` · `/api/oportunidades` | Materiais e oportunidades |
 | GET · POST | `/api/admin/queue` · `/api/admin/reviews/{id}` · `/api/admin/class-reports` · `/api/admin/class-reports/delete` | Moderação (`Authorization: Bearer …`) |

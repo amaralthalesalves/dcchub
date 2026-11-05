@@ -83,7 +83,8 @@ Parte das baterias (28 críticas e 24 ataques) foi escrita **depois** dos ajuste
 ## Limites
 
 - **Casos novos vão escapar de vez em quando** — gírias novas, sarcasmo, ataques bem construídos sem nenhuma palavra suspeita.
-- **Rede de segurança:** 3 denúncias tiram uma avaliação do ar até alguém olhar; o painel mostra a fila.
+- **Rede de segurança:** toda denúncia vai para a fila do painel. Uma avaliação só sai do ar sozinha com denúncias de **4 redes (IPs) diferentes** — contar cookies não serve, porque um cookie anônimo novo sai de graça e 3 janelas anônimas bastariam para apagar qualquer crítica. A contagem por rede fica só em memória; depois que a moderação decide, as denúncias antigas não derrubam a avaliação de novo.
+- **Campanhas:** o painel destaca dias com 5 ou mais avaliações do mesmo docente (últimos 30 dias), a favor ou contra.
 - **Fricção:** quem quiser dizer algo que esbarra numa regra precisa reescrever. É o preço de não depender de revisão humana.
 - Um classificador com IA poderia pegar sarcasmo, mas mandaria os comentários a um serviço externo. Não está implementado.
 

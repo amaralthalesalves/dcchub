@@ -9,6 +9,8 @@ const DAYS = ['', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
 const STATUS_LABEL = { ativo: 'Ativo', voluntario: 'Voluntário', emerito: 'Emérito', aposentado: 'Aposentado', externo: 'Externo', substituto: 'Substituto' };
 
 const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+// links vindos de dados raspados: só http(s)/mailto viram href (javascript:, data: etc. viram '#'); a CSP já bloqueia, isto é a 2ª barreira
+const safeHref = (u) => (/^(https?:\/\/|mailto:)/i.test(String(u ?? '').trim()) ? esc(String(u).trim()) : '#');
 const fold = (v) => String(v ?? '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
 const fmt = (n, d = 1) => (n == null ? '—' : Number(n).toLocaleString('pt-BR', { minimumFractionDigits: d, maximumFractionDigits: d }));
 const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
@@ -122,7 +124,7 @@ async function loadBoot(force = false) {
     card.hidden = false;
   }
   const note = $('#footer-note');
-  if (note) note.innerHTML = `Dados públicos do <a href="${esc(boot.sources.professors || 'https://dcc.ufmg.br/professores/')}" rel="noreferrer" target="_blank">site do DCC</a>, ofertas de ${esc(boot.terms[0] || '')} a ${esc(boot.latestTerm || '')}${boot.generatedAt ? ` · sincronizado em ${new Date(boot.generatedAt).toLocaleDateString('pt-BR')}` : ''}.`;
+  if (note) note.innerHTML = `Dados públicos do <a href="${safeHref(boot.sources.professors || 'https://dcc.ufmg.br/professores/')}" rel="noreferrer" target="_blank">site do DCC</a>, ofertas de ${esc(boot.terms[0] || '')} a ${esc(boot.latestTerm || '')}${boot.generatedAt ? ` · sincronizado em ${new Date(boot.generatedAt).toLocaleDateString('pt-BR')}` : ''}.`;
   return boot;
 }
 
@@ -628,7 +630,7 @@ function openReportDialog(id) {
   const dlg = $('#dialog');
   dlg.innerHTML = `<form method="dialog" class="dialog-body" id="report-form">
     <h2>Denunciar avaliação</h2>
-    <p class="muted">Denúncias são anônimas. Após ${3} denúncias a avaliação sai do ar até ser revisada.</p>
+    <p class="muted">Denúncias são anônimas e vão para a moderação. Denunciada por várias pessoas, de redes diferentes, a avaliação sai do ar até ser revisada.</p>
     <fieldset class="radio-list">${state.boot.reportReasons.map((r, i) => `<label><input type="radio" name="reason" value="${esc(r)}" ${i === 0 ? 'checked' : ''}> ${esc(r)}</label>`).join('')}</fieldset>
     <label class="field">Detalhes (opcional)<textarea name="detail" maxlength="300" rows="3"></textarea></label>
     <div class="row-gap end"><button class="btn btn-ghost" value="cancel" formnovalidate>Cancelar</button><button class="btn" value="send">Enviar denúncia</button></div>
@@ -789,11 +791,11 @@ async function viewProfessor({ args, isCurrent }) {
   setTitle(p.name);
   const links = [
     p.room && `<span>Sala ${esc(p.room)}</span>`,
-    p.email && `<a href="mailto:${esc(p.email)}">${esc(p.email)}</a>`,
-    p.homepage && `<a href="${esc(p.homepage)}" target="_blank" rel="noreferrer">Página pessoal ↗</a>`,
-    p.lattes && `<a href="${esc(p.lattes)}" target="_blank" rel="noreferrer">Lattes ↗</a>`,
-    p.scholar && `<a href="${esc(p.scholar)}" target="_blank" rel="noreferrer">Google Scholar ↗</a>`,
-    p.dccUrl && `<a href="${esc(p.dccUrl)}" target="_blank" rel="noreferrer">Perfil no DCC ↗</a>`,
+    p.email && `<a href="${safeHref(`mailto:${p.email}`)}">${esc(p.email)}</a>`,
+    p.homepage && `<a href="${safeHref(p.homepage)}" target="_blank" rel="noreferrer">Página pessoal ↗</a>`,
+    p.lattes && `<a href="${safeHref(p.lattes)}" target="_blank" rel="noreferrer">Lattes ↗</a>`,
+    p.scholar && `<a href="${safeHref(p.scholar)}" target="_blank" rel="noreferrer">Google Scholar ↗</a>`,
+    p.dccUrl && `<a href="${safeHref(p.dccUrl)}" target="_blank" rel="noreferrer">Perfil no DCC ↗</a>`,
   ].filter(Boolean);
   const terms = [...new Set(data.history.map((h) => h.term))].sort();
   const allTerms = data.termsTaught || terms; // contagem inclui semestres só com disciplinas hoje extintas
@@ -830,7 +832,7 @@ async function viewProfessor({ args, isCurrent }) {
     ${current.length ? `<section class="block"><h2>Turmas em ${esc(state.boot.latestTerm)}${published ? '' : ' <small class="muted">· última oferta oficial</small>'}</h2>
       <ul class="turmas">${current.map((h) => {
         const c = state.course.get(h.course);
-        return `<li><a href="#/disciplina/${encodeURIComponent(h.course)}"><b>${esc(c?.name || h.course)}</b></a> <span class="code">${esc(c?.kind === 'topico' ? courseCode(c) : (h.codes || []).join(' / '))}</span> ${fmtSchedule(h.schedule)}${h.plan ? ` <a class="small" href="${esc(h.plan)}" target="_blank" rel="noreferrer">plano de ensino ↗</a>` : ''}</li>`;
+        return `<li><a href="#/disciplina/${encodeURIComponent(h.course)}"><b>${esc(c?.name || h.course)}</b></a> <span class="code">${esc(c?.kind === 'topico' ? courseCode(c) : (h.codes || []).join(' / '))}</span> ${fmtSchedule(h.schedule)}${h.plan ? ` <a class="small" href="${safeHref(h.plan)}" target="_blank" rel="noreferrer">plano de ensino ↗</a>` : ''}</li>`;
       }).join('')}</ul></section>` : ''}
 
     <section class="block">
@@ -851,7 +853,7 @@ async function viewProfessor({ args, isCurrent }) {
       <div class="timeline">${terms.slice().reverse().map((t) => `<div class="timeline-term"><b>${esc(t)}</b><ul>${data.history.filter((h) => h.term === t).map((h) => {
         const c = state.course.get(h.course);
         const co = h.with.map((s) => state.prof.get(s)).filter(Boolean);
-        return `<li><a href="#/disciplina/${encodeURIComponent(h.course)}">${esc(c?.name || h.course)}</a> ${fmtSchedule(h.schedule)}${co.length ? ` <span class="muted small">com ${co.map((x) => `<a href="#/professor/${x.slug}">${esc(firstNameLast(x.name))}</a>`).join(', ')}</span>` : ''}${h.plan ? ` <a class="small" href="${esc(h.plan)}" target="_blank" rel="noreferrer">plano ↗</a>` : ''}</li>`;
+        return `<li><a href="#/disciplina/${encodeURIComponent(h.course)}">${esc(c?.name || h.course)}</a> ${fmtSchedule(h.schedule)}${co.length ? ` <span class="muted small">com ${co.map((x) => `<a href="#/professor/${x.slug}">${esc(firstNameLast(x.name))}</a>`).join(', ')}</span>` : ''}${h.plan ? ` <a class="small" href="${safeHref(h.plan)}" target="_blank" rel="noreferrer">plano ↗</a>` : ''}</li>`;
       }).join('')}</ul></div>`).join('')}</div></details>` : ''}
 
     ${reviewsSection({
@@ -967,7 +969,7 @@ async function viewCourse({ args, isCurrent }) {
       <div class="turma-cards">${current.map((h) => `<div class="turma-card">
         <div class="turma-profs">${h.professors.length ? h.professors.map((s) => { const p = state.prof.get(s); const st = data.professors.find((x) => x.slug === s)?.stats; return p ? `<div><a href="#/professor/${s}">${avatar(p, 'sm')} ${esc(p.name)}</a> ${pill(st?.overall, { title: st ? `${st.count} avaliação(ões) nesta disciplina` : 'sem avaliações nesta disciplina' })}</div>` : ''; }).join('') : unidentified(h, '<span class="muted">Docente a definir</span>')}</div>
         <div>${fmtSchedule(h.schedule)}${h.class ? ` <span class="muted small">turma ${esc(h.class)}</span>` : ''}${otherCodes.length ? ` <span class="code">${esc(h.codes.join(' / '))}</span>` : ''}</div>
-        ${h.plan ? `<a class="small" href="${esc(h.plan)}" target="_blank" rel="noreferrer">Plano de ensino ↗</a>` : ''}
+        ${h.plan ? `<a class="small" href="${safeHref(h.plan)}" target="_blank" rel="noreferrer">Plano de ensino ↗</a>` : ''}
       </div>`).join('')}</div>
       <p class="small muted">Confirme sala e vagas no <a href="https://sistemas.ufmg.br/siga" target="_blank" rel="noreferrer">SIGA ↗</a>. <a href="#/oferta?q=${encodeURIComponent(c.codes[0])}">Adicionar à minha grade →</a></p>
     </section>` : ''}
@@ -984,7 +986,7 @@ async function viewCourse({ args, isCurrent }) {
     </section>
 
     <details class="block history"><summary><h2>Histórico de ofertas</h2><span class="muted small">${plural(data.history.length, 'turma', 'turmas')}</span></summary>
-      <div class="timeline">${[...new Set(data.history.map((h) => h.term))].sort().reverse().map((t) => `<div class="timeline-term"><b>${esc(t)}</b><ul>${data.history.filter((h) => h.term === t).map((h) => `<li>${h.professors.map((s) => { const p = state.prof.get(s); return p ? `<a href="#/professor/${s}">${esc(firstNameLast(p.name))}</a>` : ''; }).join(', ') || unidentified(h, '<span class="muted" title="A página oficial de oferta não traz o docente desta turma">docente não informado pelo DCC</span>')} ${fmtSchedule(h.schedule)}${otherCodes.length ? ` <span class="code">${esc(h.codes.join(' / '))}</span>` : ''}${h.plan ? ` <a class="small" href="${esc(h.plan)}" target="_blank" rel="noreferrer">plano ↗</a>` : ''}</li>`).join('')}</ul></div>`).join('')}</div>
+      <div class="timeline">${[...new Set(data.history.map((h) => h.term))].sort().reverse().map((t) => `<div class="timeline-term"><b>${esc(t)}</b><ul>${data.history.filter((h) => h.term === t).map((h) => `<li>${h.professors.map((s) => { const p = state.prof.get(s); return p ? `<a href="#/professor/${s}">${esc(firstNameLast(p.name))}</a>` : ''; }).join(', ') || unidentified(h, '<span class="muted" title="A página oficial de oferta não traz o docente desta turma">docente não informado pelo DCC</span>')} ${fmtSchedule(h.schedule)}${otherCodes.length ? ` <span class="code">${esc(h.codes.join(' / '))}</span>` : ''}${h.plan ? ` <a class="small" href="${safeHref(h.plan)}" target="_blank" rel="noreferrer">plano ↗</a>` : ''}</li>`).join('')}</ul></div>`).join('')}</div>
     </details>
 
     ${reviewsSection({
@@ -1126,7 +1128,7 @@ async function viewOffer({ params, isCurrent }) {
           return `<li class="offer-row ${on ? 'on' : ''} ${clash.length && !on ? 'has-clash' : ''}">
             <div class="offer-profs">${o.professors.length ? o.professors.map((s) => { const p = state.prof.get(s); const st = o.stats[s]; return p ? `<a href="#/professor/${s}" class="prof-inline">${avatar(p, 'sm')}<span>${esc(firstNameLast(p.name))}</span></a>${pill(st?.overall, { title: st ? `${st.count} avaliação(ões) de ${p.name} nesta disciplina` : 'Ainda sem avaliações nesta disciplina' })}` : ''; }).join(' ') : unidentified(o, '<span class="muted small" title="A página oficial de oferta não traz o docente desta turma">docente não informado pelo DCC</span>')}</div>
             <div class="offer-time">${fmtSchedule(o.schedule)}${o.class ? ` <span class="muted small">${esc(o.class)}</span>` : ''}</div>
-            <div class="offer-actions">${o.plan ? `<a class="small" href="${esc(o.plan)}" target="_blank" rel="noreferrer" title="Plano de ensino">plano ↗</a>` : ''}
+            <div class="offer-actions">${o.plan ? `<a class="small" href="${safeHref(o.plan)}" target="_blank" rel="noreferrer" title="Plano de ensino">plano ↗</a>` : ''}
               <button type="button" class="btn btn-sm ${on ? '' : 'btn-ghost'}" data-pick="${esc(o.key)}" aria-pressed="${on}" ${!o.schedule.length && !on ? 'title="Sem horário informado"' : ''}>${on ? '✓ na grade' : '+ grade'}</button></div>
             ${clash.length && !on ? `<p class="clash-note small">Conflita com ${esc(clash.map((x) => shortCourse(x)).join(', '))}</p>` : ''}
           </li>`;
@@ -1416,7 +1418,7 @@ async function viewMine() {
   </section>`;
   $('#show-code')?.addEventListener('click', async () => {
     try {
-      const { code } = await api('/api/me/code');
+      const { code } = await api('/api/me/code', { method: 'POST', body: {} });
       $('#code-box').textContent = code;
       $('#code-box').hidden = false;
       $('#copy-code').hidden = false;
@@ -1472,12 +1474,12 @@ async function viewAbout() {
       <li>Críticas são bem-vindas; ofensas não. Um filtro automático confere cada comentário enquanto você escreve e não deixa publicar palavrões, xingamentos, comentários sobre aparência, idade ou vida pessoal, ameaças, boatos, discriminação e dados pessoais — ele mostra o trecho e você reescreve na hora.</li>
       <li>Denúncias graves (assédio, abuso, crimes) não são publicadas aqui: o lugar certo é a Ouvidoria da UFMG ou o DCE, que têm canais sigilosos.</li>
       <li>Acusações de discriminação (machismo, racismo…) são lidas por uma pessoa da moderação antes de publicar.</li>
-      <li>Qualquer pessoa pode denunciar uma avaliação. Com ${3} denúncias ela sai do ar até ser revisada.</li>
+      <li>Qualquer pessoa pode denunciar uma avaliação; toda denúncia chega à moderação. Denunciada por várias pessoas, de redes diferentes, ela sai do ar até ser revisada — várias denúncias do mesmo computador ou da mesma rede não bastam.</li>
       <li>Docentes que se sentirem expostos de forma injusta podem usar o botão “Denunciar”.</li>
     </ul>
 
     <h2 id="dados">De onde vêm os dados</h2>
-    <p>A lista de docentes (com áreas de pesquisa e contatos) vem de <a href="${esc(b.sources.professors || 'https://dcc.ufmg.br/professores/')}" target="_blank" rel="noreferrer">dcc.ufmg.br/professores</a>. Disciplinas, turmas, horários e planos de ensino vêm das páginas públicas de <b>oferta de disciplinas</b> do DCC (${esc(b.terms[0])} a ${esc(b.latestTerm)}).</p>
+    <p>A lista de docentes (com áreas de pesquisa e contatos) vem de <a href="${safeHref(b.sources.professors || 'https://dcc.ufmg.br/professores/')}" target="_blank" rel="noreferrer">dcc.ufmg.br/professores</a>. Disciplinas, turmas, horários e planos de ensino vêm das páginas públicas de <b>oferta de disciplinas</b> do DCC (${esc(b.terms[0])} a ${esc(b.latestTerm)}).</p>
     <p id="versoes">Quando o currículo muda, a disciplina ganha um código novo e o antigo continua sendo ofertado por um tempo para quem está na versão anterior (ex.: <b>Estruturas de Dados</b> DCC205 → DCC221, <b>PDS II</b> DCC204 → DCC219, <b>Redes</b> DCC023 → DCC095). Aqui as versões aparecem como <b>uma só disciplina</b>, com todas as turmas e avaliações juntas. Disciplinas <b>extintas</b> — de currículos antigos, como Algoritmos e Estruturas de Dados I e II, ou que não aparecem em nenhuma oferta dos últimos dois anos (${esc(b.activeTerms?.[0] || '')}–${esc(b.latestTerm)}) — não aparecem no site. Quando há uma sucessora (ex.: Introdução à Ciência da Computação DCC050 e Fundamentos de SI DCC044 → Introdução à Computação DCC096, do tronco comum), links antigos levam a ela.</p>
     <h3 id="atual">E o semestre atual?</h3>
     <p>O site só mostra como oferta oficial o que o DCC publica. ${b.offerPublished ? `A oferta de ${esc(b.latestTerm)} já está publicada.` : `<b>A oferta de ${esc(b.currentTerm)} ainda não foi publicada</b>, então as turmas “atuais” exibidas são as de ${esc(b.latestTerm)}.`} Enquanto a oferta não sai, estudantes podem <b>informar quem está dando cada disciplina</b> na página do docente ou da disciplina. Esses relatos aparecem separados, com o número de pessoas que confirmaram, e somem quando a oferta oficial é publicada.</p>
@@ -1508,9 +1510,9 @@ async function viewProvas({ params, isCurrent }) {
     <div class="page-head"><p class="eyebrow">Acervo dos estudantes</p><h1>Materiais</h1>
       <p class="lead-sm">Provas, listas e materiais de semestres anteriores reunidos pelos estudantes no <b>${esc(data.name)}</b>, uma pasta pública no Google Drive organizada por período. São ${total.toLocaleString('pt-BR')} arquivos; os links abrem o Drive em outra aba.</p></div>
     <div class="exam-intro">
-      <a class="btn" href="${esc(data.url)}" target="_blank" rel="noreferrer">Abrir o acervo completo ↗</a>
-      ${guide ? `<a class="btn btn-ghost" href="${esc(guide.url)}" target="_blank" rel="noreferrer">Como contribuir ↗</a>` : ''}
-      ${extras.length ? `<span class="small muted">Também no acervo: ${extras.map((e) => `<a href="${esc(e.url)}" target="_blank" rel="noreferrer">${esc(e.title)}</a>`).join(' · ')}</span>` : ''}
+      <a class="btn" href="${safeHref(data.url)}" target="_blank" rel="noreferrer">Abrir o acervo completo ↗</a>
+      ${guide ? `<a class="btn btn-ghost" href="${safeHref(guide.url)}" target="_blank" rel="noreferrer">Como contribuir ↗</a>` : ''}
+      ${extras.length ? `<span class="small muted">Também no acervo: ${extras.map((e) => `<a href="${safeHref(e.url)}" target="_blank" rel="noreferrer">${esc(e.title)}</a>`).join(' · ')}</span>` : ''}
     </div>
     <form class="filters" id="filters" role="search">
       <label class="field grow"><span class="sr-only">Buscar</span><input type="search" name="q" placeholder="Disciplina ou código (DCC205)…" value="${esc(params.get('q') || '')}"></label>
@@ -1528,15 +1530,15 @@ async function viewProvas({ params, isCurrent }) {
       const rows = sec.courses.filter(match);
       const folders = (q ? [] : sec.folders).filter((f) => all || f.files);
       if (!rows.length && !folders.length) return '';
-      return `<section class="exam-section"><div class="section-head"><h2>${esc(sec.title)}</h2><a class="small" href="${esc(sec.url)}" target="_blank" rel="noreferrer">Pasta no Drive ↗</a></div>
+      return `<section class="exam-section"><div class="section-head"><h2>${esc(sec.title)}</h2><a class="small" href="${safeHref(sec.url)}" target="_blank" rel="noreferrer">Pasta no Drive ↗</a></div>
         <ul class="exam-list">${rows.map((c) => {
           const course = state.course.get(c.course);
           return `<li class="${c.files ? '' : 'empty'}">
             <div class="exam-main"><span class="code">${esc(c.code)}</span>
               ${course ? `<a href="#/disciplina/${encodeURIComponent(course.id)}"><b>${esc(course.name)}</b></a>${fold(course.name) !== fold(c.title) ? ` <span class="small muted">(no acervo: ${esc(c.title)})</span>` : ''}` : `<b>${esc(c.title)}</b>`}</div>
             <span class="small muted exam-count">${filesLabel(c.files)}${c.note ? ` · ${esc(c.note)}` : ''}</span>
-            <a class="btn btn-sm btn-ghost" href="${esc(c.url)}" target="_blank" rel="noreferrer">Abrir ↗</a></li>`;
-        }).join('')}${folders.map((f) => `<li><div class="exam-main"><b>${esc(f.title)}</b></div><span class="small muted exam-count">${filesLabel(f.files)}</span><a class="btn btn-sm btn-ghost" href="${esc(f.url)}" target="_blank" rel="noreferrer">Abrir ↗</a></li>`).join('')}</ul></section>`;
+            <a class="btn btn-sm btn-ghost" href="${safeHref(c.url)}" target="_blank" rel="noreferrer">Abrir ↗</a></li>`;
+        }).join('')}${folders.map((f) => `<li><div class="exam-main"><b>${esc(f.title)}</b></div><span class="small muted exam-count">${filesLabel(f.files)}</span><a class="btn btn-sm btn-ghost" href="${safeHref(f.url)}" target="_blank" rel="noreferrer">Abrir ↗</a></li>`).join('')}</ul></section>`;
     }).join('');
     $('#exam-list').innerHTML = html || '<div class="empty-state"><p>Nenhuma pasta encontrada. O acervo pode ter a disciplina com outro nome: <a href="' + esc(data.url) + '" target="_blank" rel="noreferrer">abra o acervo completo ↗</a>.</p></div>';
     const qs = new URLSearchParams();
@@ -1557,7 +1559,7 @@ function examsBlock(exams) {
     <ul class="exam-list">${exams.items.map((e) => `<li class="${e.files ? '' : 'empty'}">
       <div class="exam-main"><span class="code">${esc(e.code)}</span> <b>${esc(e.title)}</b> <span class="small muted">· ${esc(e.section)}</span></div>
       <span class="small muted exam-count">${filesLabel(e.files)}</span>
-      <a class="btn btn-sm ${e.files ? '' : 'btn-ghost'}" href="${esc(e.url)}" target="_blank" rel="noreferrer">${e.files ? 'Abrir pasta ↗' : 'Contribuir ↗'}</a></li>`).join('')}</ul>
+      <a class="btn btn-sm ${e.files ? '' : 'btn-ghost'}" href="${safeHref(e.url)}" target="_blank" rel="noreferrer">${e.files ? 'Abrir pasta ↗' : 'Contribuir ↗'}</a></li>`).join('')}</ul>
     <p class="small muted">Material reunido por estudantes no ${esc(exams.name)} (Google Drive)${withFiles.length ? '' : '. A pasta desta disciplina ainda está vazia: se você tem provas ou listas antigas, considere contribuir'}.</p>
   </section>`;
 }
@@ -1580,13 +1582,13 @@ function oppCard(o) {
   ].filter(Boolean);
   return `<article class="opp-card${o.open ? '' : ' closed'}">
     <div class="opp-tags">${o.types.map((t) => `<span class="badge badge-type">${esc(t)}</span>`).join('')}${o.audiences.filter((a) => !o.types.includes(a)).map((a) => `<span class="badge">${esc(a)}</span>`).join('')}${o.open ? '' : '<span class="badge">Encerrada</span>'}</div>
-    <h3><a href="${esc(o.url)}" target="_blank" rel="noreferrer">${esc(o.title)}</a></h3>
+    <h3><a href="${safeHref(o.url)}" target="_blank" rel="noreferrer">${esc(o.title)}</a></h3>
     ${o.summary ? `<p class="opp-summary">${esc(o.summary)}</p>` : ''}
     ${facts.length ? `<dl class="opp-facts">${facts.join('')}</dl>` : ''}
     ${profs.length ? `<div class="opp-profs"><span class="small muted">Docentes:</span> ${profs.map((p) => `<a class="prof-inline" href="#/professor/${p.slug}">${avatar(p, 'sm')} <span>${esc(firstNameLast(p.name))}</span></a>`).join('')}</div>` : ''}
     <div class="opp-foot">
       <span class="small muted">${[...o.areas, ...o.groups].map(esc).join(' · ')}${o.published ? `${o.areas.length || o.groups.length ? ' · ' : ''}publicada em ${fmtDate(o.published)}` : ''}</span>
-      <span class="row-gap">${o.open && isHttp(o.apply) ? `<a class="btn btn-sm" href="${esc(o.apply)}" target="_blank" rel="noreferrer">Candidatar-se ↗</a>` : ''}<a class="btn btn-sm btn-ghost" href="${esc(o.url)}" target="_blank" rel="noreferrer">Ver chamada ↗</a></span>
+      <span class="row-gap">${o.open && isHttp(o.apply) ? `<a class="btn btn-sm" href="${safeHref(o.apply)}" target="_blank" rel="noreferrer">Candidatar-se ↗</a>` : ''}<a class="btn btn-sm btn-ghost" href="${safeHref(o.url)}" target="_blank" rel="noreferrer">Ver chamada ↗</a></span>
     </div>
   </article>`;
 }
@@ -1603,7 +1605,7 @@ async function viewOportunidades({ params, isCurrent }) {
   const sel = (name, v) => (params.get(name) === v ? 'selected' : '');
   main.innerHTML = `<section class="page">
     <div class="page-head"><p class="eyebrow">Pesquisa e projetos</p><h1>Oportunidades</h1>
-      <p class="lead-sm">Bolsas de iniciação científica e de pesquisa, estágios e vagas em laboratórios e projetos do DCC, reunidas da página <a href="${esc(data.source)}" target="_blank" rel="noreferrer">Oportunidades do DCC ↗</a>. ${plural(nOpen, 'chamada aberta', 'chamadas abertas')}. Confira sempre os detalhes e o prazo na chamada original.</p></div>
+      <p class="lead-sm">Bolsas de iniciação científica e de pesquisa, estágios e vagas em laboratórios e projetos do DCC, reunidas da página <a href="${safeHref(data.source)}" target="_blank" rel="noreferrer">Oportunidades do DCC ↗</a>. ${plural(nOpen, 'chamada aberta', 'chamadas abertas')}. Confira sempre os detalhes e o prazo na chamada original.</p></div>
     <form class="filters" id="filters" role="search">
       <label class="field grow"><span class="sr-only">Buscar</span><input type="search" name="q" placeholder="Tema, laboratório, docente…" value="${esc(params.get('q') || '')}"></label>
       <label class="field"><span class="sr-only">Situação</span><select name="status">
@@ -1640,9 +1642,9 @@ function profOpportunities(list, name) {
   if (!list?.length) return '';
   return `<section class="block" id="oportunidades">
     <div class="section-head"><h2>Oportunidades abertas</h2><a class="small" href="#/oportunidades">Todas as oportunidades →</a></div>
-    <ul class="exam-list">${list.map((o) => `<li><div class="exam-main"><a href="${esc(o.url)}" target="_blank" rel="noreferrer"><b>${esc(o.title)}</b></a></div>
+    <ul class="exam-list">${list.map((o) => `<li><div class="exam-main"><a href="${safeHref(o.url)}" target="_blank" rel="noreferrer"><b>${esc(o.title)}</b></a></div>
       <span class="small muted">${[o.types.join(', '), o.audiences.join(', ')].filter(Boolean).map(esc).join(' · ')}</span>
-      <a class="btn btn-sm btn-ghost" href="${esc(o.url)}" target="_blank" rel="noreferrer">Ver chamada ↗</a></li>`).join('')}</ul>
+      <a class="btn btn-sm btn-ghost" href="${safeHref(o.url)}" target="_blank" rel="noreferrer">Ver chamada ↗</a></li>`).join('')}</ul>
     <p class="small muted">Chamadas publicadas pelo DCC que citam ${esc(name)}.</p>
   </section>`;
 }
@@ -1660,9 +1662,12 @@ async function viewModeration() {
   </section>`;
   const load = async () => {
     try {
-      const { queue } = await api('/api/admin/queue', { headers: { Authorization: `Bearer ${token}` } });
+      const { queue, bursts = [] } = await api('/api/admin/queue', { headers: { Authorization: `Bearer ${token}` } });
       try { sessionStorage.setItem('avalie-admin', token); } catch (_) { /* idem */ }
-      $('#queue').innerHTML = `<h2>${plural(queue.length, 'item', 'itens')} na fila</h2>${queue.map((r) => `<div class="mod-item">
+      const burstBlock = bursts.length ? `<div class="notice notice-old" role="note"><svg class="ico" aria-hidden="true"><use href="#i-info"/></svg><div>
+        <b>Picos de avaliações (últimos 30 dias)</b> — muitas avaliações do mesmo docente num só dia podem ser campanha, a favor ou contra.
+        <ul>${bursts.map((b) => `<li>${new Date(b.day * 1000).toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' })}: <a href="#/professor/${encodeURIComponent(b.professor)}">${esc(state.prof.get(b.professor)?.name || b.professor)}</a> — ${plural(b.count, 'avaliação', 'avaliações')}, média geral ${fmt(b.avg)}</li>`).join('')}</ul></div></div>` : '';
+      $('#queue').innerHTML = `${burstBlock}<h2>${plural(queue.length, 'item', 'itens')} na fila</h2>${queue.map((r) => `<div class="mod-item">
         ${reviewCard(r, { show: 'both' })}
         <p class="small"><b>Status:</b> ${esc(r.status)} ${r.heldReason ? `· <b>Motivo:</b> ${esc(r.heldReason)}` : ''} ${r.reports.length ? `· <b>Denúncias:</b> ${r.reports.map((x) => esc(x.reason + (x.detail ? ` (“${x.detail}”)` : ''))).join('; ')}` : ''}</p>
         <div class="row-gap"><button class="btn btn-sm" data-mod="publish" data-id="${r.id}">Publicar</button><button class="btn btn-sm btn-ghost" data-mod="hold" data-id="${r.id}">Manter retida</button><button class="btn btn-sm btn-danger" data-mod="remove" data-id="${r.id}">Remover</button></div>

@@ -53,8 +53,11 @@ sequenceDiagram
 
 - **Sem cadastro.** O navegador recebe um token aleatório em cookie `HttpOnly`, `SameSite=Strict`.
 - O banco guarda só `HMAC-SHA256(segredo, token)` — nem o token, nem nada que identifique a pessoa.
-- **Data só com o dia.** A data de cada avaliação é guardada sem hora ("hoje", "ontem", "há 3 dias").
-- **Nenhum log de acesso com IP.** O IP só é usado em memória para limitar abusos (ex.: 6 avaliações a cada 10 min, 60 votos por minuto) e é descartado.
+- **Data só com o dia.** A data de cada avaliação — e também de votos, denúncias e turmas informadas, que levam o mesmo hash de quem avalia — é guardada sem hora ("hoje", "ontem", "há 3 dias").
+- **Sem ordem de chegada.** As avaliações têm ids aleatórios, e votos, denúncias e turmas informadas ficam em tabelas sem `rowid` (guardadas na ordem da chave). Com ids sequenciais, daria para saber quem avaliou ou votou antes de quem num mesmo dia, o que anularia a data só com o dia.
+- **Apagar é apagar.** O banco roda com `secure_delete`: avaliações apagadas e horários antigos são zerados no arquivo, não ficam em páginas livres.
+- **Nenhum log de acesso com IP.** O IP só é usado em memória para limitar abusos (ex.: 6 avaliações a cada 10 min; no máximo 3 avaliações da mesma turma e 3 votos na mesma avaliação por rede por dia; denúncias contadas por rede) e é descartado.
+- **Contra contas falsas sem criar contas.** Como um cookie anônimo novo sai de graça, os limites acima valem por rede — sempre só em memória, sem ligar a avaliação a quem a escreveu.
 - Quem escreveu pode **editar e apagar** as próprias avaliações. O **código de recuperação** leva a identidade anônima para outro navegador.
 
 ### O que o banco guarda
@@ -71,8 +74,10 @@ Comentários recusados pela moderação **não são guardados**.
 
 ## Segurança
 
-- Content-Security-Policy restritiva, sem nenhum recurso de terceiros (fontes, scripts, analytics).
+- Content-Security-Policy restritiva, sem nenhum recurso de terceiros (fontes, scripts, analytics); HSTS quando atrás de HTTPS.
+- Links vindos de dados raspados só viram `href` se forem `http(s)`/`mailto` (segunda barreira, além da CSP).
 - Checagem de `Origin` em toda escrita; limite de tamanho do corpo; campo-armadilha contra bots.
+- O código de recuperação **é** a identidade anônima (o mesmo valor do cookie `HttpOnly`). Por isso só sai por `POST` JSON da própria origem, com limite e sem cache. Uma página com script injetado ainda conseguiria pedi-lo, e é a CSP (nenhum script inline ou de terceiros) que impede isso.
 - Consultas SQL sempre parametrizadas.
 - Painel de moderação protegido por `DCCHUB_ADMIN_TOKEN` (`Authorization: Bearer …`).
 

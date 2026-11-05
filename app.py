@@ -113,7 +113,8 @@ MAX_TAGS = 5
 GRADES = ["A", "B", "C", "D", "E", "F", "Trancou", "Cursando", "Prefiro não dizer"]
 COMMENT_MIN, COMMENT_MAX = 30, 2000
 REPORT_REASONS = ["Ofensivo ou desrespeitoso", "Expõe dados pessoais", "Spam ou sem relação", "Informação falsa", "Outro"]
-AUTO_HIDE_REPORTS = 3
+AUTO_HIDE_REPORTS = 4  # denúncias de REDES distintas (não de cookies) para tirar do ar até a moderação olhar
+BURST_REVIEWS = 5  # avaliações do mesmo docente num só dia: destacadas no painel de moderação
 
 def fold(text: str) -> str:
     text = unicodedata.normalize("NFKD", text).encode("ascii", "ignore").decode().lower()
@@ -129,8 +130,8 @@ BRT = 3 * 3600  # Brasília (UTC-3, sem horário de verão desde 2019)
 
 
 def review_day(ts: float | None = None) -> int:
-    """Data de avaliações guardada só com precisão de dia (meia-noite de Brasília). Hora e minuto exatos permitiriam
-    cruzar uma avaliação com registros externos — por exemplo, o horário em que um link de acesso foi enviado."""
+    """Datas guardadas só com precisão de dia (meia-noite de Brasília). Hora e minuto exatos permitiriam cruzar uma
+    avaliação (ou um voto, que leva o mesmo hash de quem avalia) com registros externos de quando a pessoa usou o site."""
     ts = int(time.time() if ts is None else ts)
     return (ts - BRT) // 86400 * 86400 + BRT
 
@@ -302,6 +303,7 @@ CREATE TABLE IF NOT EXISTS reviews (
   grade TEXT,
   tags TEXT NOT NULL DEFAULT '[]',
   comment TEXT NOT NULL,
+  comment_key TEXT,
   status TEXT NOT NULL CHECK(status IN ('published', 'held', 'removed')),
   held_reason TEXT,
   reviewer_hash TEXT NOT NULL,
@@ -316,7 +318,7 @@ CREATE TABLE IF NOT EXISTS votes (
   voter_hash TEXT NOT NULL,
   created_at INTEGER NOT NULL,
   PRIMARY KEY (review_id, voter_hash)
-);
+) WITHOUT ROWID;
 CREATE TABLE IF NOT EXISTS class_reports (
   term TEXT NOT NULL,
   professor TEXT NOT NULL,
@@ -324,11 +326,11 @@ CREATE TABLE IF NOT EXISTS class_reports (
   reporter_hash TEXT NOT NULL,
   created_at INTEGER NOT NULL,
   PRIMARY KEY (term, professor, course, reporter_hash)
-);
+) WITHOUT ROWID;
 CREATE TABLE IF NOT EXISTS used_links (
   nonce TEXT PRIMARY KEY,
   expires_at INTEGER NOT NULL
-);
+) WITHOUT ROWID;
 CREATE TABLE IF NOT EXISTS reports (
   review_id INTEGER NOT NULL REFERENCES reviews(id) ON DELETE CASCADE,
   reporter_hash TEXT NOT NULL,
@@ -337,8 +339,11 @@ CREATE TABLE IF NOT EXISTS reports (
   created_at INTEGER NOT NULL,
   resolved INTEGER NOT NULL DEFAULT 0,
   PRIMARY KEY (review_id, reporter_hash)
-);
+) WITHOUT ROWID;
 """
+# votos, denúncias, turmas informadas e links usados não têm rowid (WITHOUT ROWID): ficam guardados na ordem da chave,
+# não na ordem de chegada — senão a posição no arquivo diria em que ordem cada hash agiu num mesmo dia.
+ROWLESS_TABLES = ("votes", "class_reports", "used_links", "reports")
 
 
 @contextmanager
@@ -349,6 +354,7 @@ def connect() -> Iterator[sqlite3.Connection]:
         conn.row_factory = sqlite3.Row
         conn.execute("PRAGMA foreign_keys = ON")
         conn.execute("PRAGMA busy_timeout = 5000")
+        conn.execute("PRAGMA secure_delete = ON")  # o que é apagado/reescrito é zerado no arquivo, não fica em páginas livres
         with conn:
             yield conn
     finally:
@@ -367,7 +373,72 @@ def init_db() -> None:
         conn.execute(f"UPDATE reviews SET created_at = (created_at - {BRT}) / 86400 * 86400 + {BRT}, "
                      f"updated_at = CASE WHEN updated_at IS NULL THEN NULL ELSE (updated_at - {BRT}) / 86400 * 86400 + {BRT} END "
                      f"WHERE (created_at - {BRT}) % 86400 != 0 OR (updated_at IS NOT NULL AND (updated_at - {BRT}) % 86400 != 0)")
+        # votos, denúncias e turmas informadas levam o MESMO hash de quem avalia: com hora exata, revelariam quando
+        # aquela pessoa esteve no site. Também só o dia (idempotente).
+        for table in ("votes", "reports", "class_reports"):
+            conn.execute(f"UPDATE {table} SET created_at = (created_at - {BRT}) / 86400 * 86400 + {BRT} "
+                         f"WHERE (created_at - {BRT}) % 86400 != 0")
+        # chave do comentário normalizado, indexada: a checagem de duplicata não varre mais a tabela
+        if "comment_key" not in {r["name"] for r in conn.execute("PRAGMA table_info(reviews)")}:
+            conn.execute("ALTER TABLE reviews ADD COLUMN comment_key TEXT")
+        for row in conn.execute("SELECT id, comment FROM reviews WHERE comment_key IS NULL").fetchall():
+            conn.execute("UPDATE reviews SET comment_key=? WHERE id=?", (comment_key(row["comment"]), row["id"]))
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_reviews_comment_key ON reviews(comment_key)")
+        version = conn.execute("PRAGMA user_version").fetchone()[0]
+    if version < 3:
+        harden_storage()
     migrate_aliases()
+
+
+def harden_storage() -> None:
+    """Uma vez por banco: tira do arquivo a ORDEM em que as coisas aconteceram, que a data só com o dia não esconde.
+      - avaliações ganham ids aleatórios (ids sequenciais diziam quem avaliou antes de quem num mesmo dia);
+      - votos, denúncias etc. passam a WITHOUT ROWID (o rowid também era sequencial);
+      - VACUUM reescreve o arquivo: some o que restava em páginas livres (horários antigos, avaliações apagadas).
+    Dali em diante, ids novos já nascem aleatórios e secure_delete zera o que for apagado."""
+    conn = sqlite3.connect(DB, timeout=10, isolation_level=None)
+    try:
+        conn.execute("PRAGMA foreign_keys = OFF")  # ids mudam em reviews e nos filhos juntos, dentro da transação
+        conn.execute("PRAGMA secure_delete = ON")
+        conn.execute("BEGIN IMMEDIATE")
+        for table in ROWLESS_TABLES:
+            sql = conn.execute("SELECT sql FROM sqlite_master WHERE type='table' AND name=?", (table,)).fetchone()[0]
+            if "WITHOUT ROWID" not in sql.upper():
+                cols = ", ".join(r[1] for r in conn.execute(f"PRAGMA table_info({table})"))
+                conn.execute(f"ALTER TABLE {table} RENAME TO {table}_old")
+                conn.execute(sql.rstrip().rstrip(";") + " WITHOUT ROWID")
+                conn.execute(f"INSERT INTO {table} ({cols}) SELECT {cols} FROM {table}_old")
+                conn.execute(f"DROP TABLE {table}_old")
+        ids = [r[0] for r in conn.execute("SELECT id FROM reviews")]
+        taken: set[int] = set(ids)
+        for old in ids:
+            new = new_review_id(lambda i: i in taken)
+            taken.add(new)
+            conn.execute("UPDATE reviews SET id=? WHERE id=?", (new, old))
+            for child in ("votes", "reports"):
+                conn.execute(f"UPDATE {child} SET review_id=? WHERE review_id=?", (new, old))
+        conn.execute("COMMIT")
+        conn.execute("VACUUM")
+        conn.execute("PRAGMA wal_checkpoint(TRUNCATE)")
+        conn.execute("PRAGMA user_version = 3")
+    except BaseException:
+        if conn.in_transaction:
+            conn.execute("ROLLBACK")
+        raise
+    finally:
+        conn.close()
+
+
+def new_review_id(taken) -> int:
+    """Id aleatório (até 2^53, seguro como número em JavaScript) que ainda não exista."""
+    while True:
+        candidate = secrets.randbelow(2**53 - 1) + 1
+        if not taken(candidate):
+            return candidate
+
+
+def comment_key(comment: str) -> str:
+    return hashlib.sha256(" ".join(moderation.fold(comment).split()).encode()).hexdigest()
 
 
 _migrated_version = -1
@@ -388,7 +459,7 @@ def migrate_aliases() -> None:
             conn.execute("UPDATE OR IGNORE class_reports SET course=? WHERE course=?", (new, old))
 
 
-REVIEW_COLUMNS = ["professor", "course", "term", *CRITERIA_KEYS, "would_retake", "grade", "tags", "comment"]
+REVIEW_COLUMNS = ["professor", "course", "term", *CRITERIA_KEYS, "would_retake", "grade", "tags", "comment", "comment_key"]
 
 
 def review_out(row: sqlite3.Row, viewer: str | None = None, voted: set[int] | None = None, helpful: dict[int, int] | None = None) -> dict:
@@ -462,8 +533,42 @@ class RateLimiter:
             return True
 
 
-LIMITS = {"check": (120, 60), "access": (10, 600), "login": (5, 600), "classreport": (20, 600), "review": (6, 600), "vote": (60, 60), "report": (10, 600), "restore": (10, 600), "admin": (30, 60)}
+LIMITS = {"check": (120, 60), "access": (10, 600), "login": (5, 600), "classreport": (20, 600), "review": (6, 600), "vote": (60, 60), "report": (10, 600), "restore": (10, 600), "admin": (30, 60),
+          # identidade anônima nova sai de graça (basta apagar o cookie), então os limites abaixo valem por rede (IP) —
+          # nunca guardados: só em memória, como os demais
+          "review-pair": (3, 86400),      # avaliações do MESMO docente+disciplina por IP por dia (3, não 1: Wi-Fi do campus é NAT)
+          "vote-pair": (3, 86400)}        # votos "útil" na MESMA avaliação por IP por dia
 limiter = RateLimiter()
+
+
+def ip_key(ip: str) -> str:
+    """IP só como HMAC truncado, para estruturas em memória que vivem mais que uma requisição."""
+    return hmac.new(SECRET.encode(), f"ip:{ip}".encode(), hashlib.sha256).hexdigest()[:24]
+
+
+class ReportNetworks:
+    """Redes (IPs, como HMAC) distintas que denunciaram cada avaliação — só em memória. A retirada automática conta
+    redes, não cookies: cookie anônimo novo sai de graça, então 3 cookies de um mesmo computador não tiram nada do ar.
+    Num reinício a contagem zera, o que só deixa a retirada mais conservadora (as denúncias seguem no banco e na fila)."""
+
+    def __init__(self) -> None:
+        self.by_review: dict[int, set[str]] = defaultdict(set)
+        self.lock = threading.Lock()
+
+    def add(self, review_id: int, ip: str) -> int:
+        with self.lock:
+            if len(self.by_review) > 20_000:
+                self.by_review.clear()
+            nets = self.by_review[review_id]
+            nets.add(ip_key(ip))
+            return len(nets)
+
+    def clear(self, review_id: int) -> None:
+        with self.lock:
+            self.by_review.pop(review_id, None)
+
+
+report_networks = ReportNetworks()
 
 
 class ApiError(Exception):
@@ -502,6 +607,7 @@ class App(BaseHTTPRequestHandler):
     server_version = "DCCHub/2.0"
     sys_version = ""
     protocol_version = "HTTP/1.1"
+    timeout = 30  # conexão parada ou lenta demais (slowloris, keep-alive esquecido) é fechada e libera a thread
 
     # ---- utilidades
     def log_message(self, format: str, *args: object) -> None:  # noqa: A002
@@ -514,6 +620,8 @@ class App(BaseHTTPRequestHandler):
         self.send_header("Permissions-Policy", "camera=(), microphone=(), geolocation=(), interest-cohort=()")
         self.send_header("Content-Security-Policy", CSP)
         self.send_header("X-Robots-Tag", "noindex, nofollow, noarchive")  # projeto da comunidade: fora de buscadores
+        if self.secure_request():  # só atrás de HTTPS (proxy confiável): o navegador passa a recusar http:// no domínio
+            self.send_header("Strict-Transport-Security", "max-age=31536000")
 
     def wants_gzip(self, size: int) -> bool:
         return size > 1400 and "gzip" in self.headers.get("Accept-Encoding", "")
@@ -538,8 +646,10 @@ class App(BaseHTTPRequestHandler):
             self.wfile.write(body)
 
     def client_ip(self) -> str:
+        # o ÚLTIMO item do X-Forwarded-For é o que o nosso proxy viu; os anteriores vêm do cliente e podem ser forjados
+        # (o proxy do Fly acrescenta ao valor recebido; o Caddy o substitui — nos dois casos o último é o confiável)
         if TRUST_PROXY and self.headers.get("X-Forwarded-For"):
-            return self.headers["X-Forwarded-For"].split(",")[0].strip()
+            return self.headers["X-Forwarded-For"].rsplit(",", 1)[-1].strip() or self.client_address[0]
         return self.client_address[0]
 
     def secure_request(self) -> bool:
@@ -593,10 +703,19 @@ class App(BaseHTTPRequestHandler):
         if origin and urlparse(origin).netloc != self.headers.get("Host"):
             raise ApiError(403, "Origem não permitida.")
 
-    def limit(self, bucket: str) -> None:
+    def limit(self, bucket: str, key: str | None = None, message: str | None = None) -> None:
+        """Limite por IP (ou pela chave dada). As chaves só existem em memória e somem com a janela."""
         count, window = LIMITS[bucket]
-        if not limiter.hit(bucket, self.client_ip(), count, window):
-            raise ApiError(429, "Muitas ações em pouco tempo. Aguarde alguns minutos e tente de novo.")
+        if not limiter.hit(bucket, key or self.client_ip(), count, window):
+            raise ApiError(429, message or "Muitas ações em pouco tempo. Aguarde alguns minutos e tente de novo.")
+
+    def cookie(self, name: str) -> str:
+        cookies = SimpleCookie()
+        try:
+            cookies.load(self.headers.get("Cookie", ""))
+        except Exception:  # noqa: BLE001
+            return ""
+        return cookies[name].value if name in cookies else ""
 
     # ---- roteamento
     def do_HEAD(self) -> None:
@@ -632,7 +751,7 @@ class App(BaseHTTPRequestHandler):
         ("POST", r"/api/reviews/(\d+)/helpful", "post_helpful"),
         ("POST", r"/api/reviews/(\d+)/report", "post_report"),
         ("GET", r"/api/me", "get_me"),
-        ("GET", r"/api/me/code", "get_me_code"),
+        ("POST", r"/api/me/code", "post_me_code"),
         ("POST", r"/api/me/restore", "post_restore"),
         ("POST", r"/api/class-reports", "post_class_report"),
         ("DELETE", r"/api/class-reports", "delete_class_report"),
@@ -683,7 +802,7 @@ class App(BaseHTTPRequestHandler):
         if path in ("", "/"):
             path = "/index.html"
         target = (STATIC / path.lstrip("/")).resolve()
-        if not str(target).startswith(str(STATIC.resolve())) or not target.is_file():
+        if not target.is_relative_to(STATIC.resolve()) or not target.is_file():  # não um prefixo de texto: "static-x" passaria
             # SPA: rotas desconhecidas sem extensão caem no index
             if "." not in path.rsplit("/", 1)[-1]:
                 target = STATIC / "index.html"
@@ -967,7 +1086,7 @@ class App(BaseHTTPRequestHandler):
         return {"professor": professor, "course": course, "term": term, **ratings,
                 "would_retake": None if retake is None else int(retake), "grade": grade,
                 "tags": json.dumps(list(dict.fromkeys(tags)), ensure_ascii=False), "comment": comment,
-                "_hold": [i.message for i in issues if i.action == moderation.HOLD]}
+                "comment_key": comment_key(comment), "_hold": [i.message for i in issues if i.action == moderation.HOLD]}
 
     def post_review(self) -> None:
         data = self.read_json()
@@ -976,14 +1095,20 @@ class App(BaseHTTPRequestHandler):
         viewer = self.viewer(create=True)
         flags = review.pop("_hold")
         status = "held" if flags else "published"
-        self.reject_duplicate(review["comment"], viewer)
+        self.reject_duplicate(review["comment_key"], viewer)
+        with connect() as conn:  # quem já avaliou recebe o 409 (e o link para editar) sem gastar o limite da turma
+            already = conn.execute("SELECT 1 FROM reviews WHERE reviewer_hash=? AND professor=? AND course=?",
+                                   (viewer, review["professor"], review["course"])).fetchone()
+        if not already:
+            self.limit_same_class(review["professor"], review["course"])
         try:
             with connect() as conn:
-                cur = conn.execute(
-                    f"INSERT INTO reviews ({', '.join(REVIEW_COLUMNS)}, status, held_reason, reviewer_hash, created_at) "
-                    f"VALUES ({', '.join('?' * (len(REVIEW_COLUMNS) + 4))})",
-                    [*(review[c] for c in REVIEW_COLUMNS), status, "; ".join(flags) or None, viewer, review_day()])
-                review_id = cur.lastrowid
+                # id aleatório, não sequencial: a ordem dos ids diria quem avaliou antes de quem num mesmo dia
+                review_id = new_review_id(lambda i: conn.execute("SELECT 1 FROM reviews WHERE id=?", (i,)).fetchone() is not None)
+                conn.execute(
+                    f"INSERT INTO reviews (id, {', '.join(REVIEW_COLUMNS)}, status, held_reason, reviewer_hash, created_at) "
+                    f"VALUES ({', '.join('?' * (len(REVIEW_COLUMNS) + 5))})",
+                    [review_id, *(review[c] for c in REVIEW_COLUMNS), status, "; ".join(flags) or None, viewer, review_day()])
         except sqlite3.IntegrityError:
             with connect() as conn:
                 existing = conn.execute("SELECT id FROM reviews WHERE reviewer_hash=? AND professor=? AND course=?",
@@ -995,16 +1120,21 @@ class App(BaseHTTPRequestHandler):
         self.send_json({"id": review_id, "status": status, "message": message, "held": status == "held"}, 201)
 
     @staticmethod
-    def reject_duplicate(comment: str, viewer: str, exclude_id: int | None = None) -> None:
-        """Comentário idêntico a outra avaliação (copiar-colar em massa, spam): devolve para reescrever."""
-        key = " ".join(moderation.fold(comment).split())
+    def reject_duplicate(key: str, viewer: str, exclude_id: int | None = None) -> None:
+        """Comentário idêntico a outra avaliação (copiar-colar em massa, spam): devolve para reescrever.
+        Compara a chave do texto normalizado (comment_key, indexada) — uma busca, não uma varredura da tabela."""
         with connect() as conn:
             # só de OUTRAS pessoas: reenviar a própria avaliação cai no aviso de "você já avaliou" (409)
-            for row in conn.execute("SELECT id, comment FROM reviews WHERE status!='removed' AND length(comment) = ? AND reviewer_hash != ?",
-                                    (len(comment), viewer)):
-                if row["id"] != exclude_id and " ".join(moderation.fold(row["comment"]).split()) == key:
-                    raise ApiError(400, "Revise os campos destacados.",
-                                   fields={"comment": "Este comentário é idêntico a outra avaliação. Escreva com as suas palavras."})
+            if conn.execute("SELECT 1 FROM reviews WHERE comment_key=? AND status!='removed' AND reviewer_hash!=? AND id!=? LIMIT 1",
+                            (key, viewer, exclude_id or 0)).fetchone():
+                raise ApiError(400, "Revise os campos destacados.",
+                               fields={"comment": "Este comentário é idêntico a outra avaliação. Escreva com as suas palavras."})
+
+    def limit_same_class(self, professor: str, course: str) -> None:
+        """Contra avaliações em série da mesma turma: cada cookie anônimo novo poderia avaliar de novo o mesmo docente.
+        Limita por rede (IP), só em memória — nada disso liga a avaliação a quem a escreveu."""
+        msg = "Já recebemos avaliações desta turma a partir desta conexão hoje. Se você ainda não avaliou, tente amanhã."
+        self.limit("review-pair", f"{self.client_ip()}|{professor}|{course}", msg)
 
     def post_moderation_check(self) -> None:
         """Checagem enquanto a pessoa digita: diz o que seria barrado/segurado, sem guardar nada."""
@@ -1030,7 +1160,7 @@ class App(BaseHTTPRequestHandler):
         review = self.validate_review(data, keep_course=row["course"])
         self.limit("review")
         flags = review.pop("_hold")
-        self.reject_duplicate(review["comment"], row["reviewer_hash"], exclude_id=row["id"])
+        self.reject_duplicate(review["comment_key"], row["reviewer_hash"], exclude_id=row["id"])
         with connect() as conn:
             row = self.own_review(conn, review_id)
             if (row["professor"], row["course"]) != (review["professor"], review["course"]):
@@ -1061,7 +1191,9 @@ class App(BaseHTTPRequestHandler):
                 raise ApiError(400, "Você não pode votar na sua própria avaliação.")
             removed = conn.execute("DELETE FROM votes WHERE review_id=? AND voter_hash=?", (int(review_id), viewer)).rowcount
             if not removed:
-                conn.execute("INSERT INTO votes (review_id, voter_hash, created_at) VALUES (?, ?, ?)", (int(review_id), viewer, int(time.time())))
+                # tirar o voto é sempre livre; dar voto na mesma avaliação tem teto por rede (cookie novo sai de graça)
+                self.limit("vote-pair", f"{self.client_ip()}|{int(review_id)}", "Esta avaliação já recebeu votos desta conexão hoje.")
+                conn.execute("INSERT INTO votes (review_id, voter_hash, created_at) VALUES (?, ?, ?)", (int(review_id), viewer, review_day()))
             count = conn.execute("SELECT COUNT(*) FROM votes WHERE review_id=?", (int(review_id),)).fetchone()[0]
         self.send_json({"voted": not removed, "helpful": count})
 
@@ -1077,10 +1209,12 @@ class App(BaseHTTPRequestHandler):
             if not row:
                 raise ApiError(404, "Avaliação não encontrada.")
             conn.execute("INSERT OR IGNORE INTO reports (review_id, reporter_hash, reason, detail, created_at) VALUES (?, ?, ?, ?, ?)",
-                         (row["id"], viewer, reason, clean_line(data.get("detail"), 300) or None, int(time.time())))
-            n = conn.execute("SELECT COUNT(*) FROM reports WHERE review_id=? AND resolved=0", (row["id"],)).fetchone()[0]
-            if n >= AUTO_HIDE_REPORTS:
-                conn.execute("UPDATE reviews SET status='held', held_reason=? WHERE id=?", (f"{n} denúncias", row["id"]))
+                         (row["id"], viewer, reason, clean_line(data.get("detail"), 300) or None, review_day()))
+            # toda denúncia vai para a fila; tirar do ar sozinho exige redes distintas, não cookies (que saem de graça):
+            # senão qualquer um apagaria críticas com 3 janelas anônimas
+            networks = report_networks.add(row["id"], self.client_ip())
+            if networks >= AUTO_HIDE_REPORTS:
+                conn.execute("UPDATE reviews SET status='held', held_reason=? WHERE id=?", (f"denúncias de {networks} redes diferentes", row["id"]))
         self.send_json({"message": "Obrigado. A denúncia foi registrada e será analisada."})
 
     # ---- identidade anônima
@@ -1093,13 +1227,13 @@ class App(BaseHTTPRequestHandler):
             helpful = helpful_counts(conn, [r["id"] for r in rows])
         self.send_json({"reviews": [review_out(r, viewer, set(), helpful) for r in rows], "hasIdentity": True})
 
-    def get_me_code(self) -> None:
-        cookies = SimpleCookie()
-        try:
-            cookies.load(self.headers.get("Cookie", ""))
-        except Exception:  # noqa: BLE001
-            pass
-        token = cookies[COOKIE].value if COOKIE in cookies else ""
+    def post_me_code(self) -> None:
+        """O código de recuperação É a identidade anônima (o cookie HttpOnly): mostrá-lo à página anula o HttpOnly.
+        Por isso só sai por POST JSON da própria origem (passa por check_origin; um formulário de outro site não envia
+        JSON), com limite e sem cache — e a CSP sem scripts inline/externos é o que impede uma página injetada de pedi-lo."""
+        self.read_json()
+        self.limit("restore")
+        token = self.cookie(COOKIE)
         if not re.fullmatch(r"[A-Za-z0-9_-]{43}", token):
             raise ApiError(404, "Este navegador ainda não tem um identificador anônimo.")
         self.send_json({"code": token})
@@ -1157,7 +1291,7 @@ class App(BaseHTTPRequestHandler):
         viewer = self.viewer(create=True)
         with connect() as conn:
             conn.execute("INSERT OR IGNORE INTO class_reports (term, professor, course, reporter_hash, created_at) VALUES (?,?,?,?,?)",
-                         (term, professor, course, viewer, int(time.time())))
+                         (term, professor, course, viewer, review_day()))
             n = conn.execute("SELECT COUNT(*) FROM class_reports WHERE term=? AND professor=? AND course=?", (term, professor, course)).fetchone()[0]
         self.send_json({"term": term, "count": n, "message": "Obrigado! A turma aparece como informada por estudantes até sair a oferta oficial."}, 201)
 
@@ -1191,12 +1325,7 @@ class App(BaseHTTPRequestHandler):
         return hmac.new(SECRET.encode(), f"acesso:{code}".encode(), hashlib.sha256).hexdigest()[:40]
 
     def has_access(self) -> bool:
-        cookies = SimpleCookie()
-        try:
-            cookies.load(self.headers.get("Cookie", ""))
-        except Exception:  # noqa: BLE001
-            return False
-        given = cookies[ACCESS_COOKIE].value if ACCESS_COOKIE in cookies else ""
+        given = self.cookie(ACCESS_COOKIE)
         if not given:
             return False
         # entrada por e-mail: token assinado e com validade, sem nada do e-mail (DCCHUB_EMAIL_EPOCH revoga todos)
@@ -1273,12 +1402,18 @@ class App(BaseHTTPRequestHandler):
             reasons = defaultdict(list)
             for rep in conn.execute("SELECT review_id, reason, detail FROM reports WHERE resolved=0"):
                 reasons[rep["review_id"]].append({"reason": rep["reason"], "detail": rep["detail"]})
+            # picos: muitas avaliações do mesmo docente num só dia costumam ser campanha (a favor ou contra)
+            bursts = conn.execute("""SELECT professor, created_at day, COUNT(*) n, ROUND(AVG(overall), 1) avg FROM reviews
+                                     WHERE status!='removed' AND created_at >= ? GROUP BY professor, created_at
+                                     HAVING n >= ? ORDER BY created_at DESC, n DESC""",
+                                  (review_day() - 30 * 86400, BURST_REVIEWS)).fetchall()
         out = []
         for r in rows:
             item = review_out(r)
             item.update(status=r["status"], heldReason=r["held_reason"], reports=reasons.get(r["id"], []))
             out.append(item)
-        self.send_json({"queue": out})
+        self.send_json({"queue": out, "bursts": [{"professor": b["professor"], "day": b["day"], "count": b["n"], "avg": b["avg"]}
+                                                 for b in bursts]})
 
     def post_admin_review(self, review_id: str) -> None:
         self.require_admin()
@@ -1290,6 +1425,7 @@ class App(BaseHTTPRequestHandler):
             if not conn.execute("UPDATE reviews SET status=?, held_reason=NULL WHERE id=?", (status, int(review_id))).rowcount:
                 raise ApiError(404, "Avaliação não encontrada.")
             conn.execute("UPDATE reports SET resolved=1 WHERE review_id=?", (int(review_id),))
+        report_networks.clear(int(review_id))  # decidido por uma pessoa: denúncias antigas não a tiram do ar de novo
         self.send_json({"message": "Feito.", "status": status})
 
 
