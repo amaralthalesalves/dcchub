@@ -89,6 +89,16 @@ def review(**over):
     return data
 
 
+class proxied:
+    """Simula o app atrás de um proxy confiável (X-Forwarded-For / X-Forwarded-Proto)."""
+
+    def __enter__(self):
+        self.original, app.TRUST_PROXY = app.TRUST_PROXY, True
+
+    def __exit__(self, *exc):
+        app.TRUST_PROXY = self.original
+
+
 class Client:
     """Cliente HTTP com cookies (simula um navegador)."""
 
@@ -135,7 +145,7 @@ class ServerTest(unittest.TestCase):
         with app.connect() as conn:
             conn.executescript("DELETE FROM votes; DELETE FROM reports; DELETE FROM reviews; DELETE FROM class_reports;")
         app.limiter.events.clear()
-        app.limiter.events.clear()
+        app.report_networks.by_review.clear()
 
     def client(self) -> Client:
         return Client(self.port)
@@ -314,6 +324,21 @@ class ServerTest(unittest.TestCase):
         self.assertIn("error", data)
 
     # ---------------------------------------------------------------- criação
+    def test_review_dates_are_stored_by_day(self):
+        """Hora exata permitiria cruzar a avaliação com o horário de envio do link de acesso."""
+        c = self.client()
+        self.assertEqual(c.post("/api/reviews", review())[0], 201)
+        with app.connect() as conn:
+            created = conn.execute("SELECT created_at FROM reviews").fetchone()[0]
+            self.assertEqual((created - app.BRT) % 86400, 0, "só o dia (meia-noite de Brasília)")
+            self.assertEqual(created, app.review_day())
+            conn.execute("UPDATE reviews SET created_at = created_at + 51234, updated_at = created_at + 777")  # banco antigo
+        app.init_db()
+        with app.connect() as conn:
+            created, updated = conn.execute("SELECT created_at, updated_at FROM reviews").fetchone()
+        self.assertEqual(((created - app.BRT) % 86400, (updated - app.BRT) % 86400), (0, 0), "datas antigas arredondadas")
+        self.assertEqual(app.review_day(1_767_236_400 + 23 * 3600), 1_767_236_400, "23h em Brasília ainda é o mesmo dia")
+
     def test_publish_review_and_aggregate(self):
         c = self.client()
         status, data, _ = c.post("/api/reviews", review())
@@ -425,7 +450,8 @@ class ServerTest(unittest.TestCase):
     def test_recovery_code_moves_identity(self):
         a = self.client()
         a.post("/api/reviews", review())
-        _, code, _ = a.get("/api/me/code")
+        self.assertEqual(a.get("/api/me/code")[0], 404, "não sai por GET")
+        _, code, _ = a.post("/api/me/code")
         b = self.client()
         self.assertEqual(b.post("/api/me/restore", {"code": "x" * 43})[0], 404)
         status, data, _ = b.post("/api/me/restore", {"code": code["code"]})
@@ -457,16 +483,188 @@ class ServerTest(unittest.TestCase):
         self.assertIn("offerings", json.loads(res.read()))
         conn.close()
 
-    def test_reports_hide_review_after_threshold(self):
+    def test_reports_hide_review_only_from_distinct_networks(self):
+        """Cookie anônimo novo sai de graça: denúncias de muitas janelas na mesma rede não tiram a avaliação do ar."""
         author = self.client()
         _, created, _ = author.post("/api/reviews", review())
         rid = created["id"]
         self.assertEqual(self.client().post(f"/api/reviews/{rid}/report", {"reason": "inventado"})[0], 400)
-        for _ in range(app.AUTO_HIDE_REPORTS):
-            status, _, _ = self.client().post(f"/api/reviews/{rid}/report", {"reason": app.REPORT_REASONS[0]})
-            self.assertEqual(status, 200)
-        _, prof, _ = author.get("/api/professors/ana-silva")
-        self.assertEqual(prof["reviews"], [])
+        for _ in range(app.AUTO_HIDE_REPORTS + 2):  # mesma rede, cookies novos
+            self.assertEqual(self.client().post(f"/api/reviews/{rid}/report", {"reason": app.REPORT_REASONS[0]})[0], 200)
+        self.assertEqual(len(author.get("/api/professors/ana-silva")[1]["reviews"]), 1, "uma rede só não censura")
+        status, queue, _ = author.get("/api/admin/queue", headers={"Authorization": "Bearer admin-teste"})
+        self.assertEqual([r["id"] for r in queue["queue"]], [rid], "mas a denúncia chega à moderação")
+
+        with proxied():
+            for i in range(app.AUTO_HIDE_REPORTS - 2):  # forjar o 1º item do X-Forwarded-For não cria redes novas
+                self.client().post(f"/api/reviews/{rid}/report", {"reason": app.REPORT_REASONS[0]},
+                                   headers={"X-Forwarded-For": f"10.9.9.{i}, 127.0.0.1"})
+            self.assertEqual(len(author.get("/api/professors/ana-silva")[1]["reviews"]), 1)
+            for i in range(app.AUTO_HIDE_REPORTS - 1):  # redes realmente distintas (a 1ª já veio de 127.0.0.1)
+                self.assertEqual(self.client().post(f"/api/reviews/{rid}/report", {"reason": app.REPORT_REASONS[1]},
+                                                    headers={"X-Forwarded-For": f"200.0.0.{i}"})[0], 200)
+        self.assertEqual(author.get("/api/professors/ana-silva")[1]["reviews"], [])
+        with app.connect() as conn:
+            self.assertIn("redes", conn.execute("SELECT held_reason FROM reviews WHERE id=?", (rid,)).fetchone()[0])
+
+        # depois da decisão humana, as denúncias antigas não a derrubam de novo
+        self.assertEqual(author.post(f"/api/admin/reviews/{rid}", {"action": "publish"}, headers={"Authorization": "Bearer admin-teste"})[0], 200)
+        with proxied():
+            self.client().post(f"/api/reviews/{rid}/report", {"reason": app.REPORT_REASONS[0]}, headers={"X-Forwarded-For": "200.0.0.99"})
+        self.assertEqual(len(author.get("/api/professors/ana-silva")[1]["reviews"]), 1)
+
+    def test_same_class_reviews_limited_per_network(self):
+        """Contra avaliações em série da mesma turma com cookies novos (identidade anônima é de graça)."""
+        n = app.LIMITS["review-pair"][0]
+        statuses = [self.client().post("/api/reviews", review(comment=f"Aulas claras e listas que preparam bem para a prova, versão {i}."))[0]
+                    for i in range(n + 1)]
+        self.assertEqual(statuses, [201] * n + [429])
+        self.assertEqual(self.client().post("/api/reviews", review(course="DCC011", term="2025.2"))[0], 201, "outra turma segue livre")
+        app.limiter.events.clear()  # o limite geral (6 a cada 10 min) não é o assunto aqui
+        author = self.client()
+        author.post("/api/reviews", review(course="DCC221", term="2025.2", comment="Primeira avaliação desta pessoa para a turma de estruturas."))
+        for _ in range(n):  # reenviar a própria avaliação sempre devolve "você já avaliou", nunca 429
+            self.assertEqual(author.post("/api/reviews", review(course="DCC221", term="2025.2", comment="Reenvio da mesma pessoa para a mesma turma de novo."))[0], 409)
+        with proxied():
+            self.assertEqual(self.client().post("/api/reviews", review(comment="Outra rede, outra pessoa: aulas boas e provas justas no semestre."),
+                                                headers={"X-Forwarded-For": "200.1.1.1"})[0], 201)
+
+    def test_helpful_votes_limited_per_network(self):
+        _, created, _ = self.client().post("/api/reviews", review())
+        rid, n = created["id"], app.LIMITS["vote-pair"][0]
+        statuses = [self.client().post(f"/api/reviews/{rid}/helpful")[0] for _ in range(n + 1)]
+        self.assertEqual(statuses, [200] * n + [429])
+        voter = self.client()
+        with proxied():
+            self.assertEqual(voter.post(f"/api/reviews/{rid}/helpful", headers={"X-Forwarded-For": "200.4.4.4"})[1], {"voted": True, "helpful": n + 1})
+        self.assertEqual(voter.post(f"/api/reviews/{rid}/helpful")[1]["voted"], False, "tirar o voto é sempre possível")
+
+    def test_activity_dates_are_stored_by_day(self):
+        """Votos, denúncias e turmas informadas levam o mesmo hash de quem avalia: hora exata revelaria quando a pessoa usou o site."""
+        author, other = self.client(), self.client()
+        _, created, _ = author.post("/api/reviews", review())
+        _, mine, _ = other.post("/api/reviews", review(professor="bruno-costa", comment="Boa didática e listas alinhadas com a prova final."))
+        author.post(f"/api/reviews/{mine['id']}/helpful")
+        author.post(f"/api/reviews/{mine['id']}/report", {"reason": app.REPORT_REASONS[0]})
+        with app.connect() as conn:
+            conn.execute("INSERT INTO class_reports VALUES ('2099.1', 'ana-silva', 'DCC206', 'x', ?)", (app.review_day() + 4321,))
+            conn.execute("UPDATE votes SET created_at = created_at + 999")
+        app.init_db()
+        with app.connect() as conn:
+            for table in ("votes", "reports", "class_reports"):
+                for (ts,) in conn.execute(f"SELECT created_at FROM {table}"):
+                    self.assertEqual((ts - app.BRT) % 86400, 0, table)
+            self.assertEqual(conn.execute("PRAGMA secure_delete").fetchone()[0], 1)
+            self.assertGreaterEqual(conn.execute("PRAGMA user_version").fetchone()[0], 2, "VACUUM único já feito")
+
+    def test_review_ids_are_random_and_tables_keep_no_arrival_order(self):
+        """Ids sequenciais (ou rowid) diriam quem avaliou/votou antes de quem num mesmo dia, mesmo com a data só por dia."""
+        ids = [self.client().post("/api/reviews", review(professor=p, course=c, term=t, comment=f"Aulas claras, listas boas e provas justas, turma {i}."))[1]["id"]
+               for i, (p, c, t) in enumerate([("ana-silva", "DCC206", "2025.1"), ("bruno-costa", "DCC206", "2025.2"), ("ana-silva", "DCC011", "2025.2")])]
+        self.assertGreater(min(ids), 1_000_000, "ids aleatórios grandes")
+        self.assertLessEqual(max(ids), 2**53, "seguros como número em JavaScript")
+        self.assertFalse(ids[1] - ids[0] == 1 and ids[2] - ids[1] == 1, "não sequenciais")
+        with app.connect() as conn:
+            for table in app.ROWLESS_TABLES:
+                sql = conn.execute("SELECT sql FROM sqlite_master WHERE name=?", (table,)).fetchone()[0]
+                self.assertIn("WITHOUT ROWID", sql.upper(), table)
+
+    def test_old_database_is_migrated_to_random_ids(self):
+        """Banco antigo (ids sequenciais, tabelas com rowid): renumera mantendo votos e denúncias ligados à avaliação certa."""
+        import sqlite3
+        old_db = Path(TMP.name) / "antigo.db"
+        old_db.unlink(missing_ok=True)
+        schema = app.SCHEMA.replace(" WITHOUT ROWID", "").replace("  comment_key TEXT,\n", "")
+        conn = sqlite3.connect(old_db)
+        conn.executescript(schema)
+        cols = "professor, course, term, overall, didactics, fairness, difficulty, workload, would_retake, grade, tags, comment, status, reviewer_hash, created_at"
+        for i in (1, 2):
+            conn.execute(f"INSERT INTO reviews (id, {cols}) VALUES (?, 'ana-silva', 'DCC206', '2025.1', 4, 4, 4, 3, 3, 1, NULL, '[]', ?, 'published', ?, ?)",
+                         (i, f"Comentário antigo número {i} sobre a disciplina inteira.", f"autor{i}", app.review_day()))
+        conn.execute("INSERT INTO votes VALUES (2, 'leitor', ?)", (app.review_day(),))
+        conn.execute("INSERT INTO reports (review_id, reporter_hash, reason, created_at) VALUES (1, 'leitor', 'Outro', ?)", (app.review_day(),))
+        conn.commit()
+        conn.close()
+        original = app.DB
+        app.DB = old_db
+        try:
+            app.init_db()
+            with app.connect() as conn:
+                rows = {r["comment"][-40:]: r for r in conn.execute("SELECT id, comment, comment_key FROM reviews")}
+                ids = [r["id"] for r in rows.values()]
+                self.assertTrue(all(i > 1_000_000 for i in ids), ids)
+                voted = conn.execute("SELECT review_id FROM votes").fetchone()[0]
+                reported = conn.execute("SELECT review_id FROM reports").fetchone()[0]
+                by_id = {r["id"]: r["comment"] for r in rows.values()}
+                self.assertIn("número 2", by_id[voted], "o voto segue na avaliação certa")
+                self.assertIn("número 1", by_id[reported], "a denúncia segue na avaliação certa")
+                self.assertTrue(all(r["comment_key"] for r in rows.values()), "chave do comentário preenchida")
+                self.assertEqual(conn.execute("PRAGMA user_version").fetchone()[0], 3)
+                self.assertEqual(conn.execute("PRAGMA foreign_key_check").fetchall(), [])
+            app.init_db()  # idempotente: não renumera de novo
+            with app.connect() as conn:
+                self.assertEqual(sorted(r[0] for r in conn.execute("SELECT id FROM reviews")), sorted(ids))
+        finally:
+            app.DB = original
+
+    def test_duplicate_check_uses_normalized_key(self):
+        text = "Professora explica muito bem e as listas preparam para a prova."
+        self.assertEqual(self.client().post("/api/reviews", review(comment=text))[0], 201)
+        variant = "  PROFESSORA  explica muito bem e as listas preparam para a prova. "
+        status, data, _ = self.client().post("/api/reviews", review(professor="bruno-costa", comment=variant.lower().replace("professora", "Professora")))
+        self.assertEqual(status, 400)
+        self.assertIn("idêntico", data["fields"]["comment"])
+        with app.connect() as conn:
+            plan = " ".join(r[-1] for r in conn.execute("EXPLAIN QUERY PLAN SELECT 1 FROM reviews WHERE comment_key=? AND status!='removed' AND reviewer_hash!=? AND id!=?", ("x", "y", 0)))
+        self.assertIn("idx_reviews_comment_key", plan, "busca pelo índice, sem varrer a tabela")
+
+    def test_recovery_code_only_by_same_origin_post(self):
+        c = self.client()
+        c.post("/api/reviews", review())
+        self.assertEqual(c.get("/api/me/code")[0], 404)
+        self.assertEqual(c.post("/api/me/code", headers={"Origin": "https://evil.example"})[0], 403)
+        self.assertEqual(c.request("POST", "/api/me/code", raw=b"x=1", headers={"Content-Type": "application/x-www-form-urlencoded"})[0], 415)
+        status, data, res = c.post("/api/me/code")
+        self.assertEqual((status, len(data["code"])), (200, 43))
+        self.assertEqual(res.getheader("Cache-Control"), "no-store")
+
+    def test_client_ip_uses_last_forwarded_hop(self):
+        handler = app.App.__new__(app.App)
+        handler.client_address = ("10.0.0.2", 1234)
+        handler.headers = {"X-Forwarded-For": "6.6.6.6, 200.5.5.5"}
+        with proxied():
+            self.assertEqual(handler.client_ip(), "200.5.5.5", "o 1º item vem do cliente e pode ser forjado")
+        self.assertEqual(handler.client_ip(), "10.0.0.2", "sem proxy confiável, o cabeçalho é ignorado")
+
+    def test_admin_sees_review_bursts(self):
+        with app.connect() as conn:
+            for i in range(app.BURST_REVIEWS):
+                conn.execute(f"INSERT INTO reviews ({', '.join(app.REVIEW_COLUMNS)}, status, reviewer_hash, created_at) "
+                             "VALUES ('ana-silva', 'DCC206', '2025.1', 1, 1, 1, 3, 3, 0, NULL, '[]', 'x', NULL, 'published', ?, ?)",
+                             (f"h{i}", app.review_day()))
+        _, data, _ = self.client().get("/api/admin/queue", headers={"Authorization": "Bearer admin-teste"})
+        self.assertEqual(data["bursts"], [{"professor": "ana-silva", "day": app.review_day(), "count": app.BURST_REVIEWS, "avg": 1.0}])
+
+    def test_static_path_cannot_escape_to_sibling_folder(self):
+        base = Path(TMP.name) / "site"
+        (base / "static").mkdir(parents=True, exist_ok=True)
+        (base / "static-x").mkdir(exist_ok=True)
+        (base / "static-x" / "segredo.txt").write_text("não deveria sair")
+        (base / "static" / "ok.txt").write_text("público")
+        original = app.STATIC
+        app.STATIC = base / "static"
+        try:
+            self.assertEqual(self.client().get("/ok.txt")[0], 200)
+            self.assertEqual(self.client().get("/../static-x/segredo.txt")[0], 404)
+            self.assertEqual(self.client().get("/%2e%2e/static-x/segredo.txt")[0], 404)
+        finally:
+            app.STATIC = original
+
+    def test_hsts_only_behind_https_proxy(self):
+        self.assertIsNone(self.client().get("/api/bootstrap")[2].getheader("Strict-Transport-Security"))
+        with proxied():
+            res = self.client().get("/api/bootstrap", headers={"X-Forwarded-Proto": "https"})[2]
+        self.assertIn("max-age=", res.getheader("Strict-Transport-Security"))
 
     def test_admin_queue_and_actions(self):
         c = self.client()
@@ -495,9 +693,12 @@ class ServerTest(unittest.TestCase):
 
     def test_rate_limit_on_reviews(self):
         limit = app.LIMITS["review"][0]
+        pairs = [(p, c, t) for p in ("ana-silva", "bruno-costa") for c, t in (("DCC206", "2025.1"), ("DCC011", "2025.2"), ("DCC221", "2025.2"))]
         statuses = []
         for i in range(limit + 1):
-            statuses.append(self.client().post("/api/reviews", review(comment=f"Aulas claras e listas que preparam bem para a prova, turma {i}."))[0])
+            prof, course, term = pairs[i % len(pairs)]
+            statuses.append(self.client().post("/api/reviews", review(professor=prof, course=course, term=term,
+                                                                      comment=f"Aulas claras e listas que preparam bem para a prova, turma {i}."))[0])
         self.assertEqual(statuses[:limit], [201] * limit)
         self.assertEqual(statuses[-1], 429)
 
