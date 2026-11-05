@@ -113,4 +113,11 @@ DCCHUB_DB=/var/lib/dcchub/dcchub.db DCCHUB_TRUST_PROXY=1 DCCHUB_ADMIN_TOKEN=... 
 DCCHUB_ACCESS_CODES=... HOST=127.0.0.1 PORT=8000 python3 app.py
 ```
 
-Coloque atrás de um proxy com HTTPS (Caddy/nginx) e mantenha `DCCHUB_TRUST_PROXY=1` — o app passa a usar `X-Forwarded-For` para o limite de abusos e marca o cookie como `Secure`. Um serviço `systemd` com `Restart=always` cuida de reinícios.
+Coloque atrás de um proxy com HTTPS (Caddy/nginx) e mantenha `DCCHUB_TRUST_PROXY=1` — o app passa a usar o último item de `X-Forwarded-For` para o limite de abusos, marca o cookie como `Secure` e envia HSTS. No nginx, use `proxy_set_header X-Forwarded-For $remote_addr;` (não `$proxy_add_x_forwarded_for`). Um serviço `systemd` com `Restart=always` cuida de reinícios.
+
+## Limites em memória
+
+Os limites de abuso (avaliações, votos e denúncias por rede) e a contagem de denúncias por rede vivem **só na memória** do processo, de propósito: nada disso vai para o banco. Consequências:
+
+- **Rode uma única instância.** Com duas, cada uma conta pela metade. No Fly, mantenha uma máquina (`fly scale count 1`).
+- **Reiniciar zera os contadores.** No Fly com `auto_stop_machines`, cada parada também zera. Isso deixa a retirada automática por denúncias mais conservadora (as denúncias seguem no banco e na fila), mas reabre por um momento os limites diários.

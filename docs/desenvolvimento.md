@@ -59,7 +59,7 @@ Linguagem visual sóbria e institucional: superfícies neutras, **um** azul de d
 | `DCCHUB_SECRET` | gerado em `secret.key`, ao lado do banco | Chave do HMAC. **Faça backup**: trocá-la desliga as pessoas das próprias avaliações. |
 | `DCCHUB_ADMIN_TOKEN` | — | Ativa o painel de moderação em `/#/moderacao`. |
 | `DCCHUB_ACCESS_CODES` | — (site aberto) | Código(s) de acesso da comunidade, separados por vírgula. Veja [Comunidade e privacidade](comunidade-e-privacidade.md#o-código-de-acesso). |
-| `DCCHUB_TRUST_PROXY` | — | `1` atrás de um proxy confiável: usa `X-Forwarded-For` e marca o cookie como `Secure`. |
+| `DCCHUB_TRUST_PROXY` | — | `1` atrás de um proxy confiável: usa o **último** item de `X-Forwarded-For` (o que o proxy viu; os anteriores podem ser forjados), marca o cookie como `Secure` e envia HSTS. |
 | `HOST` / `PORT` | `0.0.0.0` / `8000` | Endereço de escuta. |
 
 Os nomes antigos (`AVALIA_DCC_*`) continuam aceitos. O cookie (`avalia_dcc`) e as chaves do navegador (`avalie-*`) mantêm o nome antigo **de propósito**: trocá-los desconectaria todo mundo da própria identidade anônima e apagaria rascunhos e grades salvos.
@@ -78,7 +78,7 @@ Todas as rotas respondem JSON. Com `DCCHUB_ACCESS_CODES` definido, tudo exceto `
 | POST · PUT · DELETE | `/api/reviews` · `/api/reviews/{id}` | Criar · editar · apagar (só quem escreveu) |
 | POST | `/api/reviews/{id}/helpful` · `/api/reviews/{id}/report` | Voto útil (alterna) · denúncia |
 | POST | `/api/moderation/check` | Avisos de moderação para um rascunho de comentário |
-| GET · POST | `/api/me` · `/api/me/code` · `/api/me/restore` | Minhas avaliações e código de recuperação |
+| GET · POST · POST | `/api/me` · `/api/me/code` · `/api/me/restore` | Minhas avaliações · mostrar o código de recuperação (só POST JSON da própria origem, com limite) · recuperar |
 | POST · DELETE | `/api/class-reports` | Informar/desfazer "docente X dá a disciplina Y" (só sem oferta oficial) |
 | GET | `/api/provas` · `/api/oportunidades` | Materiais e oportunidades |
 | GET · POST | `/api/admin/queue` · `/api/admin/reviews/{id}` · `/api/admin/class-reports` · `/api/admin/class-reports/delete` | Moderação (`Authorization: Bearer …`) |
