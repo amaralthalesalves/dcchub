@@ -745,3 +745,27 @@ body.gated { padding-bottom: 0; }
 .mod-hints.is-hold b { color: var(--ok); }
 .mod-hints ul { margin: 4px 0 0; padding-left: 18px; }
 .mod-evidence { color: var(--muted); font-size: 12.5px; }
+
+/* evolução por semestre (linha da nota geral) */
+.evo-chart { position: relative; width: 100%; min-height: 190px; }
+.evo-chart svg { display: block; overflow: visible; }
+.evo-grid { stroke: var(--line); stroke-width: 1; }
+.evo-axis { fill: var(--muted); font: 500 11px var(--sans); }
+.evo-end { fill: var(--ink); font: 700 13px var(--sans); }
+.evo-line { fill: none; stroke: var(--primary); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.evo-dot { fill: var(--primary); stroke: var(--surface); stroke-width: 2; }
+.evo-dot.few { fill: var(--surface); stroke: var(--primary); stroke-width: 2; }
+.evo-cross { stroke: var(--line-strong); stroke-width: 1; }
+.evo-hit { fill: transparent; cursor: pointer; outline: none; }
+.evo-hit:focus-visible { fill: color-mix(in srgb, var(--focus) 10%, transparent); }
+.evo-tip { position: absolute; z-index: 2; pointer-events: none; min-width: 150px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-sm); box-shadow: var(--shadow-pop); padding: 8px 10px; font-size: 12px; color: var(--ink-2); }
+.evo-tip-head b { font-size: 16px; color: var(--ink); }
+.evo-tip dl { display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; margin: 6px 0; }
+.evo-tip dt { color: var(--muted); }
+.evo-tip dd { margin: 0; text-align: right; font-weight: 600; color: var(--ink); }
+.evo-tip-foot { color: var(--muted); border-top: 1px solid var(--line); padding-top: 5px; }
+.evo-note { display: flex; align-items: center; gap: 6px; margin: 6px 0 0; }
+.evo-key { display: inline-block; width: 10px; height: 10px; border-radius: 50%; box-sizing: border-box; }
+.evo-key-few { border: 2px solid var(--primary); background: var(--surface); }
+.evo-table { margin-top: 8px; }
+.evo-table summary { cursor: pointer; color: var(--primary); }

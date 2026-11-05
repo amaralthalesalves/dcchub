@@ -67,6 +67,23 @@ await go('#/disciplina/DCC034'); await sleep(800);
 const before = await ev(`return document.querySelector('.helpful b').textContent`);
 await ev(`document.querySelector('.helpful').click()`); await sleep(800);
 ok(await ev(`return document.querySelector('.helpful').classList.contains('on')`), `voto útil marcado (antes "${before}")`);
+// 5b) evolução por semestre: gráfico, tooltip no foco, clique filtra as avaliações pelo semestre
+await go('#/professor/adriano-cesar-machado-pereira');
+const evo = await ev(`
+  const hits = document.querySelectorAll('.evo-hit');
+  if (hits.length < 2) return { hits: hits.length };
+  hits[1].dispatchEvent(new FocusEvent('focus'));
+  const tip = document.querySelector('.evo-tip');
+  const tipOk = !tip.hidden && /geral/.test(tip.textContent);
+  const term = hits[1].getAttribute('aria-label').split(':')[0];
+  hits[1].dispatchEvent(new MouseEvent('click', { bubbles: true }));
+  await new Promise((r) => setTimeout(r, 300));
+  const sel = document.querySelector('[data-filter-term="reviews"]').value;
+  const cards = [...document.querySelectorAll('.review-list .review')];
+  return { hits: hits.length, tipOk, term, sel, cards: cards.length, allTerm: cards.every((c) => c.querySelector('header p').textContent.trim().startsWith(term)), table: document.querySelectorAll('.evo-table tbody tr').length };`);
+ok(evo.hits >= 2 && evo.table === evo.hits, `gráfico de evolução com um ponto por semestre (${evo.hits}) e tabela equivalente`);
+ok(evo.tipOk, 'tooltip do semestre aparece no foco do teclado');
+ok(evo.sel === evo.term && evo.cards > 0 && evo.allTerm, `clicar em ${evo.term} filtra as avaliações daquele semestre (${evo.cards})`);
 // 6) grade
 await go('#/oferta'); await sleep(1000);
 await ev(`document.querySelectorAll('[data-pick]')[0].click()`); await sleep(200);

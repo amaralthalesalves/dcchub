@@ -364,6 +364,105 @@ function summaryBlock(summary, { subject = 'docente' } = {}) {
   </div>`;
 }
 
+// ---- evolução por semestre cursado: linha da nota geral (1–5), um ponto por semestre com avaliações.
+// Ponto vazado = menos de EVOLUTION_MIN avaliações naquele semestre (pouco para chamar de tendência).
+const EVOLUTION_MIN = 3;
+function evolutionBlock(summary) {
+  const terms = summary?.byTerm || [];
+  if (terms.length < 2) return '';
+  const crit = state.boot.criteria;
+  return `<section class="block evolution" aria-labelledby="evo-title">
+    <div class="section-head"><h2 id="evo-title">Evolução por semestre</h2><span class="muted small">nota geral, pelo semestre em que a turma foi cursada</span></div>
+    <div class="evo-chart" id="evo-chart"></div>
+    <p class="small muted evo-note"><span class="evo-key evo-key-few" aria-hidden="true"></span> menos de ${EVOLUTION_MIN} avaliações no semestre · clique num semestre para ver as avaliações dele</p>
+    <details class="evo-table"><summary class="small">Ver em tabela</summary>
+      <div class="table-wrap"><table class="table">
+        <thead><tr><th>Semestre</th><th class="num">Aval.</th>${crit.map((c) => `<th class="num" title="${esc(c.label)}">${esc(c.short || c.label)}</th>`).join('')}</tr></thead>
+        <tbody>${terms.slice().reverse().map((t) => `<tr><td>${esc(t.term)}</td><td class="num">${t.count}</td>${crit.map((c) => `<td class="num">${pill(t[c.key], { neutral: c.neutral })}</td>`).join('')}</tr>`).join('')}</tbody>
+      </table></div>
+    </details>
+  </section>`;
+}
+
+function wireEvolution(summary, { onPick } = {}) {
+  const box = $('#evo-chart');
+  if (!box) return;
+  const terms = summary.byTerm;
+  const svgNS = 'http://www.w3.org/2000/svg';
+  const el = (tag, attrs = {}, parent) => { const n = document.createElementNS(svgNS, tag); for (const [k, v] of Object.entries(attrs)) n.setAttribute(k, v); if (parent) parent.append(n); return n; };
+  const tip = document.createElement('div');
+  tip.className = 'evo-tip';
+  tip.hidden = true;
+  const draw = () => {
+    const W = Math.max(280, box.clientWidth);
+    const H = 190;
+    const m = { top: 14, right: 48, bottom: 28, left: 42 };
+    const x = (i) => m.left + (terms.length === 1 ? (W - m.left - m.right) / 2 : (i * (W - m.left - m.right)) / (terms.length - 1));
+    const y = (v) => m.top + ((5 - v) / 4) * (H - m.top - m.bottom);
+    box.replaceChildren();
+    const svg = el('svg', { width: W, height: H, viewBox: `0 0 ${W} ${H}`, role: 'group', 'aria-label': 'Nota geral por semestre' }, box);
+    const deco = el('g', { 'aria-hidden': 'true' }, svg); // grade, eixos, linha e pontos: o leitor de tela usa os alvos e a tabela
+    for (let v = 1; v <= 5; v += 1) { // grade recessiva + rótulos do eixo
+      el('line', { x1: m.left, x2: W - m.right + 8, y1: y(v), y2: y(v), class: 'evo-grid' }, deco);
+      el('text', { x: m.left - 10, y: y(v) + 4, class: 'evo-axis', 'text-anchor': 'end' }, deco).textContent = v;
+    }
+    const every = Math.ceil(terms.length / Math.max(1, Math.floor((W - m.left - m.right) / 56))); // rótulos do X sem colidir
+    const labeled = new Set(terms.map((_, i) => i).filter((i) => i % every === 0));
+    const lastI = terms.length - 1;
+    if (!labeled.has(lastI)) { labeled.delete(lastI - (lastI % every)); labeled.add(lastI); } // o mais recente sempre aparece
+    terms.forEach((t, i) => {
+      if (labeled.has(i)) el('text', { x: x(i), y: H - 8, class: 'evo-axis', 'text-anchor': 'middle' }, deco).textContent = t.term;
+    });
+    const cross = el('line', { y1: m.top - 4, y2: H - m.bottom, class: 'evo-cross', visibility: 'hidden' }, deco);
+    el('polyline', { points: terms.map((t, i) => `${x(i)},${y(t.overall)}`).join(' '), class: 'evo-line' }, deco);
+    terms.forEach((t, i) => el('circle', { cx: x(i), cy: y(t.overall), r: 4.5, class: t.count < EVOLUTION_MIN ? 'evo-dot few' : 'evo-dot' }, deco));
+    const last = terms[terms.length - 1]; // valor só na ponta (o resto fica no tooltip e na tabela)
+    el('text', { x: x(terms.length - 1) + 10, y: y(last.overall) + 4, class: 'evo-end' }, deco).textContent = fmt(last.overall);
+    // alvos de hover/foco: a faixa inteira de cada semestre, bem maior que o ponto
+    const half = terms.length > 1 ? (x(1) - x(0)) / 2 : 40;
+    terms.forEach((t, i) => {
+      const hit = el('rect', { x: x(i) - half, y: 0, width: half * 2, height: H, class: 'evo-hit', tabindex: 0, role: 'button',
+        'aria-label': `${t.term}: nota geral ${fmt(t.overall)}, ${t.count} ${t.count === 1 ? 'avaliação' : 'avaliações'}. Ver avaliações deste semestre.` }, svg);
+      const show = () => {
+        cross.setAttribute('x1', x(i)); cross.setAttribute('x2', x(i)); cross.setAttribute('visibility', 'visible');
+        tip.replaceChildren();
+        const head = document.createElement('div'); head.className = 'evo-tip-head';
+        const val = document.createElement('b'); val.textContent = fmt(t.overall);
+        const lbl = document.createElement('span'); lbl.textContent = ` geral · ${t.term}`;
+        head.append(val, lbl);
+        const rows = document.createElement('dl');
+        state.boot.criteria.filter((c) => c.key !== 'overall' && t[c.key] != null).forEach((c) => {
+          const dt = document.createElement('dt'); dt.textContent = c.short || c.label;
+          const dd = document.createElement('dd'); dd.textContent = fmt(t[c.key]);
+          rows.append(dt, dd);
+        });
+        const foot = document.createElement('div'); foot.className = 'evo-tip-foot';
+        foot.textContent = `${t.count} ${t.count === 1 ? 'avaliação' : 'avaliações'}${t.count < EVOLUTION_MIN ? ' · poucas para indicar tendência' : ''}`;
+        tip.append(head, rows, foot);
+        tip.hidden = false;
+        // ao lado da linha vertical (direita, ou esquerda se não couber): nunca cobre o ponto nem a linha
+        const right = x(i) + 14;
+        tip.style.left = `${right + tip.offsetWidth <= W ? right : Math.max(0, x(i) - 14 - tip.offsetWidth)}px`;
+        tip.style.top = '0px';
+      };
+      const hide = () => { cross.setAttribute('visibility', 'hidden'); tip.hidden = true; };
+      hit.addEventListener('pointerenter', show);
+      hit.addEventListener('focus', show);
+      hit.addEventListener('pointerleave', hide);
+      hit.addEventListener('blur', hide);
+      const pick = () => onPick?.(t.term);
+      hit.addEventListener('click', pick);
+      hit.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(); } });
+    });
+    box.append(tip);
+  };
+  draw();
+  if (window.ResizeObserver) {
+    let lastW = box.clientWidth;
+    new ResizeObserver(() => { if (box.isConnected && box.clientWidth !== lastW) { lastW = box.clientWidth; draw(); } }).observe(box);
+  }
+}
+
 function tagTone(tag) {
   const t = state.boot.tags;
   return t.positivo.includes(tag) ? 'pos' : t.negativo.includes(tag) ? 'neg' : 'neu';
@@ -409,10 +508,14 @@ function reviewCard(r, { show = 'course' } = {}) {
 function reviewsSection({ reviews, show, filterOptions, filterLabel, ctaHref, subjectName }) {
   const opts = filterOptions?.length > 1
     ? `<label class="select-inline">${esc(filterLabel)} <select data-filter="reviews"><option value="">Todas</option>${filterOptions.map((o) => `<option value="${esc(o.value)}">${esc(o.label)} (${o.count})</option>`).join('')}</select></label>` : '';
+  const termCounts = reviews.reduce((acc, r) => ({ ...acc, [r.term]: (acc[r.term] || 0) + 1 }), {});
+  const termKeys = Object.keys(termCounts).sort().reverse();
+  const termOpts = termKeys.length > 1
+    ? `<label class="select-inline">Semestre <select data-filter-term="reviews"><option value="">Todos</option>${termKeys.map((t) => `<option value="${esc(t)}">${esc(t)} (${termCounts[t]})</option>`).join('')}</select></label>` : '';
   return `<section class="reviews-section" id="avaliacoes">
     <div class="section-head">
       <h2>Avaliações <span class="count">${reviews.length}</span></h2>
-      <div class="row-gap">${opts}
+      <div class="row-gap">${opts}${termOpts}
         <label class="select-inline">Ordenar <select data-sort="reviews">
           <option value="helpful">Mais úteis</option><option value="recent">Mais recentes</option><option value="high">Melhores notas</option><option value="low">Piores notas</option>
         </select></label>
@@ -428,9 +531,10 @@ function wireReviewList(reviews, show) {
   const list = $('.review-list');
   if (!list) return;
   let filter = '';
+  let term = '';
   let sort = 'helpful';
   const redraw = () => {
-    const sorted = reviews.filter((r) => !filter || r.course === filter || r.professor === filter);
+    const sorted = reviews.filter((r) => (!filter || r.course === filter || r.professor === filter) && (!term || r.term === term));
     const by = {
       helpful: (a, b) => b.helpful - a.helpful || b.createdAt - a.createdAt,
       recent: (a, b) => b.createdAt - a.createdAt,
@@ -441,7 +545,19 @@ function wireReviewList(reviews, show) {
   };
   $('[data-filter="reviews"]')?.addEventListener('change', (e) => { filter = e.target.value; redraw(); });
   $('[data-sort="reviews"]')?.addEventListener('change', (e) => { sort = e.target.value; redraw(); });
+  const termSelect = $('[data-filter-term="reviews"]');
+  termSelect?.addEventListener('change', (e) => { term = e.target.value; redraw(); });
   list._reviews = reviews;
+  // usado pelo gráfico de evolução: clicar num semestre filtra a lista
+  return {
+    showTerm(t) {
+      if (!termSelect || ![...termSelect.options].some((o) => o.value === t)) return;
+      termSelect.value = t;
+      term = t;
+      redraw();
+      $('#avaliacoes')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    },
+  };
 }
 
 // ---------------------------------------------------------------- ações globais (delegação)
@@ -765,6 +881,7 @@ async function viewProfessor({ args, isCurrent }) {
     </header>
 
     ${summaryBlock(data.summary)}
+    ${evolutionBlock(data.summary)}
 
     ${communityBlock(data.community, { mode: 'prof', subject: firstName(p.name) })}
 
@@ -802,7 +919,8 @@ async function viewProfessor({ args, isCurrent }) {
       filterOptions: Object.entries(reviewCounts).map(([id, count]) => ({ value: id, label: state.course.get(id)?.name || id, count })),
     })}
   </section>`;
-  wireReviewList(data.reviews, 'course');
+  const profList = wireReviewList(data.reviews, 'course');
+  wireEvolution(data.summary, { onPick: (t) => profList?.showTerm(t) });
   wireCommunity({ professor: slug, mode: 'prof', reload: () => router() });
 }
 
@@ -901,6 +1019,7 @@ async function viewCourse({ args, isCurrent }) {
     </header>
 
     ${c.active || data.summary.count ? summaryBlock(data.summary, { subject: 'disciplina' }) : ''}
+    ${evolutionBlock(data.summary)}
 
     ${c.active ? communityBlock(data.community, { mode: 'course' }) : ''}
 
@@ -935,7 +1054,8 @@ async function viewCourse({ args, isCurrent }) {
       filterOptions: Object.entries(reviewCounts).map(([slug, count]) => ({ value: slug, label: state.prof.get(slug)?.name || slug, count })),
     })}
   </section>`;
-  wireReviewList(data.reviews, 'prof');
+  const courseList = wireReviewList(data.reviews, 'prof');
+  wireEvolution(data.summary, { onPick: (t) => courseList?.showTerm(t) });
   wireCommunity({ course: c.id, mode: 'course', reload: () => router() });
   const table = $('#compare');
   if (table) {

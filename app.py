@@ -505,8 +505,15 @@ def aggregate(rows: list[sqlite3.Row]) -> dict:
     tags = Counter(t for r in rows for t in json.loads(r["tags"] or "[]"))
     grades = Counter(r["grade"] for r in rows if r["grade"] in GRADES[:6])
     dist = Counter(r["overall"] for r in rows)
+    # evolução: médias por semestre CURSADO (o informado na avaliação), do mais antigo ao mais recente.
+    # Não revela nada novo: o semestre de cada avaliação já aparece no próprio cartão.
+    terms: dict[str, list] = defaultdict(list)
+    for r in rows:
+        terms[r["term"]].append(r)
+    by_term = [{"term": t, "count": len(rs), **{k: mean_of([r[k] for r in rs]) for k in CRITERIA_KEYS}}
+               for t, rs in sorted(terms.items())]
     return {
-        "count": n, "avg": avg, "answered": answered,
+        "count": n, "avg": avg, "answered": answered, "byTerm": by_term,
         "retake": round(100 * sum(retake) / len(retake)) if retake else None,
         "tags": [{"tag": t, "count": c} for t, c in tags.most_common(8)],
         "grades": {g: grades.get(g, 0) for g in GRADES[:6]},

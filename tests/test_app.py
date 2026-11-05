@@ -390,6 +390,25 @@ class ServerTest(unittest.TestCase):
         self.assertEqual(prof["summary"]["avg"]["difficulty"], 5.0)
         self.assertEqual(self.client().get("/api/offerings?term=2025.1")[0], 200)
 
+    def test_evolution_by_term(self):
+        """Médias por semestre cursado, em ordem, no resumo do docente e da disciplina."""
+        def r(term, overall, passing, **kw):
+            return review(term=term, ratings={"overall": overall, "didactics": overall, "fairness": 3, "difficulty": 3, "passing": passing, "workload": 3}, **kw)
+        self.assertEqual(self.client().post("/api/reviews", r("2025.1", 2, 5, comment="Primeira turma avaliada, semestre bem puxado e provas difíceis."))[0], 201)
+        self.assertEqual(self.client().post("/api/reviews", r("2024.2", 4, 2, comment="Turma anterior, aulas boas e avaliação tranquila no fim do semestre."))[0], 201)
+        self.assertEqual(self.client().post("/api/reviews", r("2025.1", 4, 3, comment="Mesmo semestre de outra pessoa, achei as aulas melhores que o esperado."))[0], 201)
+        with app.connect() as conn:  # avaliação antiga, sem "passar"
+            conn.execute("""INSERT INTO reviews (id, professor, course, term, overall, didactics, fairness, difficulty, workload, comment, status, reviewer_hash, created_at)
+                            VALUES (991, 'ana-silva', 'DCC206', '2025.1', 3, 3, 3, 3, 3, 'Avaliação antiga de 2025.1 sem a pergunta separada.', 'published', 'antiga', ?)""", (app.review_day(),))
+            conn.execute("""INSERT INTO reviews (id, professor, course, term, overall, didactics, fairness, difficulty, workload, comment, status, reviewer_hash, created_at)
+                            VALUES (992, 'ana-silva', 'DCC206', '2023.2', 1, 1, 1, 1, 1, 'Segurada pela moderação, não entra nas médias públicas.', 'held', 'segurada', ?)""", (app.review_day(),))
+        _, prof, _ = self.client().get("/api/professors/ana-silva")
+        self.assertEqual([(t["term"], t["count"], t["overall"], t["passing"]) for t in prof["summary"]["byTerm"]],
+                         [("2024.2", 1, 4.0, 2.0), ("2025.1", 3, 3.0, 4.0)], "ordem cronológica; vazios e seguradas fora")
+        _, course, _ = self.client().get("/api/courses/DCC206")
+        self.assertEqual([t["term"] for t in course["summary"]["byTerm"]], ["2024.2", "2025.1"])
+        self.assertNotIn("byTerm", self.client().get("/api/professors/bruno-costa")[1]["summary"], "sem avaliações, sem série")
+
     def test_unverified_pair_is_accepted_but_not_marked(self):
         c = self.client()
         status, data, _ = c.post("/api/reviews", review(professor="bruno-costa", course="DCC011", term="2024.2"))
