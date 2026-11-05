@@ -135,7 +135,7 @@ Coloque atrás de um proxy com HTTPS (Caddy/nginx) e mantenha `DCCHUB_TRUST_PROX
 
 ## Limites em memória
 
-Os limites de abuso (avaliações, votos e denúncias por rede) e a contagem de denúncias por rede vivem **só na memória** do processo, de propósito: nada disso vai para o banco. Consequências:
+Os limites de abuso (avaliações, votos e denúncias por rede, links de e-mail por dia) e a contagem de denúncias por rede vivem **só na memória** do processo, de propósito: nada disso vai para o banco. Consequências:
 
 - **Rode uma única instância.** Com duas, cada uma conta pela metade. No Fly, mantenha uma máquina (`fly scale count 1`).
 - **Reiniciar zera os contadores.** No Fly com `auto_stop_machines`, cada parada também zera. Isso deixa a retirada automática por denúncias mais conservadora (as denúncias seguem no banco e na fila), mas reabre por um momento os limites diários.

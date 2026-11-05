@@ -136,6 +136,28 @@ class EmailLoginTest(unittest.TestCase):
         self.assertIn("falha ao enviar", err.getvalue())
         self.assertNotIn("aluna", err.getvalue())
 
+    def test_recipient_refused_is_logged_without_address(self):
+        """Regressão: o texto de SMTPRecipientsRefused (e de respostas do servidor) traz o endereço."""
+        import smtplib
+        from unittest import mock
+
+        class Refusing:
+            def __init__(self, *a, **kw): pass
+            def __enter__(self): return self
+            def __exit__(self, *exc): return False
+            def starttls(self, **kw): pass
+            def login(self, *a): pass
+            def send_message(self, msg):
+                raise smtplib.SMTPRecipientsRefused({"aluna@ufmg.br": (550, b"5.1.1 <aluna@ufmg.br>: user unknown")})
+
+        err = io.StringIO()
+        with mock.patch.object(email_login.smtplib, "SMTP", Refusing), contextlib.redirect_stderr(err):
+            email_login.deliver(config(SMTP_HOST="smtp.exemplo"), "aluna@ufmg.br", "https://x/#/entrar?t=abc")
+        self.assertIn("SMTPRecipientsRefused (código 550)", err.getvalue())
+        self.assertNotIn("aluna", err.getvalue())
+        data_error = smtplib.SMTPDataError(554, b"rejected for aluna@ufmg.br")
+        self.assertEqual(email_login.describe_error(data_error), "SMTPDataError (código 554)")
+
 
 if __name__ == "__main__":
     unittest.main()

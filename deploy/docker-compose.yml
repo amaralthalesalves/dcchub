@@ -17,6 +17,7 @@ services:
       DCCHUB_SMTP_PASSWORD: ${DCCHUB_SMTP_PASSWORD:-}
       DCCHUB_SMTP_FROM: ${DCCHUB_SMTP_FROM:-}
       DCCHUB_EMAIL_EPOCH: ${DCCHUB_EMAIL_EPOCH:-1}
+      DCCHUB_EMAIL_DAILY_LIMIT: ${DCCHUB_EMAIL_DAILY_LIMIT:-250}
     volumes:
       - dcchub-var:/app/var              # banco SQLite + chave secreta: é ISTO que precisa de backup
   caddy:

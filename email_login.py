@@ -143,8 +143,16 @@ def deliver(cfg: Config, to: str, url: str) -> None:
                 server.login(cfg.smtp_user, cfg.smtp_password)
             server.send_message(msg)
     except Exception as exc:  # noqa: BLE001
-        # sem o endereço no log
-        print(f"[login] falha ao enviar e-mail: {type(exc).__name__}: {exc}", file=sys.stderr, flush=True)
+        print(f"[login] falha ao enviar e-mail: {describe_error(exc)}", file=sys.stderr, flush=True)
+
+
+def describe_error(exc: BaseException) -> str:
+    """Erro de envio SEM o texto da exceção: SMTPRecipientsRefused e afins trazem o endereço (e respostas do servidor
+    costumam repeti-lo). Fica só o tipo e o código SMTP, o bastante para diagnosticar."""
+    code = getattr(exc, "smtp_code", None)
+    if code is None and isinstance(exc, smtplib.SMTPRecipientsRefused):
+        code = next((c for c, _ in exc.recipients.values()), None)
+    return type(exc).__name__ + (f" (código {code})" if code is not None else "")
 
 
 def send_async(cfg: Config, to: str, url: str) -> None:

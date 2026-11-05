@@ -31,10 +31,11 @@ sequenceDiagram
 ```
 
 - **Só `@ufmg.br` exato.** Todo aluno tem um. `@dcc.ufmg.br` — o domínio que os docentes do DCC divulgam — e outros subdomínios são recusados, então digitar o endereço público de um docente **não dispara e-mail nenhum** para ele.
-- **O e-mail não é guardado.** Só passa pela memória durante o envio: não vai para o banco nem para logs (inclusive mensagens de erro de envio). O limite de 3 links por endereço por hora usa um HMAC do endereço que fica só em memória e some ao fim da janela.
+- **O e-mail não é guardado.** Só passa pela memória durante o envio: não vai para o banco nem para logs — erros de envio registram só o tipo e o código SMTP, porque o texto dessas exceções costuma trazer o endereço. O limite de 3 links por endereço por hora usa um HMAC do endereço que fica só em memória e some ao fim da janela.
 - **O link** é um token assinado, válido por 15 minutos e de **uso único**; não contém o e-mail. Ele fica no fragmento da URL (`#/entrar?t=…`), que não é enviado ao servidor quando o link é aberto — assim, antivírus de e-mail que "visitam" links não conseguem gastá-lo.
 - **O cookie de acesso** também não contém nada do e-mail e é **independente da identidade anônima** de quem avalia (`avalia_dcc`). Saber quem pediu um link não diz nada sobre quem escreveu cada avaliação.
-- **Revogar:** trocar `DCCHUB_EMAIL_EPOCH` desconecta todo mundo que entrou por e-mail.
+- **Revogar:** trocar `DCCHUB_EMAIL_EPOCH` desconecta todo mundo que entrou por e-mail. Não dá para revogar uma pessoa só: o cookie não diz de quem é (é o preço de não guardar o e-mail).
+- **Cota de envio:** no máximo 20 links por conexão por dia e `DCCHUB_EMAIL_DAILY_LIMIT` (padrão 250) no total, para que ninguém esgote a cota do serviço de e-mail e trave o acesso de todo mundo.
 - **O e-mail é neutro:** "Seu link de acesso", sem falar em avaliações, docentes ou disciplinas.
 
 > [!NOTE]
@@ -57,7 +58,7 @@ sequenceDiagram
 - **Sem ordem de chegada.** As avaliações têm ids aleatórios, e votos, denúncias e turmas informadas ficam em tabelas sem `rowid` (guardadas na ordem da chave). Com ids sequenciais, daria para saber quem avaliou ou votou antes de quem num mesmo dia, o que anularia a data só com o dia.
 - **Apagar é apagar.** O banco roda com `secure_delete`: avaliações apagadas e horários antigos são zerados no arquivo, não ficam em páginas livres.
 - **Nenhum log de acesso com IP.** O IP só é usado em memória para limitar abusos (ex.: 6 avaliações a cada 10 min; no máximo 3 avaliações da mesma turma e 3 votos na mesma avaliação por rede por dia; denúncias contadas por rede) e é descartado.
-- **Contra contas falsas sem criar contas.** Como um cookie anônimo novo sai de graça, os limites acima valem por rede — sempre só em memória, sem ligar a avaliação a quem a escreveu.
+- **Contra contas falsas sem criar contas.** Como um cookie anônimo novo sai de graça, os limites acima valem por rede e, para quem entrou por e-mail, por login (1 avaliação por turma por dia) — sempre só em memória, sem ligar a avaliação a quem a escreveu.
 - Quem escreveu pode **editar e apagar** as próprias avaliações. O **código de recuperação** leva a identidade anônima para outro navegador.
 
 ### O que o banco guarda

@@ -65,6 +65,7 @@ Linguagem visual sóbria e institucional: superfícies neutras, **um** azul de d
 | `DCCHUB_PUBLIC_URL` | `http://localhost:PORT` | Endereço público usado nos links enviados (ex.: `https://dcchub.com.br`). Nunca vem do cabeçalho `Host`. |
 | `DCCHUB_SMTP_HOST` · `_PORT` · `_USER` · `_PASSWORD` · `_FROM` · `_TLS` | porta 587, `starttls` (`ssl` na 465) | Envio dos links. Sem `SMTP_HOST`, o link aparece no terminal (desenvolvimento). |
 | `DCCHUB_EMAIL_EPOCH` | `1` | Trocar o valor revoga todos os acessos feitos por e-mail. |
+| `DCCHUB_EMAIL_DAILY_LIMIT` | `250` | Teto global de links enviados por dia (abaixo da cota do serviço de envio; o Brevo grátis dá 300). Cada conexão pede no máximo 20 por dia. |
 | `DCCHUB_TRUST_PROXY` | — | `1` atrás de um proxy confiável: usa o **último** item de `X-Forwarded-For` (o que o proxy viu; os anteriores podem ser forjados), marca o cookie como `Secure` e envia HSTS. |
 | `HOST` / `PORT` | `0.0.0.0` / `8000` | Endereço de escuta. |
 

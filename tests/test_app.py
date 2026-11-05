@@ -384,6 +384,21 @@ class ServerTest(unittest.TestCase):
         finally:
             app.ACCESS_CODES, app.EMAIL.enabled, app.EMAIL.epoch, app.EMAIL.public_url, app.email_login.send_async = original
 
+    def test_email_login_daily_caps(self):
+        """Poucas conexões não podem gastar a cota diária do serviço de e-mail (e travar o acesso de todo mundo)."""
+        original = (app.EMAIL.enabled, app.email_login.send_async, app.EMAIL_DAILY_LIMIT, app.LIMITS["login"])
+        sent = []
+        app.EMAIL.enabled, app.EMAIL_DAILY_LIMIT, app.LIMITS["login"] = True, 4, (100, 600)
+        app.email_login.send_async = lambda cfg, to, url: sent.append(to)
+        try:
+            per_ip = app.LIMITS["login-day"][0]
+            statuses = [self.client().post("/api/access/email", {"email": f"a{i}@ufmg.br"})[0] for i in range(per_ip + 1)]
+            self.assertEqual(statuses[-1], 429, "teto diário por conexão")
+            self.assertEqual(len(sent), 4, "teto global por dia")
+            self.assertIn(503, statuses)
+        finally:
+            app.EMAIL.enabled, app.email_login.send_async, app.EMAIL_DAILY_LIMIT, app.LIMITS["login"] = original
+
     def test_email_login_disabled_by_default(self):
         self.assertEqual(self.client().post("/api/access/email", {"email": "a@ufmg.br"})[0], 404)
         self.assertEqual(self.client().post("/api/access/email/verify", {"token": "x"})[0], 404)
@@ -583,7 +598,7 @@ class ServerTest(unittest.TestCase):
             self.client().post(f"/api/reviews/{rid}/report", {"reason": app.REPORT_REASONS[0]}, headers={"X-Forwarded-For": "200.0.0.99"})
         self.assertEqual(len(author.get("/api/professors/ana-silva")[1]["reviews"]), 1)
 
-    def test_same_class_reviews_limited_per_network(self):
+    def test_same_class_reviews_limited_per_network_and_login(self):
         """Contra avaliações em série da mesma turma com cookies novos (identidade anônima é de graça)."""
         n = app.LIMITS["review-pair"][0]
         statuses = [self.client().post("/api/reviews", review(comment=f"Aulas claras e listas que preparam bem para a prova, versão {i}."))[0]
@@ -598,6 +613,23 @@ class ServerTest(unittest.TestCase):
         with proxied():
             self.assertEqual(self.client().post("/api/reviews", review(comment="Outra rede, outra pessoa: aulas boas e provas justas no semestre."),
                                                 headers={"X-Forwarded-For": "200.1.1.1"})[0], 201)
+
+        # login por e-mail: uma avaliação por turma por login, mesmo trocando de rede e de cookie
+        app.limiter.events.clear()
+        import email_login
+        original = app.EMAIL.enabled
+        app.EMAIL.enabled = True
+        try:
+            access = f"dcchub_access={email_login.access_token(app.SECRET, app.EMAIL.epoch)}"
+            with proxied():
+                first = self.client(); first.cookie = access
+                self.assertEqual(first.post("/api/reviews", review(professor="bruno-costa", comment="Didática ótima e provas coerentes com as listas da disciplina."),
+                                            headers={"X-Forwarded-For": "200.2.2.2"})[0], 201)
+                again = self.client(); again.cookie = access
+                self.assertEqual(again.post("/api/reviews", review(professor="bruno-costa", comment="Mesma turma de novo, com outro cookie anônimo e outra rede."),
+                                            headers={"X-Forwarded-For": "200.3.3.3"})[0], 429)
+        finally:
+            app.EMAIL.enabled = original
 
     def test_helpful_votes_limited_per_network(self):
         _, created, _ = self.client().post("/api/reviews", review())

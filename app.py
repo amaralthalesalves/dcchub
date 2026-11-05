@@ -17,7 +17,7 @@ Variáveis de ambiente (todas opcionais):
     DCCHUB_EMAIL_LOGIN  "1" para liberar o acesso por link enviado ao e-mail @ufmg.br (ver email_login.py); o e-mail
                         não é guardado. Configuração do envio: DCCHUB_PUBLIC_URL, DCCHUB_SMTP_HOST/PORT/USER/PASSWORD/
                         FROM/TLS; sem SMTP, o link aparece no terminal (desenvolvimento). DCCHUB_EMAIL_EPOCH: trocar
-                        o valor revoga todos os acessos feitos por e-mail
+                        o valor revoga todos os acessos feitos por e-mail; DCCHUB_EMAIL_DAILY_LIMIT: teto de links por dia (250)
   Os nomes antigos (AVALIA_DCC_*) continuam aceitos.
     HOST / PORT             endereço de escuta (padrão 0.0.0.0:8000)
 """
@@ -534,11 +534,14 @@ class RateLimiter:
 
 
 LIMITS = {"check": (120, 60), "access": (10, 600), "login": (5, 600), "classreport": (20, 600), "review": (6, 600), "vote": (60, 60), "report": (10, 600), "restore": (10, 600), "admin": (30, 60),
-          # identidade anônima nova sai de graça (basta apagar o cookie), então os limites abaixo valem por rede (IP) —
-          # nunca guardados: só em memória, como os demais
+          # identidade anônima nova sai de graça (basta apagar o cookie), então os limites abaixo valem por rede (IP) e,
+          # no acesso por e-mail, por login — nunca guardados: só em memória, como os demais
+          "login-day": (20, 86400),       # links pedidos por IP por dia (protege a cota diária do serviço de e-mail)
           "review-pair": (3, 86400),      # avaliações do MESMO docente+disciplina por IP por dia (3, não 1: Wi-Fi do campus é NAT)
+          "review-access": (1, 86400),    # idem, por login de e-mail
           "vote-pair": (3, 86400)}        # votos "útil" na MESMA avaliação por IP por dia
 limiter = RateLimiter()
+EMAIL_DAILY_LIMIT = int(env("EMAIL_DAILY_LIMIT") or 250)  # teto global de links por dia (plano grátis do Brevo: 300)
 
 
 def ip_key(ip: str) -> str:
@@ -716,6 +719,14 @@ class App(BaseHTTPRequestHandler):
         except Exception:  # noqa: BLE001
             return ""
         return cookies[name].value if name in cookies else ""
+
+    def email_login_key(self) -> str | None:
+        """Identificador do login por e-mail deste navegador (o nonce do cookie de acesso), para limites em memória.
+        Não diz quem é a pessoa nem vai para o banco: serve só para um mesmo login não avaliar a mesma turma em série."""
+        given = self.cookie(ACCESS_COOKIE)
+        if EMAIL.enabled and given.startswith("e1.") and email_login.check_access(SECRET, EMAIL.epoch, given):
+            return given.split(".")[2]
+        return None
 
     # ---- roteamento
     def do_HEAD(self) -> None:
@@ -1132,9 +1143,12 @@ class App(BaseHTTPRequestHandler):
 
     def limit_same_class(self, professor: str, course: str) -> None:
         """Contra avaliações em série da mesma turma: cada cookie anônimo novo poderia avaliar de novo o mesmo docente.
-        Limita por rede (IP), só em memória — nada disso liga a avaliação a quem a escreveu."""
+        Limita por rede (IP) e por login de e-mail, só em memória — nada disso liga a avaliação a quem a escreveu."""
         msg = "Já recebemos avaliações desta turma a partir desta conexão hoje. Se você ainda não avaliou, tente amanhã."
         self.limit("review-pair", f"{self.client_ip()}|{professor}|{course}", msg)
+        login = self.email_login_key()
+        if login:
+            self.limit("review-access", f"{login}|{professor}|{course}", msg)
 
     def post_moderation_check(self) -> None:
         """Checagem enquanto a pessoa digita: diz o que seria barrado/segurado, sem guardar nada."""
@@ -1364,7 +1378,12 @@ class App(BaseHTTPRequestHandler):
             raise ApiError(400, msg, fields={"email": [msg]})
         # no máximo 3 links por endereço por hora (chave HMAC só em memória). Acima disso a resposta é a mesma,
         # mas nada é enviado: ninguém usa o site para encher a caixa de outra pessoa.
+        self.limit("login-day", message="Muitos pedidos de link a partir desta conexão hoje. Tente amanhã.")
         if limiter.hit("login-addr", email_login.address_key(SECRET, address), 3, 3600):
+            # teto global por dia: sem ele, poucas conexões gastariam a cota do serviço de envio e ninguém mais entraria
+            if not limiter.hit("login-global", "*", EMAIL_DAILY_LIMIT, 86400):
+                raise ApiError(503, "O limite diário de envios de e-mail foi atingido. Tente de novo amanhã"
+                               + (" ou entre com o código da comunidade." if ACCESS_CODES else "."))
             email_login.send_async(EMAIL, address, f"{public_url(self)}/#/entrar?t={email_login.link_token(SECRET)}")
         self.send_json({"ok": True, "message": f"Enviamos um link de acesso para {address}. Ele vale por "
                         f"{email_login.LINK_TTL // 60} minutos e funciona em qualquer navegador."})
