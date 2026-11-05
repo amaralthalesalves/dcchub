@@ -91,11 +91,15 @@ CRITERIA = [
     {"key": "fairness", "label": "Avaliações justas", "short": "Justiça", "hint": "Provas e trabalhos coerentes com o que foi ensinado", "low": "Nada justas", "high": "Muito justas"},
     # aprender e passar são coisas diferentes: matéria difícil com avaliação tranquila, ou o contrário
     {"key": "difficulty", "label": "Dificuldade para aprender", "short": "Aprender", "hint": "Quão difícil foi entender o conteúdo",
-     "low": "Muito fácil", "high": "Muito difícil", "neutral": True},
+     "low": "Muito fácil", "high": "Muito difícil",
+     "levels": ["Muito fácil", "Fácil", "Média", "Difícil", "Muito difícil"], "neutral": True},
     {"key": "passing", "label": "Dificuldade para passar", "short": "Passar", "hint": "Quão difícil foi tirar nota e ser aprovado",
-     "low": "Muito fácil", "high": "Muito difícil", "neutral": True},
-    {"key": "workload", "label": "Carga de trabalho", "short": "Carga", "hint": "Tempo exigido fora da sala de aula", "low": "Leve", "high": "Muito pesada", "neutral": True},
+     "low": "Muito fácil", "high": "Muito difícil",
+     "levels": ["Muito fácil", "Fácil", "Média", "Difícil", "Muito difícil"], "neutral": True},
+    {"key": "workload", "label": "Carga de trabalho", "short": "Carga", "hint": "Tempo exigido fora da sala de aula", "low": "Muito leve",
+     "high": "Muito pesada", "levels": ["Muito leve", "Leve", "Moderada", "Pesada", "Muito pesada"], "neutral": True},
 ]
+# "levels": nome de cada ponto das escalas neutras (1 a 5), mostrado ao lado da média — "3,8" sozinho parece nota boa
 CRITERIA_KEYS = [c["key"] for c in CRITERIA]
 # avaliações anteriores à separação de "dificuldade" em aprender/passar têm "passing" vazio (NULL): a pergunta antiga
 # misturava as duas coisas, então a nota antiga ficou em "aprender" e "passar" não é inventado. Médias ignoram vazios.

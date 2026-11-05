@@ -67,8 +67,14 @@ function scoreClass(v, neutral = false) {
   if (neutral) return v >= 4 ? 'n-high' : v >= 2.6 ? 'n-mid' : 'n-low';
   return v >= 4 ? 'good' : v >= 3 ? 'ok' : 'bad';
 }
-const pill = (v, { neutral = false, title = '' } = {}) =>
-  `<span class="pill ${scoreClass(v, neutral)}" ${title ? `title="${esc(title)}"` : ''}>${v == null ? '—' : fmt(v)}</span>`;
+// escalas neutras (dificuldade, carga): nome do ponto mais próximo da média — "3,8" sozinho parece nota boa
+const level = (c, v) => (v == null || !c?.levels ? '' : c.levels[Math.min(4, Math.max(0, Math.round(v) - 1))]);
+// com `crit`, a pílula é neutra quando o critério é e ganha o nome do nível no tooltip (tabelas não têm espaço para o texto)
+const pill = (v, { neutral = false, title = '', crit = null } = {}) => {
+  if (crit) { neutral = !!crit.neutral; title = title || (level(crit, v) ? `${crit.label}: ${level(crit, v).toLowerCase()}` : ''); }
+  return `<span class="pill ${scoreClass(v, neutral)}" ${title ? `title="${esc(title)}"` : ''}>${v == null ? '—' : fmt(v)}</span>`;
+};
+const critByKey = (k) => state.boot.criteria.find((c) => c.key === k);
 
 function stars(v) {
   const pct = v == null ? 0 : (v / 5) * 100;
@@ -328,13 +334,14 @@ function courseRow(c) {
 function firstNameLast(name) { const p = name.split(' '); return p.length > 1 ? `${p[0]} ${p[p.length - 1]}` : name; }
 
 function bars(avg, criteria, { answered = {}, count = 0 } = {}) {
+  const hasLevels = criteria.some((c) => c.levels); // coluna do nível em todas as linhas, para as barras ficarem alinhadas
   return `<dl class="bars">${criteria.map((c) => {
     const v = avg?.[c.key];
     const partial = answered[c.key] != null && answered[c.key] < count; // ex.: "passar" não existia nas avaliações antigas
     const note = partial ? (answered[c.key] ? ` <small class="muted">(${answered[c.key]} de ${count})</small>` : ' <small class="muted">(ainda sem respostas)</small>') : '';
     return `<div class="bar-row" title="${esc(c.hint)}${partial ? ' — pergunta nova: as avaliações anteriores não a respondiam' : ''}">
       <dt>${esc(c.label)}${note}</dt>
-      <dd><span class="bar"><span class="bar-fill ${scoreClass(v, c.neutral)}" style="width:${v ? (v / 5) * 100 : 0}%"></span></span><b>${fmt(v)}</b></dd>
+      <dd><span class="bar"><span class="bar-fill ${scoreClass(v, c.neutral)}" style="width:${v ? (v / 5) * 100 : 0}%"></span></span><b>${fmt(v)}</b>${hasLevels ? `<small class="bar-level">${esc(level(c, v))}</small>` : ''}</dd>
     </div>`;
   }).join('')}</dl>`;
 }
@@ -378,7 +385,7 @@ function evolutionBlock(summary) {
     <details class="evo-table"><summary class="small">Ver em tabela</summary>
       <div class="table-wrap"><table class="table">
         <thead><tr><th>Semestre</th><th class="num">Aval.</th>${crit.map((c) => `<th class="num" title="${esc(c.label)}">${esc(c.short || c.label)}</th>`).join('')}</tr></thead>
-        <tbody>${terms.slice().reverse().map((t) => `<tr><td>${esc(t.term)}</td><td class="num">${t.count}</td>${crit.map((c) => `<td class="num">${pill(t[c.key], { neutral: c.neutral })}</td>`).join('')}</tr>`).join('')}</tbody>
+        <tbody>${terms.slice().reverse().map((t) => `<tr><td>${esc(t.term)}</td><td class="num">${t.count}</td>${crit.map((c) => `<td class="num">${pill(t[c.key], { crit: c })}</td>`).join('')}</tr>`).join('')}</tbody>
       </table></div>
     </details>
   </section>`;
@@ -488,7 +495,7 @@ function reviewCard(r, { show = 'course' } = {}) {
       </div>
     </header>
     <ul class="review-metrics">
-      ${crit.filter((c) => r.ratings[c.key] != null).map((c) => `<li><span>${esc(c.label)}</span>${pill(r.ratings[c.key], { neutral: c.neutral })}</li>`).join('')}
+      ${crit.filter((c) => r.ratings[c.key] != null).map((c) => `<li><span>${esc(c.label)}</span>${pill(r.ratings[c.key], { crit: c })}${c.levels ? `<small>${esc(level(c, r.ratings[c.key]).toLowerCase())}</small>` : ''}</li>`).join('')}
       ${r.wouldRetake != null ? `<li><span>Faria de novo</span><b class="${r.wouldRetake ? 'yes' : 'no'}">${r.wouldRetake ? 'Sim' : 'Não'}</b></li>` : ''}
       ${r.grade ? `<li><span>Conceito</span><b>${esc(r.grade)}</b></li>` : ''}
     </ul>
@@ -901,7 +908,7 @@ async function viewProfessor({ args, isCurrent }) {
           <td><a href="#/disciplina/${encodeURIComponent(c.id)}"><b>${esc(c.name)}</b></a><br><span class="code">${esc(courseCode(c))}</span></td>
           <td>${c.terms.length ? `${c.terms.length}× <span class="muted small">(último ${esc(c.terms[c.terms.length - 1])})</span>` : '<span class="muted small">—</span>'}</td>
           <td>${pill(c.stats?.overall)} <span class="muted small">${c.stats ? c.stats.count : ''}</span></td>
-          <td>${pill(c.stats?.didactics)}</td><td>${pill(c.stats?.difficulty, { neutral: true })}</td><td>${pill(c.stats?.passing, { neutral: true })}</td><td>${pill(c.stats?.workload, { neutral: true })}</td>
+          <td>${pill(c.stats?.didactics)}</td>${['difficulty', 'passing', 'workload'].map((k) => `<td>${pill(c.stats?.[k], { crit: critByKey(k) })}</td>`).join('')}
           <td>${c.active ? `<a class="link-btn" href="#/avaliar?professor=${slug}&course=${encodeURIComponent(c.id)}">Avaliar</a>` : '<span class="small muted">fora de oferta</span>'}</td>
         </tr>`).join('')}</tbody></table></div>` : '<p class="muted">Nenhuma disciplina em oferta nos últimos semestres.</p>'}
       ${oldCourses.length ? `<p class="small muted old-courses">Também lecionou, em currículos ou temas que não são mais ofertados: ${oldCourses.map((c) => `<a href="#/disciplina/${encodeURIComponent(c.id)}">${esc(c.name)}</a> (${esc(c.terms[c.terms.length - 1])})`).join(', ')}.</p>` : ''}
@@ -1073,7 +1080,7 @@ async function viewCourse({ args, isCurrent }) {
       $('tbody', table).innerHTML = rows.map((p) => `<tr class="${p.terms.includes(latest) ? 'row-live' : ''}">
         <td><a class="prof-inline" href="#/professor/${p.slug}">${avatar(p, 'sm')} <span>${esc(p.name)}</span></a>${p.terms.includes(latest) ? ` <span class="badge badge-live">${esc(latest)}</span>` : ''}</td>
         <td class="num">${p.sections || '—'}</td><td>${esc(p.terms[p.terms.length - 1] || '—')}</td>
-        ${crit.map((k) => `<td class="num">${pill(p.stats?.[k.key], { neutral: k.neutral })}</td>`).join('')}
+        ${crit.map((k) => `<td class="num">${pill(p.stats?.[k.key], { crit: k })}</td>`).join('')}
         <td class="num">${p.stats?.retake != null ? `${p.stats.retake}%` : '—'}</td><td class="num">${p.stats?.count || 0}</td></tr>`).join('');
       $$('th', table).forEach((th) => th.setAttribute('aria-sort', th.dataset.k === key ? (dir > 0 ? 'ascending' : 'descending') : 'none'));
     };
