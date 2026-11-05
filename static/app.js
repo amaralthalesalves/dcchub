@@ -978,6 +978,9 @@ async function viewOffer({ params, isCurrent }) {
   if (!isCurrent()) return;
   const key = `avalie-grade-${term}`;
   let picked = new Set(store.get(key, []));
+  const icsKey = `avalie-aulas-${term}`; // datas de início/fim das aulas, só neste navegador
+  let icsDates = store.get(icsKey, {});
+  let icsOpen = false;
   const offerings = data.offerings.map((o, i) => ({ ...o, uid: `${o.course}|${o.class || ''}|${o.professors.join(',')}|${o.schedule.map(fmtSlot).join(',')}|${i}` }));
   // ids estáveis entre visitas: sem o índice quando possível
   offerings.forEach((o) => { o.key = o.uid.replace(/\|\d+$/, ''); });
@@ -1028,7 +1031,51 @@ async function viewOffer({ params, isCurrent }) {
     </div>
     ${hasConflict ? '<p class="warn small">⚠ Há turmas com horários sobrepostos (em vermelho).</p>' : ''}
     <ul class="planner-list">${list.map((o) => { const c = state.course.get(o.course); return `<li><span class="dot" style="--h:${hue.get(o.course)}"></span><a href="#/disciplina/${encodeURIComponent(o.course)}">${esc(c?.name || o.course)}</a> <span class="muted small">${esc(o.professors.map((s) => firstNameLast(state.prof.get(s)?.name || s)).join(', '))}</span><button class="link-btn unpick" data-unpick="${esc(o.key)}" aria-label="Remover">✕</button></li>`; }).join('')}</ul>
-    <p class="small muted">${plural(list.length, 'disciplina', 'disciplinas')} · ${list.reduce((a, o) => a + o.schedule.reduce((x, s) => x + (toMin(s.end) - toMin(s.start)), 0), 0) / 60 | 0}h/semana em sala</p>`;
+    <p class="small muted">${plural(list.length, 'disciplina', 'disciplinas')} · ${list.reduce((a, o) => a + o.schedule.reduce((x, s) => x + (toMin(s.end) - toMin(s.start)), 0), 0) / 60 | 0}h/semana em sala</p>
+    <details class="ics-export" id="ics-export" ${icsOpen ? 'open' : ''}><summary>Exportar para o calendário (.ics)</summary>
+      <form id="ics-form" class="ics-form">
+        <div class="ics-dates">
+          <label class="field"><span>Início das aulas</span><input type="date" name="start" required value="${esc(icsDates.start || '')}"></label>
+          <label class="field"><span>Fim das aulas</span><input type="date" name="end" required value="${esc(icsDates.end || '')}"></label>
+        </div>
+        <button class="btn btn-sm" type="submit">Baixar ${esc(term)}.ics</button>
+        <p class="small muted">Use as datas do calendário acadêmico da UFMG. Cada horário vira um evento semanal; feriados e recessos não são removidos. O arquivo é gerado aqui, no seu navegador.</p>
+      </form>
+    </details>`;
+    $('#ics-export').addEventListener('toggle', (e) => { icsOpen = e.target.open; });
+    $('#ics-form').addEventListener('input', (e) => { icsDates = { ...icsDates, [e.target.name]: e.target.value }; store.set(icsKey, icsDates); });
+    $('#ics-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const fd = new FormData(e.target); // lê do formulário (preenchimento automático não dispara 'input')
+      icsDates = { start: fd.get('start'), end: fd.get('end') };
+      store.set(icsKey, icsDates);
+      exportIcs(list);
+    });
+  };
+
+  // grade -> .ics, gerado no navegador (static/ics.js): a grade continua sem passar pelo servidor
+  const exportIcs = (list) => {
+    try {
+      const items = list.map((o) => {
+        const c = state.course.get(o.course);
+        const profs = o.professors.map((s) => state.prof.get(s)?.name || s).join(', ');
+        return {
+          uid: `${term}-${o.key}`,
+          title: c ? `${c.codes[0]} — ${c.name}` : o.course,
+          description: [o.class && `Turma ${o.class}`, profs && `Docentes: ${profs}`, `Oferta ${term} (DCCHub). Confira a sala no SIGA.`].filter(Boolean).join('\n'),
+          schedule: o.schedule,
+        };
+      });
+      const { ics, events, skipped } = window.DCCHubICS.build(items, { ...icsDates, term });
+      if (!events) { toast('Nenhuma turma da grade tem horário dentro dessas datas.', 'warn'); return; }
+      const url = URL.createObjectURL(new Blob([ics], { type: 'text/calendar;charset=utf-8' }));
+      const a = Object.assign(document.createElement('a'), { href: url, download: `grade-${term}.ics` });
+      document.body.append(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 10_000);
+      toast(`${plural(events, 'horário semanal exportado', 'horários semanais exportados')}${skipped ? ` · ${plural(skipped, 'turma sem horário ficou', 'turmas sem horário ficaram')} de fora` : ''}.`);
+    } catch (err) { toast(err.message, 'error'); }
   };
 
   const draw = () => {

@@ -504,6 +504,12 @@ a.chip:hover { border-color: var(--line-strong); color: var(--ink); text-decorat
 .planner-list li > a, .planner-list li > .muted { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .planner-list li > .muted { flex: 1; }
 .planner-list li a { color: var(--ink); font-weight: 600; }
+.ics-export { margin-top: 12px; border-top: 1px solid var(--line); padding-top: 10px; }
+.ics-export summary { cursor: pointer; font-weight: 600; font-size: 14px; color: var(--ink); }
+.ics-form { display: grid; gap: 10px; margin-top: 10px; }
+.ics-dates { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; }
+.ics-form .btn { justify-self: start; }
+.ics-form p { margin: 0; }
 .dot { width: 9px; height: 9px; border-radius: 50%; background: hsl(var(--h) 40% 45%); flex: none; }
 
 /* ---------- minhas / recuperação */
