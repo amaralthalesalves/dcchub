@@ -120,4 +120,4 @@ docker compose up -d --build
 
 ---
 
-<sub>Inspirado no que funciona em RateMyProfessors, UW Flow, GDE/Unicamp e MatrUSP — e evitando nota única sem contexto, rankings enviesados por poucas avaliações e ataques pessoais.</sub>
+<sub>Criado e mantido por [Thales Amaral](https://github.com/amaralthalesalves). Inspirado no que funciona em RateMyProfessors, UW Flow, GDE/Unicamp e MatrUSP — e evitando nota única sem contexto, rankings enviesados por poucas avaliações e ataques pessoais.</sub>

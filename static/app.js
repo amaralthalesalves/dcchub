@@ -1374,7 +1374,7 @@ async function viewAbout() {
     <div class="page-head"><p class="eyebrow">Sobre</p><h1>Como funciona</h1>
       <p class="lead-sm">O DCCHub reúne o que estudantes do DCC precisam para escolher e cursar disciplinas: avaliações anônimas, a oferta do semestre, provas antigas e oportunidades de pesquisa — com transparência sobre os dados e respeito a quem ensina.</p></div>
 
-    <p class="notice notice-old" role="note"><span><b>Projeto independente de estudantes.</b> O DCCHub não tem vínculo com o DCC nem com a UFMG e não fala em nome deles. É feito pela e para a comunidade estudantil; os dados de oferta, docentes, materiais e oportunidades vêm de fontes públicas ou da própria comunidade.</span></p>
+    <p class="notice notice-old" role="note"><span><b>Projeto independente de estudantes.</b> O DCCHub não tem vínculo com o DCC nem com a UFMG e não fala em nome deles. É feito pela e para a comunidade estudantil; os dados de oferta, docentes, materiais e oportunidades vêm de fontes públicas ou da própria comunidade. Criado e mantido por Thales Amaral, estudante da UFMG — que, como qualquer pessoa, não tem como saber quem escreveu cada avaliação.</span></p>
 
     <h2 id="avaliar">O que você avalia</h2>
     <ul>${b.criteria.map((c) => `<li><b>${esc(c.label)}</b> — ${esc(c.hint)} (1 = ${esc(c.low.toLowerCase())}, 5 = ${esc(c.high.toLowerCase())}).</li>`).join('')}</ul>
