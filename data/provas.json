@@ -1,0 +1,925 @@
+{
+ "generatedAt": "2026-11-05T11:35:22+00:00",
+ "name": "newCompleaks",
+ "url": "https://drive.google.com/drive/folders/11qr5vHPEckWX-TjPq8f7D6DfMUrAfElW",
+ "sections": [
+  {
+   "title": "1° Período",
+   "url": "https://drive.google.com/drive/folders/1dANFjLXiJJtLRlR16XmQM5d26H2ldqtv",
+   "courses": [
+    {
+     "code": "CAD011",
+     "title": "Administração",
+     "url": "https://drive.google.com/drive/folders/1klJRk0HFoOzlZBQIKlnK42xU42OW4QNa",
+     "files": 54,
+     "note": null,
+     "course": null
+    },
+    {
+     "code": "DCC044",
+     "title": "Fundamentos de Sistemas da Informação",
+     "url": "https://drive.google.com/drive/folders/15QH0Ao064keq2E1Yf0CXJWSNmnzpmpX4",
+     "files": 13,
+     "note": null,
+     "course": null
+    },
+    {
+     "code": "DCC050",
+     "title": "Introdução à Ciência da Computação",
+     "url": "https://drive.google.com/drive/folders/1GwxESWOOJ6_IYF5rEsyBfxxmxxDqKYw6",
+     "files": 2,
+     "note": null,
+     "course": null
+    },
+    {
+     "code": "DCC203",
+     "title": "Programação e Desenvolvimento de Software I",
+     "url": "https://drive.google.com/drive/folders/1m_a7BwMJULTVyOFZyzMVKl78aKilbLuw",
+     "files": 188,
+     "note": null,
+     "course": "DCC203"
+    },
+    {
+     "code": "DCC638",
+     "title": "Introdução à Lógica Computacional",
+     "url": "https://drive.google.com/drive/folders/1_x0Hzv4a2O_EDs1JqMYcpxRQrDF5bEN7",
+     "files": 111,
+     "note": null,
+     "course": "DCC638"
+    },
+    {
+     "code": "ECN140",
+     "title": "Introdução à Economia",
+     "url": "https://drive.google.com/drive/folders/1MNm_GACBhaioAxFb_x78WIjseF_EYOsV",
+     "files": 30,
+     "note": null,
+     "course": null
+    },
+    {
+     "code": "MAT038",
+     "title": "Geometria Analítica e Álgebra Linear",
+     "url": "https://drive.google.com/drive/folders/1VA7Dfnz6jnxvsl-RkD0mzz26lYE6TI7g",
+     "files": 145,
+     "note": null,
+     "course": null
+    }
+   ],
+   "folders": []
+  },
+  {
+   "title": "2° Período",
+   "url": "https://drive.google.com/drive/folders/1DJHWmtZmNGXKAnSPDS8YHaYwms8zNgrA",
+   "courses": [
+    {
+     "code": "CAD011",
+     "title": "Administração",
+     "url": "https://drive.google.com/drive/folders/1klJRk0HFoOzlZBQIKlnK42xU42OW4QNa",
+     "files": 54,
+     "note": null,
+     "course": null
+    },
+    {
+     "code": "DCC114",
+     "title": "Introdução aos Sistemas Lógicos",
+     "url": "https://drive.google.com/drive/folders/1As2XybQoZ9MmLlsOGZbjpDYWKNBftPj2",
+     "files": 42,
+     "note": null,
+     "course": "DCC114"
+    },
+    {
+     "code": "DCC204",
+     "title": "Programação e Desenvolvimento de Software II",
+     "url": "https://drive.google.com/drive/folders/17ORChBLzedf8SqC9mxFMGU-UAOAkjHIS",
+     "files": 257,
+     "note": null,
+     "course": "DCC219"
+    },
+    {
+     "code": "DCC216",
+     "title": "Matemática Discreta",
+     "url": "https://drive.google.com/drive/folders/1FuZ3OfEP4Tctrvvoile56qFGDxKAIjSS",
+     "files": 152,
+     "note": null,
+     "course": "DCC216"
+    },
+    {
+     "code": "DCC639",
+     "title": "Álgebra Linear Computacional",
+     "url": "https://drive.google.com/drive/folders/1dnq_Qkq0-iVgFcm67NEiDa-nyOISbpJr",
+     "files": 145,
+     "note": null,
+     "course": "DCC639"
+    },
+    {
+     "code": "ECN101",
+     "title": "Economia",
+     "url": "https://drive.google.com/drive/folders/1vxrrJPBO1HKd1KfjsTRXUiRp-hJrUWtN",
+     "files": 49,
+     "note": null,
+     "course": null
+    },
+    {
+     "code": "ECN140",
+     "title": "Introdução à Economia",
+     "url": "https://drive.google.com/drive/folders/1MNm_GACBhaioAxFb_x78WIjseF_EYOsV",
+     "files": 30,
+     "note": null,
+     "course": null
+    },
+    {
+     "code": "EST229",
+     "title": "Estatística Básica",
+     "url": "https://drive.google.com/drive/folders/1RjWeS2bMv5OilWHlEIt2qOtvFLxrhgJ9",
+     "files": 22,
+     "note": null,
+     "course": null
+    },
+    {
+     "code": "MAT001",
+     "title": "Cálculo Diferencial e Integral I",
+     "url": "https://drive.google.com/drive/folders/1ZDe25l9YqBM997-3MGprqijiayR25WnF",
+     "files": 61,
+     "note": null,
+     "course": null
+    }
+   ],
+   "folders": []
+  },
+  {
+   "title": "3° Período",
+   "url": "https://drive.google.com/drive/folders/1Iv5FvYCQKv99ZJhLqF5EKXZElwkE6pYL",
+   "courses": [
+    {
+     "code": "DCC011",
+     "title": "Introdução a Bancos de Dados",
+     "url": "https://drive.google.com/drive/folders/1GkHLf4SmBDlwaTzJNG-8vNnnJf4Jq_bu",
+     "files": 158,
+     "note": null,
+     "course": "DCC222"
+    },
+    {
+     "code": "DCC114",
+     "title": "Introdução aos Sistemas Lógicos",
+     "url": "https://drive.google.com/drive/folders/1As2XybQoZ9MmLlsOGZbjpDYWKNBftPj2",
+     "files": 42,
+     "note": null,
+     "course": "DCC114"
+    },
+    {
+     "code": "DCC205",
+     "title": "Estruturas de Dados",
+     "url": "https://drive.google.com/drive/folders/1w3YTpgqZMo7sopSb5c5ezDw-Ba0OCw2t",
+     "files": 114,
+     "note": null,
+     "course": "DCC221"
+    },
+    {
+     "code": "DCC639",
+     "title": "Álgebra Linear Computacional",
+     "url": "https://drive.google.com/drive/folders/1dnq_Qkq0-iVgFcm67NEiDa-nyOISbpJr",
+     "files": 145,
+     "note": null,
+     "course": "DCC639"
+    },
+    {
+     "code": "EST031",
+     "title": "Estatística e Probabilidades",
+     "url": "https://drive.google.com/drive/folders/1g-RcIFZ7gopiBQFRgqp134zrARyZmGph",
+     "files": 10,
+     "note": null,
+     "course": null
+    },
+    {
+     "code": "EST032",
+     "title": "Probabilidade",
+     "url": "https://drive.google.com/drive/folders/1ecpK6srR-Kj2stO3dXiWbBxndHV47R-u",
+     "files": 55,
+     "note": null,
+     "course": null
+    },
+    {
+     "code": "MAT039",
+     "title": "Cálculo Diferencial e Integral II",
+     "url": "https://drive.google.com/drive/folders/1qAqMuuuo2UJ5EjrSVekWtNAQ3J9t77ak",
+     "files": 160,
+     "note": null,
+     "course": null
+    }
+   ],
+   "folders": []
+  },
+  {
+   "title": "4° Período",
+   "url": "https://drive.google.com/drive/folders/16Fgwnit5VaNn5KPQLXStuHyOkG-LccXj",
+   "courses": [
+    {
+     "code": "CAD163",
+     "title": "Administração de Recursos Humanos",
+     "url": "https://drive.google.com/drive/folders/1YoUB9TVA_ctyMFwXxY_RXdRi3hBh8Zkq",
+     "files": 9,
+     "note": null,
+     "course": null
+    },
+    {
+     "code": "DCC006",
+     "title": "Organização de Computadores I",
+     "url": "https://drive.google.com/drive/folders/1dBgTW4QMN8bkd6m_6TuRTHk1Sm3tbrMp",
+     "files": 52,
+     "note": null,
+     "course": "DCC006"
+    },
+    {
+     "code": "DCC129",
+     "title": "Fundamentos da Teoria da Computação",
+     "url": "https://drive.google.com/drive/folders/1ptvhAIyqlzfT4CQ5BKTK46T-w5lyh_SG",
+     "files": 37,
+     "note": null,
+     "course": "DCC129"
+    },
+    {
+     "code": "DCC206",
+     "title": "Algoritmos I",
+     "url": "https://drive.google.com/drive/folders/15s1YJqpaxqiNROSuUYewxdjwi8JTcTni",
+     "files": 57,
+     "note": null,
+     "course": "DCC206"
+    },
+    {
+     "code": "DCC212",
+     "title": "Introdução à Ciência dos Dados",
+     "url": "https://drive.google.com/drive/folders/1B8cAi57zALS5oD9ds0uilqR4YdrsLqCa",
+     "files": 47,
+     "note": null,
+     "course": "DCC212"
+    },
+    {
+     "code": "MAT034",
+     "title": "Álbegra A",
+     "url": "https://drive.google.com/drive/folders/12HhD8ljY1sXqh2-ar2lOFbkCpDaslKmn",
+     "files": 83,
+     "note": null,
+     "course": null
+    },
+    {
+     "code": "TGI004",
+     "title": "Usuários da Informação",
+     "url": "https://drive.google.com/drive/folders/1oavcUn2aZf6DA5ZSIio--mIAm_AU3ibA",
+     "files": 5,
+     "note": null,
+     "course": null
+    }
+   ],
+   "folders": []
+  },
+  {
+   "title": "5° Período",
+   "url": "https://drive.google.com/drive/folders/1anumMuarEdzYyShZtS2tN1OnSdzKQl-v",
+   "courses": [
+    {
+     "code": "CAD004",
+     "title": "Administração da Produção",
+     "url": "https://drive.google.com/drive/folders/1gcfqjaGqYFiMBbXSsCH1RQHFpPVWrkxr",
+     "files": 2,
+     "note": null,
+     "course": null
+    },
+    {
+     "code": "CIC010",
+     "title": "Introdução à Contabilidade",
+     "url": "https://drive.google.com/drive/folders/1KGEKrOxvRHS753b5rLAUHeXCke6-gx1F",
+     "files": 0,
+     "note": null,
+     "course": null
+    },
+    {
+     "code": "OTI071",
+     "title": "Organização e Tratamento da Informação",
+     "url": "https://drive.google.com/drive/folders/1LRtpk8a_M_6Jzcik8igcuv4poSQUjHan",
+     "files": 0,
+     "note": null,
+     "course": null
+    },
+    {
+     "code": "DCC024",
+     "title": "Linguagens de Programação",
+     "url": "https://drive.google.com/drive/folders/1l8vErdzXXJW5I92dyAmzjLCFDsPeYa8k",
+     "files": 149,
+     "note": null,
+     "course": "DCC024"
+    },
+    {
+     "code": "DCC035",
+     "title": "Pesquisa Operacional",
+     "url": "https://drive.google.com/drive/folders/1sB3kN8v9XjTk7X1AJrhDlaBMtn3obk7C",
+     "files": 12,
+     "note": null,
+     "course": "DCC035"
+    },
+    {
+     "code": "DCC194",
+     "title": "Interação Humano-Computador",
+     "url": "https://drive.google.com/drive/folders/1Zb-zLW6D9NG9Lh2oFLp0JYNFYhOlmoHq",
+     "files": 3,
+     "note": null,
+     "course": "DCC194"
+    },
+    {
+     "code": "DCC207",
+     "title": "Algoritmos II",
+     "url": "https://drive.google.com/drive/folders/1rrNS5VIo6eIEGCXEZYaMqNGJ2svhWzr-",
+     "files": 42,
+     "note": null,
+     "course": "DCC207"
+    },
+    {
+     "code": "MAT040",
+     "title": "Equações Diferenciais C",
+     "url": "https://drive.google.com/drive/folders/1AEiTHgGe9WtsP4-2JUr-JFmeXmh0aRob",
+     "files": 27,
+     "note": null,
+     "course": null
+    }
+   ],
+   "folders": []
+  },
+  {
+   "title": "6° Período",
+   "url": "https://drive.google.com/drive/folders/1j_HH4kqnA8OJAo7LpDZ8Ybmvmi7TrYf0",
+   "courses": [
+    {
+     "code": "CAD153",
+     "title": "Administração de Custos",
+     "url": "https://drive.google.com/drive/folders/16fI16qZGJzvGVZO-sm0L6IjXVvxrLBPs",
+     "files": 0,
+     "note": null,
+     "course": null
+    },
+    {
+     "code": "DCC053",
+     "title": "Compiladores 1",
+     "url": "https://drive.google.com/drive/folders/1ZKxgwuh_9ANuLU4tk3S0mJyjYNuGlS91",
+     "files": 112,
+     "note": null,
+     "course": "DCC053"
+    },
+    {
+     "code": "DCC603",
+     "title": "Engenharia de Software",
+     "url": "https://drive.google.com/drive/folders/1U4y1DjZnN-FEiKgMDt4dM-ZFh1uX9lSl",
+     "files": 11,
+     "note": null,
+     "course": "DCC094"
+    },
+    {
+     "code": "DCC605",
+     "title": "Sistemas Operacionais",
+     "url": "https://drive.google.com/drive/folders/1c1QkQfolroe2VcNSymYkhkq2zpLbMjRP",
+     "files": 49,
+     "note": null,
+     "course": "DCC605"
+    },
+    {
+     "code": "FIS156",
+     "title": "Introdução à Física Estatística Computacional",
+     "url": "https://drive.google.com/drive/folders/1W_ckMHZVAiW8xyZLmwHkvGdQ1yFPLZOF",
+     "files": 21,
+     "note": null,
+     "course": null
+    }
+   ],
+   "folders": []
+  },
+  {
+   "title": "7° Período",
+   "url": "https://drive.google.com/drive/folders/1VbFpsLEK9eWIpVlVepOgNfXS8tMAfN5B",
+   "courses": [
+    {
+     "code": "CAD167",
+     "title": "Administração Financeira",
+     "url": "https://drive.google.com/drive/folders/1qgZayYt-pmdcwK77G_aCe-3e2UPnXAyP",
+     "files": 1,
+     "note": null,
+     "course": null
+    },
+    {
+     "code": "DCC072",
+     "title": "Engenharia de Software II",
+     "url": "https://drive.google.com/drive/folders/1jPNKpceWV4Ubk0tO7CD0BkoJV4sL__JT",
+     "files": 0,
+     "note": null,
+     "course": "DCC072"
+    },
+    {
+     "code": "DCC636",
+     "title": "Ética na Computação",
+     "url": "https://drive.google.com/drive/folders/1VPzzViPyRxJLha0xIqfb4yEP0XAqX_Cx",
+     "files": 0,
+     "note": null,
+     "course": "DCC636"
+    },
+    {
+     "code": "DCC642",
+     "title": "Introdução à Inteligência Artificial",
+     "url": "https://drive.google.com/drive/folders/1PixNo0AYciRYzqCXvRiXQX0uaCCBDGQx",
+     "files": 0,
+     "note": null,
+     "course": "DCC642"
+    },
+    {
+     "code": "DCC023",
+     "title": "Redes de Computadores",
+     "url": "https://drive.google.com/drive/folders/1qAdlIKjm05a4R5yvETL6lGomkBqI8cZH",
+     "files": 4,
+     "note": null,
+     "course": "DCC095"
+    },
+    {
+     "code": "DCC641",
+     "title": "Fundamentos de Sistemas Paralelos e Distribuídos",
+     "url": "https://drive.google.com/drive/folders/14x_4qmEg22U61Utj7P4vjGeIczbf13Y4",
+     "files": 19,
+     "note": null,
+     "course": "DCC641"
+    }
+   ],
+   "folders": []
+  },
+  {
+   "title": "8° Período",
+   "url": "https://drive.google.com/drive/folders/1rERALR3Rxc6mXOI9ZSez6TvtD4qhH_5w",
+   "courses": [
+    {
+     "code": "CAD164",
+     "title": "Administração Mercadológica",
+     "url": "https://drive.google.com/drive/folders/1J38m2u-i295O9ApmDFEWqqsSGCfZInJC",
+     "files": 2,
+     "note": null,
+     "course": null
+    },
+    {
+     "code": "DCC637",
+     "title": "Computação e Sociedade",
+     "url": "https://drive.google.com/drive/folders/1vJO8A3CW3xgPLE63VUMZ0Hi5MQOyYZeU",
+     "files": 0,
+     "note": null,
+     "course": "DCC637"
+    }
+   ],
+   "folders": []
+  },
+  {
+   "title": "Corrida CompLeaks_ 2026",
+   "url": "https://drive.google.com/drive/folders/1mzneH7tKMJ3RzXggfc6VjKrW5KGvYWPH",
+   "courses": [],
+   "folders": [
+    {
+     "title": "Versões Curriculares",
+     "url": "https://drive.google.com/drive/folders/1vLDWbQVhsXlq2h9hhqU80DJZ6XUYGsUD",
+     "files": 2
+    }
+   ]
+  },
+  {
+   "title": "Optativas e Formação Livre",
+   "url": "https://drive.google.com/drive/folders/1stRNez-a1xc_DRvKHiCupjYoNRPUBnJZ",
+   "courses": [
+    {
+     "code": "DCC030",
+     "title": "Classes de Grafos",
+     "url": "https://drive.google.com/drive/folders/1NNJTn-0dLq19mnqe8w_CmAR7earjK-F9",
+     "files": 0,
+     "note": null,
+     "course": null
+    },
+    {
+     "code": "DCC030",
+     "title": "Empreendimentos em Informática",
+     "url": "https://drive.google.com/drive/folders/1BLSUL6NZIBKD-1hbSBpJFIhnEvL-KrHi",
+     "files": 0,
+     "note": null,
+     "course": "DCC055"
+    },
+    {
+     "code": "DCC030",
+     "title": "Fundamentos do Processamento de Sinais",
+     "url": "https://drive.google.com/drive/folders/1wHXl9SJLqf8XRIXzN2A2tsXG1Dp_gDdF",
+     "files": 0,
+     "note": null,
+     "course": null
+    },
+    {
+     "code": "DCC030",
+     "title": "Fundamentos Estatísticos de Ciência dos Dados B",
+     "url": "https://drive.google.com/drive/folders/1X10wOwxTbOg8bQfX6bQSarstEJ_CZaJF",
+     "files": 0,
+     "note": null,
+     "course": "DCC082"
+    },
+    {
+     "code": "DCC030",
+     "title": "Análise e Mineração de Mídias Sociais",
+     "url": "https://drive.google.com/drive/folders/1TpxRS07r6Y0935dDec-RYTBamrB7eEFS",
+     "files": 0,
+     "note": null,
+     "course": null
+    },
+    {
+     "code": "DCC030",
+     "title": "Aprendizado Profundo para Processamento de Linguagem Natural",
+     "url": "https://drive.google.com/drive/folders/1ERrE3BtaU9AAE67DbaXr7KoFsR2Te0gn",
+     "files": 0,
+     "note": null,
+     "course": null
+    },
+    {
+     "code": "DCC030",
+     "title": "Bancos de Dados Geográficos",
+     "url": "https://drive.google.com/drive/folders/1F4cGg5jtOAq_tLh7zFUztjmfJ-uzVTTv",
+     "files": 0,
+     "note": null,
+     "course": null
+    },
+    {
+     "code": "DCC030",
+     "title": "Bioinformática",
+     "url": "https://drive.google.com/drive/folders/1Y1gFcM2xKNupcd6TLZOKhia_laMGrAH2",
+     "files": 0,
+     "note": null,
+     "course": null
+    },
+    {
+     "code": "DCC030",
+     "title": "Cibersegurança",
+     "url": "https://drive.google.com/drive/folders/1KO6aYyX8my-WLXNfInAGC_u3UnZ9dPmC",
+     "files": 0,
+     "note": null,
+     "course": "DCC080"
+    },
+    {
+     "code": "DCC030",
+     "title": "Criação de Startups: Abordagem Ágil de Problemas de Empresas",
+     "url": "https://drive.google.com/drive/folders/17H3Xs2s1CbxUi3KK51VS1ePxpFjJpfvR",
+     "files": 0,
+     "note": null,
+     "course": "TOP-criacao-de-startups-abordagem-agil-de-problemas-de-empresas"
+    },
+    {
+     "code": "DCC030",
+     "title": "Engenharia de Usabilidade",
+     "url": "https://drive.google.com/drive/folders/1o9Ph7jpVJWu2OOqmzT0WtsWyL_uOo50I",
+     "files": 0,
+     "note": null,
+     "course": "DCC193"
+    },
+    {
+     "code": "DCC030",
+     "title": "Gerenciamento das Redes de Computadores e Serviços",
+     "url": "https://drive.google.com/drive/folders/1a3ryOAoAJ1UmCeXdphSILs6zoyDgF2lU",
+     "files": 0,
+     "note": null,
+     "course": null
+    },
+    {
+     "code": "DCC030",
+     "title": "Gestão de Equipes",
+     "url": "https://drive.google.com/drive/folders/1Ej9jlW58aJ08KlmN2F4-jDKB61qw9pqP",
+     "files": 0,
+     "note": null,
+     "course": "DCC083"
+    },
+    {
+     "code": "DCC030",
+     "title": "Introdução à Computação Visual",
+     "url": "https://drive.google.com/drive/folders/16YO4-tmAD7_cJTO4-3XFWy1uU7yy2YSr",
+     "files": 0,
+     "note": null,
+     "course": "TOP-introducao-a-computacao-visual"
+    },
+    {
+     "code": "DCC030",
+     "title": "Introdução à Integração Humano-Computador como Uma Extensão da Interação",
+     "url": "https://drive.google.com/drive/folders/1s1JDmInOwPnNrGXLeFTNTaBkCF0sr4XJ",
+     "files": 0,
+     "note": null,
+     "course": null
+    },
+    {
+     "code": "DCC030",
+     "title": "Métodos Formais",
+     "url": "https://drive.google.com/drive/folders/1VU-MwyO1jLflK8CnNGP8ZzVUf-cBe4KC",
+     "files": 0,
+     "note": null,
+     "course": "DCC092"
+    },
+    {
+     "code": "DCC030",
+     "title": "Prática em Desenvolvimento de Software",
+     "url": "https://drive.google.com/drive/folders/1JuPSwWSNcy45DziTpTFk48h4ZpTqqTUn",
+     "files": 0,
+     "note": null,
+     "course": null
+    },
+    {
+     "code": "DCC030",
+     "title": "Recuperação da Informação Musical",
+     "url": "https://drive.google.com/drive/folders/1wn1Wj3HmSDHVJ9WAykfVxlxhKOaJMkva",
+     "files": 0,
+     "note": null,
+     "course": "TOP-recuperacao-de-informacao-musical"
+    },
+    {
+     "code": "DCC030",
+     "title": "Teste de Software",
+     "url": "https://drive.google.com/drive/folders/1FH1B5haLGxvrxVW234bRP-bH0u56vcdD",
+     "files": 0,
+     "note": null,
+     "course": "DCC089"
+    },
+    {
+     "code": "DCC055",
+     "title": "EMPREENDIMENTOS EM INFORMATICA",
+     "url": "https://drive.google.com/drive/folders/1IUMyGJ6KUHBGYqSRcu-IjUTU5TOmJzkn",
+     "files": 0,
+     "note": null,
+     "course": "DCC055"
+    },
+    {
+     "code": "DCC057",
+     "title": "MINERACAO DE DADOS",
+     "url": "https://drive.google.com/drive/folders/1naAlUinxhN_diFYcbT18amlH0G1U-US0",
+     "files": 0,
+     "note": null,
+     "course": "DCC057"
+    },
+    {
+     "code": "DCC193",
+     "title": "ENGENHARIA DE USABILIDADE",
+     "url": "https://drive.google.com/drive/folders/19A2dldjesiXUqZcrBypL0t03ZofNEHTx",
+     "files": 0,
+     "note": null,
+     "course": "DCC193"
+    },
+    {
+     "code": "DCC199",
+     "title": "TEORIA DOS GRAFOS",
+     "url": "https://drive.google.com/drive/folders/18gYm0-ABU9DWuftUEviWIFpxP-5JsnOx",
+     "files": 0,
+     "note": null,
+     "course": "DCC199"
+    },
+    {
+     "code": "DCC215",
+     "title": "HEURÍSTICAS E METAHEURÍSTICAS",
+     "url": "https://drive.google.com/drive/folders/1g3EFWx-ITIN4CEIgXZg5mvKF1Gk4WPx-",
+     "files": 0,
+     "note": null,
+     "course": "DCC215"
+    },
+    {
+     "code": "DCC603",
+     "title": "ENGENHARIA DE SOFTWARE",
+     "url": "https://drive.google.com/drive/folders/1WlFuwtJ4tvUikYGQGaMa0IWUfc0gatsd",
+     "files": 0,
+     "note": null,
+     "course": "DCC094"
+    },
+    {
+     "code": "FIS065",
+     "title": "FUNDAMENTOS DE MECANICA",
+     "url": "https://drive.google.com/drive/folders/1nHsgUv7W-M3Un4h-Gdaj8eANU5lP77_z",
+     "files": 0,
+     "note": null,
+     "course": null
+    },
+    {
+     "code": "FIS069",
+     "title": "FUNDAMENTOS DE ELETROMAGNETISMO",
+     "url": "https://drive.google.com/drive/folders/1h6DzdpvyGrBWsTok9Io-bhvC2a1vVTdq",
+     "files": 0,
+     "note": null,
+     "course": null
+    },
+    {
+     "code": "FIS086",
+     "title": "FUNDAMENTOS DE OSCILACOES, ONDAS E OPTICAS",
+     "url": "https://drive.google.com/drive/folders/1gE_aCw6Rjp3qF3tM8-1GyyOcwg-nDAQw",
+     "files": 0,
+     "note": null,
+     "course": null
+    },
+    {
+     "code": "FIS088",
+     "title": "FUNDAMENTOS DE FISICA QUANTICA",
+     "url": "https://drive.google.com/drive/folders/149RcTF6raoxnn6IOcobKBCsMFFaFGU7M",
+     "files": 0,
+     "note": null,
+     "course": null
+    },
+    {
+     "code": "FIS152",
+     "title": "FUNDAMENTOS DE MECÂNICA DOS FLUIDOS E TERMODINÂMICA",
+     "url": "https://drive.google.com/drive/folders/1_FasIV6c7vD-Pn8bLJ32NCPQGKRuyF-l",
+     "files": 0,
+     "note": null,
+     "course": null
+    },
+    {
+     "code": "ICB001",
+     "title": "BASES ECOLÓGICAS PARA O DESENVOLVIMENTO SUSTENTÁVEL",
+     "url": "https://drive.google.com/drive/folders/1XXm41PE4uCA2sGqT2L6xT_o9A_HKWRCL",
+     "files": 0,
+     "note": null,
+     "course": null
+    },
+    {
+     "code": "LET223",
+     "title": "FUNDAMENTOS DE LIBRAS",
+     "url": "https://drive.google.com/drive/folders/11Aa8aTEAyb5inMlvyOFatvHIQSpLHfRV",
+     "files": 0,
+     "note": null,
+     "course": null
+    },
+    {
+     "code": "MAT002",
+     "title": "CALCULO DIFERENCIAL E INTEGRAL III",
+     "url": "https://drive.google.com/drive/folders/1uDVHUjHzqBqBcknJgI_GhSSyFAf1Qlyk",
+     "files": 0,
+     "note": null,
+     "course": null
+    },
+    {
+     "code": "UNI003",
+     "title": "OFICINA DE LINGUA PORTUGUESA: LEITURA E PRODUCAO DE TEXTOS",
+     "url": "https://drive.google.com/drive/folders/1OLEUToSBZmoG2Lt-HunQ862_xqQG0HJs",
+     "files": 0,
+     "note": null,
+     "course": null
+    },
+    {
+     "code": "DCC030",
+     "title": "Processamento de Linguagem Natural",
+     "url": "https://drive.google.com/drive/folders/1KyN6ygHIe1oC2Yo_6zGslvJo-upM_3UB",
+     "files": 1,
+     "note": null,
+     "course": null
+    },
+    {
+     "code": "DCC030",
+     "title": "Teoria dos Grafos",
+     "url": "https://drive.google.com/drive/folders/1M1Mnv_qBulp_SMJ4Ao7WDjfWTJ0rSwc3",
+     "files": 2,
+     "note": null,
+     "course": "DCC199"
+    },
+    {
+     "code": "DCC030",
+     "title": "Computação em Nuvem",
+     "url": "https://drive.google.com/drive/folders/1XMUR-knWGagWC6lLSIwFSQ4yKHC7Toa6",
+     "files": 36,
+     "note": null,
+     "course": "TOP-computacao-em-nuvem"
+    },
+    {
+     "code": "DCC030",
+     "title": "Sistemas de Recomendação",
+     "url": "https://drive.google.com/drive/folders/1fG7AVf8uY0qXMLr0XVAB3cdlPy6gs8bB",
+     "files": 2,
+     "note": null,
+     "course": null
+    },
+    {
+     "code": "DCC194",
+     "title": "Armazens de Dados",
+     "url": "https://drive.google.com/drive/folders/1gKLMLbK0sSbi1u0yZhOd_hRKWo8T8Gzq",
+     "files": 3,
+     "note": null,
+     "course": "DCC194"
+    },
+    {
+     "code": "DCC194",
+     "title": "Interação Humano-Computador",
+     "url": "https://drive.google.com/drive/folders/1Zb-zLW6D9NG9Lh2oFLp0JYNFYhOlmoHq",
+     "files": 3,
+     "note": null,
+     "course": "DCC194"
+    },
+    {
+     "code": "MAT890",
+     "title": "Pré Cálculo",
+     "url": "https://drive.google.com/drive/folders/1gjLmMWlSCp1uP4lubwq0hBSkl-sooES8",
+     "files": 2,
+     "note": null,
+     "course": null
+    },
+    {
+     "code": "UNI001",
+     "title": "INGLÊS INSTRUMENTAL I",
+     "url": "https://drive.google.com/drive/folders/1hw2OXWLnfNk8l_9v7tkvjRFKpnnqM9tb",
+     "files": 2,
+     "note": null,
+     "course": null
+    },
+    {
+     "code": "UNI002",
+     "title": "INGLÊS INSTRUMENTAL II",
+     "url": "https://drive.google.com/drive/folders/1NVk_HPFs962hX2AhDvhG86kbtci_6YM8",
+     "files": 1,
+     "note": null,
+     "course": null
+    }
+   ],
+   "folders": []
+  },
+  {
+   "title": "Outros e Antigo Compleaks",
+   "url": "https://drive.google.com/drive/folders/1xzGms9o0S9RljcuyarZPp1h2q-qktW-6",
+   "courses": [
+    {
+     "code": "DCC001",
+     "title": "PROGRAMACAO DE COMPUTADORES",
+     "url": "https://drive.google.com/drive/folders/1pMvjdaUuEuIo0XN9EJ5O6ndSWQ80IqZO",
+     "files": 0,
+     "note": null,
+     "course": "DCC001"
+    },
+    {
+     "code": "DCC010",
+     "title": "COMPILADORES",
+     "url": "https://drive.google.com/drive/folders/1hj6KkUdjgM1fdF4ArbUR_sEg2Zw3Tf1a",
+     "files": 0,
+     "note": null,
+     "course": "DCC053"
+    },
+    {
+     "code": "DCC017",
+     "title": "INTRODUCAO A ARQUITETURA DE COMPUTADORES",
+     "url": "https://drive.google.com/drive/folders/1dFbUJ3JFOL7ySkK76w_7gXX2qLdm6NBk",
+     "files": 0,
+     "note": null,
+     "course": "DCC006"
+    },
+    {
+     "code": "DCC033",
+     "title": "ANALISE NUMERICA",
+     "url": "https://drive.google.com/drive/folders/1LfWqrv57RvJZT_-x8zw1wbnL_X5cKqsG",
+     "files": 0,
+     "note": null,
+     "course": "DCC033"
+    },
+    {
+     "code": "DCC034",
+     "title": "CALCULO NUMERICO",
+     "url": "https://drive.google.com/drive/folders/1IK-_YAOmSD_mT_a-k1rSQlkl1J5M4CXb",
+     "files": 0,
+     "note": null,
+     "course": "DCC034"
+    },
+    {
+     "code": "DCC208",
+     "title": "INTRODUÇÃO À PROGRAMAÇÃO DE COMPUTADORES",
+     "url": "https://drive.google.com/drive/folders/1x77-a80MJtKV2xxR5SzRR3wY7y4SnR41",
+     "files": 0,
+     "note": null,
+     "course": "DCC001"
+    },
+    {
+     "code": "DCC601",
+     "title": "INTRODUCAO A INFORMATICA",
+     "url": "https://drive.google.com/drive/folders/1Ne-1lyQ0fojbvpBFEq8oxA5zLu8EIAgS",
+     "files": 0,
+     "note": null,
+     "course": "DCC601"
+    }
+   ],
+   "folders": [
+    {
+     "title": "Antigo Compleaks",
+     "url": "https://drive.google.com/drive/folders/1mGuoSSqneWg2nFOjdGzvCZ8qAW6VGlmv",
+     "files": 608
+    }
+   ]
+  }
+ ],
+ "extras": [
+  {
+   "title": "Bem vindo ao newCompleaks",
+   "url": "https://drive.google.com/file/d/180TVxfocAgBCDkUpMLvXwejQk1WZZWrx/view?usp=drive_web"
+  },
+  {
+   "title": "Dicas para anonimizar seus arquivos",
+   "url": "https://drive.google.com/file/d/1P4oIN8y4o3cH4MUSE_Q_OVnfrSpGeIXK/view?usp=drive_web"
+  },
+  {
+   "title": "Dicas para encontrar livros online",
+   "url": "https://drive.google.com/file/d/1f_jzNHPG-XzgpkOQSIVCLDBm_hjh726I/view?usp=drive_web"
+  },
+  {
+   "title": "Grade Curricular CC versão 2025",
+   "url": "https://drive.google.com/file/d/1Yz9nDJcpv0kInr1hG7UpM6MBaHnf7ZEj/view?usp=drive_web"
+  },
+  {
+   "title": "Grade Curricular SI versão 2025",
+   "url": "https://drive.google.com/file/d/1QJzxOozkvPYmcNNQhpYMm5Jb_9U5CKB5/view?usp=drive_web"
+  }
+ ]
+}

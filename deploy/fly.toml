@@ -1,0 +1,27 @@
+# Alternativa paga e simples: Fly.io (~US$ 2–4/mês). Na pasta raiz do projeto:
+#   fly launch --no-deploy --copy-config --config deploy/fly.toml
+#   fly volumes create dcchub_var --size 1 --region gru
+#   fly secrets set DCCHUB_ADMIN_TOKEN=... DCCHUB_ACCESS_CODES=...   &&   fly deploy --config deploy/fly.toml
+app = "dcchub"
+primary_region = "gru"          # São Paulo (mais caro que EUA; troque por "iad" para economizar)
+
+[build]
+  dockerfile = "../Dockerfile"
+
+[env]
+  DCCHUB_TRUST_PROXY = "1"
+
+[[mounts]]
+  source = "dcchub_var"
+  destination = "/app/var"
+
+[http_service]
+  internal_port = 8000
+  force_https = true
+  auto_stop_machines = "stop"   # desliga sem tráfego (economiza); liga de novo na primeira visita
+  auto_start_machines = true
+  min_machines_running = 0
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "256mb"

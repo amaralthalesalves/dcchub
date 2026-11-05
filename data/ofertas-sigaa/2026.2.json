@@ -1,0 +1,3377 @@
+{
+ "term": "2026.2",
+ "source": "SIGAA — Mapa de oferta por departamento",
+ "note": "Só código, título, turma, horário e nome dos docentes.",
+ "offerings": [
+  {
+   "codes": [
+    "DCC001"
+   ],
+   "name": "PROGRAMACAO DE COMPUTADORES",
+   "class": "TN1",
+   "schedule": [
+    {
+     "day": 1,
+     "start": "14:55",
+     "end": "16:35"
+    },
+    {
+     "day": 3,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "teachers": [
+    "JOAO GUILHERME MAIA DE MENEZES"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC001"
+   ],
+   "name": "PROGRAMACAO DE COMPUTADORES",
+   "class": "TB",
+   "schedule": [
+    {
+     "day": 1,
+     "start": "09:25",
+     "end": "11:05"
+    },
+    {
+     "day": 3,
+     "start": "09:25",
+     "end": "11:05"
+    }
+   ],
+   "teachers": [
+    "JOSE LOPES DE SIQUEIRA NETO"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC001"
+   ],
+   "name": "PROGRAMACAO DE COMPUTADORES",
+   "class": "TM2",
+   "schedule": [
+    {
+     "day": 1,
+     "start": "13:00",
+     "end": "14:40"
+    },
+    {
+     "day": 3,
+     "start": "13:00",
+     "end": "14:40"
+    }
+   ],
+   "teachers": [
+    "ITALO FERNANDO SCOTA CUNHA"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC001"
+   ],
+   "name": "PROGRAMACAO DE COMPUTADORES",
+   "class": "TM1",
+   "schedule": [
+    {
+     "day": 1,
+     "start": "13:00",
+     "end": "14:40"
+    },
+    {
+     "day": 3,
+     "start": "13:00",
+     "end": "14:40"
+    }
+   ],
+   "teachers": [
+    "WILLIAM ROBSON SCHWARTZ"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC001"
+   ],
+   "name": "PROGRAMACAO DE COMPUTADORES",
+   "class": "TD",
+   "schedule": [
+    {
+     "day": 1,
+     "start": "11:10",
+     "end": "12:50"
+    },
+    {
+     "day": 3,
+     "start": "11:10",
+     "end": "12:50"
+    }
+   ],
+   "teachers": [
+    "DANIEL FERNANDES MACEDO"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC001"
+   ],
+   "name": "PROGRAMACAO DE COMPUTADORES",
+   "class": "TE",
+   "schedule": [
+    {
+     "day": 4,
+     "start": "20:55",
+     "end": "22:35"
+    },
+    {
+     "day": 2,
+     "start": "19:00",
+     "end": "20:40"
+    }
+   ],
+   "teachers": [
+    "ALEXANDRE ALVES DA ROCHA"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC001"
+   ],
+   "name": "PROGRAMACAO DE COMPUTADORES",
+   "class": "TM3",
+   "schedule": [
+    {
+     "day": 3,
+     "start": "13:00",
+     "end": "14:40"
+    },
+    {
+     "day": 1,
+     "start": "13:00",
+     "end": "14:40"
+    }
+   ],
+   "teachers": [
+    "ADRIANO CESAR MACHADO PEREIRA"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC001"
+   ],
+   "name": "PROGRAMACAO DE COMPUTADORES",
+   "class": "TZ",
+   "schedule": [
+    {
+     "day": 1,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 3,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "teachers": [
+    "ADRIANO ALONSO VELOSO"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC001"
+   ],
+   "name": "PROGRAMACAO DE COMPUTADORES",
+   "class": "TN2",
+   "schedule": [
+    {
+     "day": 1,
+     "start": "14:55",
+     "end": "16:35"
+    },
+    {
+     "day": 3,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "teachers": [
+    "JOSE LOPES DE SIQUEIRA NETO"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC006"
+   ],
+   "name": "ORGANIZAÇÃO DE COMPUTADORES I",
+   "class": "TL",
+   "schedule": [
+    {
+     "day": 1,
+     "start": "19:00",
+     "end": "20:40"
+    },
+    {
+     "day": 3,
+     "start": "19:00",
+     "end": "20:40"
+    }
+   ],
+   "teachers": [
+    "MICHELE NOGUEIRA LIMA"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC006"
+   ],
+   "name": "ORGANIZAÇÃO DE COMPUTADORES I",
+   "class": "TL1",
+   "schedule": [
+    {
+     "day": 1,
+     "start": "14:55",
+     "end": "16:35"
+    },
+    {
+     "day": 3,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "teachers": [
+    "RAFAEL FOLLMANN FACCENDA"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC009"
+   ],
+   "name": "PROJETO ORIENTADO EM COMPUTACAO II",
+   "class": "PM3",
+   "schedule": [],
+   "teachers": [
+    "ERICKSON RANGEL DO NASCIMENTO"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC009"
+   ],
+   "name": "PROJETO ORIENTADO EM COMPUTACAO II",
+   "class": "PM5",
+   "schedule": [],
+   "teachers": [
+    "MICHELE AMARAL BRANDAO"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC009"
+   ],
+   "name": "PROJETO ORIENTADO EM COMPUTACAO II",
+   "class": "PM6/PM",
+   "schedule": [],
+   "teachers": [
+    "PEDRO OLMO STANCIOLI VAZ DE MELO"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC009"
+   ],
+   "name": "PROJETO ORIENTADO EM COMPUTACAO II",
+   "class": "PM4",
+   "schedule": [],
+   "teachers": [
+    "JOAO GUILHERME MAIA DE MENEZES"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC009"
+   ],
+   "name": "PROJETO ORIENTADO EM COMPUTACAO II",
+   "class": "PM2",
+   "schedule": [],
+   "teachers": [
+    "GISELE LOBO PAPPA"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC009"
+   ],
+   "name": "PROJETO ORIENTADO EM COMPUTACAO II",
+   "class": "PM1",
+   "schedule": [],
+   "teachers": [
+    "ADRIANO CESAR MACHADO PEREIRA"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC010"
+   ],
+   "name": "COMPILADORES",
+   "class": "TN",
+   "schedule": [
+    {
+     "day": 2,
+     "start": "14:55",
+     "end": "16:35"
+    },
+    {
+     "day": 4,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "teachers": [
+    "RENATO ANTONIO CELSO FERREIRA"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC011"
+   ],
+   "name": "INTRODUÇÃO A BANCO DE DADOS",
+   "class": "TB",
+   "schedule": [
+    {
+     "day": 1,
+     "start": "09:25",
+     "end": "11:05"
+    },
+    {
+     "day": 3,
+     "start": "09:25",
+     "end": "11:05"
+    }
+   ],
+   "teachers": [
+    "RODRYGO LUIS TEODORO SANTOS"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC011"
+   ],
+   "name": "INTRODUÇÃO A BANCO DE DADOS",
+   "class": "TE",
+   "schedule": [
+    {
+     "day": 2,
+     "start": "19:00",
+     "end": "20:40"
+    },
+    {
+     "day": 4,
+     "start": "19:00",
+     "end": "20:40"
+    }
+   ],
+   "teachers": [
+    "MICHELE AMARAL BRANDAO"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC017"
+   ],
+   "name": "INTRODUCAO A ARQUITETURA DE COMPUTADORES",
+   "class": "TN",
+   "schedule": [
+    {
+     "day": 1,
+     "start": "14:55",
+     "end": "16:35"
+    },
+    {
+     "day": 3,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "teachers": [
+    "RAFAEL FOLLMANN FACCENDA"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC023"
+   ],
+   "name": "REDES DE COMPUTADORES",
+   "class": "TE",
+   "schedule": [
+    {
+     "day": 3,
+     "start": "20:55",
+     "end": "22:35"
+    },
+    {
+     "day": 1,
+     "start": "19:00",
+     "end": "20:40"
+    }
+   ],
+   "teachers": [
+    "ALDRI LUIZ DOS SANTOS"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC023"
+   ],
+   "name": "REDES DE COMPUTADORES",
+   "class": "TM",
+   "schedule": [
+    {
+     "day": 1,
+     "start": "13:00",
+     "end": "14:40"
+    },
+    {
+     "day": 3,
+     "start": "13:00",
+     "end": "14:40"
+    }
+   ],
+   "teachers": [
+    "LUIZ FILIPE MENEZES VIEIRA"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC024"
+   ],
+   "name": "LINGUAGENS DE PROGRAMACAO",
+   "class": "TM",
+   "schedule": [
+    {
+     "day": 1,
+     "start": "13:00",
+     "end": "14:40"
+    },
+    {
+     "day": 3,
+     "start": "13:00",
+     "end": "14:40"
+    }
+   ],
+   "teachers": [
+    "FERNANDO MAGNO QUINTAO PEREIRA"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC024"
+   ],
+   "name": "LINGUAGENS DE PROGRAMACAO",
+   "class": "TE",
+   "schedule": [
+    {
+     "day": 1,
+     "start": "19:00",
+     "end": "20:40"
+    },
+    {
+     "day": 3,
+     "start": "19:00",
+     "end": "20:40"
+    }
+   ],
+   "teachers": [
+    "JOAO EDUARDO MONTANDON DE ARAUJO FILHO"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC030",
+    "DCC071"
+   ],
+   "name": "TOPICOS EM CIENCIA DA COMPUTACAO - Projeto de Sistemas Robóticos",
+   "class": "TE3/TL19",
+   "schedule": [
+    {
+     "day": 2,
+     "start": "19:00",
+     "end": "20:40"
+    },
+    {
+     "day": 4,
+     "start": "19:00",
+     "end": "20:40"
+    }
+   ],
+   "teachers": [
+    "PAULO ALFREDO FROTA REZECK"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC030",
+    "DCC071"
+   ],
+   "name": "TOPICOS EM CIENCIA DA COMPUTACAO - Nanocomputação e Nanotecnologia Computacional",
+   "class": "TZ6/TL13",
+   "schedule": [
+    {
+     "day": 1,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 3,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "teachers": [
+    "OMAR PARANAIBA VILELA NETO"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC030",
+    "DCC071"
+   ],
+   "name": "TOPICOS EM CIENCIA DA COMPUTACAO - Otimização Linear Robusta",
+   "class": "TM2/TL3",
+   "schedule": [
+    {
+     "day": 2,
+     "start": "13:00",
+     "end": "14:40"
+    },
+    {
+     "day": 4,
+     "start": "13:00",
+     "end": "14:40"
+    }
+   ],
+   "teachers": [
+    "MARCIO COSTA SANTOS"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC030",
+    "DCC055"
+   ],
+   "name": "TOPICOS EM CIENCIA DA COMPUTACAO - Empreendimentos em Informática",
+   "class": "TZ7/TL3",
+   "schedule": [
+    {
+     "day": 2,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 4,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "teachers": [
+    "ADRIANO CESAR MACHADO PEREIRA"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC030",
+    "DCC071"
+   ],
+   "name": "TOPICOS EM CIENCIA DA COMPUTACAO - Manutenção e Evolução de Software",
+   "class": "TZ5/TL10",
+   "schedule": [
+    {
+     "day": 1,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 3,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "teachers": [
+    "MARCO TULIO DE OLIVEIRA VALENTE"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC030",
+    "DCC071"
+   ],
+   "name": "TOPICOS EM CIENCIA DA COMPUTACAO - Aprendizado por Reforço",
+   "class": "TZ4/TL9",
+   "schedule": [
+    {
+     "day": 2,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 4,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "teachers": [
+    "LUIZ CHAIMOWICZ"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC030",
+    "DCC071"
+   ],
+   "name": "TOPICOS EM CIENCIA DA COMPUTACAO - Computação Social",
+   "class": "TN4/TL15",
+   "schedule": [
+    {
+     "day": 1,
+     "start": "14:55",
+     "end": "16:35"
+    },
+    {
+     "day": 3,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "teachers": [
+    "ANA PAULA COUTO DA SILVA"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC030"
+   ],
+   "name": "TOPICOS EM CIENCIA DA COMPUTACAO - Criação de startups: abordagem ágil de problemas de empresas",
+   "class": "TM4",
+   "schedule": [
+    {
+     "day": 2,
+     "start": "13:00",
+     "end": "14:40"
+    },
+    {
+     "day": 4,
+     "start": "13:00",
+     "end": "14:40"
+    }
+   ],
+   "teachers": [
+    "DANIEL FERNANDES MACEDO"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC030",
+    "DCC071"
+   ],
+   "name": "TOPICOS EM CIENCIA DA COMPUTACAO - IA Generativa para Música",
+   "class": "TZ3/TL8",
+   "schedule": [
+    {
+     "day": 2,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 4,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "teachers": [
+    "LUCAS NASCIMENTO FERREIRA"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC030",
+    "DCC071"
+   ],
+   "name": "TOPICOS EM CIENCIA DA COMPUTACAO - Ambientes em Computação",
+   "class": "TN3/TL14",
+   "schedule": [
+    {
+     "day": 2,
+     "start": "14:55",
+     "end": "16:35"
+    },
+    {
+     "day": 4,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "teachers": [
+    "RAQUEL CARDOSO DE MELO MINARDI"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC030",
+    "DCC071"
+   ],
+   "name": "TOPICOS EM CIENCIA DA COMPUTACAO - Programação e Arquitetura de Computadores Paralelos",
+   "class": "TN5/TL16",
+   "schedule": [
+    {
+     "day": 1,
+     "start": "14:55",
+     "end": "16:35"
+    },
+    {
+     "day": 3,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "teachers": [
+    "GEORGE LUIZ MEDEIROS TEODORO"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC030",
+    "DCC071"
+   ],
+   "name": "TOPICOS EM CIENCIA DA COMPUTACAO - Bancos de Dados Geográficos e Ciência de Dados Geoespaciais",
+   "class": "TM5/TL4",
+   "schedule": [
+    {
+     "day": 2,
+     "start": "13:00",
+     "end": "14:40"
+    },
+    {
+     "day": 4,
+     "start": "13:00",
+     "end": "14:40"
+    }
+   ],
+   "teachers": [
+    "CLODOVEU AUGUSTO DAVIS JUNIOR"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC030",
+    "DCC089"
+   ],
+   "name": "TOPICOS EM CIENCIA DA COMPUTACAO - Teste de Software",
+   "class": "TE2/TL3",
+   "schedule": [
+    {
+     "day": 2,
+     "start": "19:00",
+     "end": "20:40"
+    },
+    {
+     "day": 4,
+     "start": "19:00",
+     "end": "20:40"
+    }
+   ],
+   "teachers": [
+    "ANDRE CAVALCANTE HORA"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC030",
+    "DCC071"
+   ],
+   "name": "TOPICOS EM CIENCIA DA COMPUTACAO - Criação de startups: abordagem ágil de problemas de empresas",
+   "class": "TZ/TL2",
+   "schedule": [
+    {
+     "day": 1,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 3,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "teachers": [
+    "DANIEL FERNANDES MACEDO"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC030",
+    "DCC071"
+   ],
+   "name": "TOPICOS EM CIENCIA DA COMPUTACAO - Grandes Modelos de Linguagem",
+   "class": "TD1/TL5",
+   "schedule": [
+    {
+     "day": 1,
+     "start": "14:55",
+     "end": "16:35"
+    },
+    {
+     "day": 3,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "teachers": [
+    "ANISIO MENDES LACERDA"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC030"
+   ],
+   "name": "TOPICOS EM CIENCIA DA COMPUTACAO - Cryptography - Theory and Applications",
+   "class": "TE",
+   "schedule": [
+    {
+     "day": 3,
+     "start": "19:00",
+     "end": "20:40"
+    },
+    {
+     "day": 1,
+     "start": "19:00",
+     "end": "20:40"
+    }
+   ],
+   "teachers": [
+    "JEROEN ANTONIUS MARIA VAN DE GRAAF"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC030"
+   ],
+   "name": "TOPICOS EM CIENCIA DA COMPUTACAO - Theory and Practice of SMT Solving",
+   "class": "TZ2",
+   "schedule": [
+    {
+     "day": 1,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 3,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "teachers": [
+    "HANIEL MOREIRA BARBOSA"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC030",
+    "DCC042",
+    "DCC071"
+   ],
+   "name": "TOPICOS EM CIENCIA DA COMPUTACAO - Robótica Móvel",
+   "class": "TM3/TL2/TL17",
+   "schedule": [
+    {
+     "day": 2,
+     "start": "13:00",
+     "end": "14:40"
+    },
+    {
+     "day": 4,
+     "start": "13:00",
+     "end": "14:40"
+    }
+   ],
+   "teachers": [
+    "DOUGLAS GUIMARAES MACHARET"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC030"
+   ],
+   "name": "TOPICOS EM CIENCIA DA COMPUTACAO - Cibersegurança",
+   "class": "TE1",
+   "schedule": [
+    {
+     "day": 1,
+     "start": "19:00",
+     "end": "20:40"
+    },
+    {
+     "day": 3,
+     "start": "19:00",
+     "end": "20:40"
+    }
+   ],
+   "teachers": [
+    "MICHELE NOGUEIRA LIMA"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC030",
+    "DCC071"
+   ],
+   "name": "TOPICOS EM CIENCIA DA COMPUTACAO - Sistemas Operacionais Avançados",
+   "class": "TN1/TL11",
+   "schedule": [
+    {
+     "day": 2,
+     "start": "14:55",
+     "end": "16:35"
+    },
+    {
+     "day": 4,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "teachers": [
+    "MARCOS AUGUSTO MENEZES VIEIRA"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC030",
+    "DCC071"
+   ],
+   "name": "TOPICOS EM CIENCIA DA COMPUTACAO - Quantitative Information Flow",
+   "class": "TN2/TL12",
+   "schedule": [
+    {
+     "day": 1,
+     "start": "14:55",
+     "end": "16:35"
+    },
+    {
+     "day": 3,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "teachers": [
+    "MARIO SERGIO FERREIRA ALVIM JUNIOR"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC033"
+   ],
+   "name": "ANALISE NUMERICA",
+   "class": "TE",
+   "schedule": [
+    {
+     "day": 4,
+     "start": "20:55",
+     "end": "22:35"
+    },
+    {
+     "day": 2,
+     "start": "19:00",
+     "end": "20:40"
+    }
+   ],
+   "teachers": [
+    "PEDRO HENRIQUE SILVA SOUZA BARROS"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC033"
+   ],
+   "name": "ANALISE NUMERICA",
+   "class": "TB",
+   "schedule": [
+    {
+     "day": 4,
+     "start": "09:25",
+     "end": "11:05"
+    },
+    {
+     "day": 2,
+     "start": "09:25",
+     "end": "11:05"
+    }
+   ],
+   "teachers": [
+    "ALEXANDRE SALLES DA CUNHA"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC033"
+   ],
+   "name": "ANALISE NUMERICA",
+   "class": "TN",
+   "schedule": [
+    {
+     "day": 2,
+     "start": "14:55",
+     "end": "16:35"
+    },
+    {
+     "day": 4,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "teachers": [
+    "CRISTIANO ARBEX VALLE"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC034"
+   ],
+   "name": "CALCULO NUMERICO",
+   "class": "TM2",
+   "schedule": [
+    {
+     "day": 2,
+     "start": "13:00",
+     "end": "14:40"
+    },
+    {
+     "day": 4,
+     "start": "13:00",
+     "end": "14:40"
+    }
+   ],
+   "teachers": [
+    "FREDERICO GADELHA GUIMARAES"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC034"
+   ],
+   "name": "CALCULO NUMERICO",
+   "class": "TM1",
+   "schedule": [
+    {
+     "day": 2,
+     "start": "13:00",
+     "end": "14:40"
+    },
+    {
+     "day": 4,
+     "start": "13:00",
+     "end": "14:40"
+    }
+   ],
+   "teachers": [
+    "MARTIN GOMEZ RAVETTI"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC034"
+   ],
+   "name": "CALCULO NUMERICO",
+   "class": "TB2",
+   "schedule": [
+    {
+     "day": 2,
+     "start": "09:25",
+     "end": "11:05"
+    },
+    {
+     "day": 4,
+     "start": "09:25",
+     "end": "11:05"
+    }
+   ],
+   "teachers": [
+    "LOIC PASCAL GILLES CERF"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC034"
+   ],
+   "name": "CALCULO NUMERICO",
+   "class": "TB1",
+   "schedule": [
+    {
+     "day": 2,
+     "start": "09:25",
+     "end": "11:05"
+    },
+    {
+     "day": 4,
+     "start": "09:25",
+     "end": "11:05"
+    }
+   ],
+   "teachers": [
+    "LEONARDO BARBOSA E OLIVEIRA"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC034"
+   ],
+   "name": "CALCULO NUMERICO",
+   "class": "TA1",
+   "schedule": [
+    {
+     "day": 2,
+     "start": "07:30",
+     "end": "09:10"
+    },
+    {
+     "day": 4,
+     "start": "07:30",
+     "end": "09:10"
+    }
+   ],
+   "teachers": [
+    "MARTIN GOMEZ RAVETTI"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC035"
+   ],
+   "name": "PESQUISA OPERACIONAL",
+   "class": "TZ",
+   "schedule": [
+    {
+     "day": 4,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 2,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "teachers": [
+    "CRISTIANO ARBEX VALLE"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC046"
+   ],
+   "name": "MONOGRAFIA EM SISTEMAS DE INFORMAÇÃO I",
+   "class": "TB",
+   "schedule": [],
+   "teachers": [
+    "GISELE LOBO PAPPA"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC046"
+   ],
+   "name": "MONOGRAFIA EM SISTEMAS DE INFORMAÇÃO I",
+   "class": "TA",
+   "schedule": [],
+   "teachers": [
+    "ADRIANO CESAR MACHADO PEREIRA"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC046"
+   ],
+   "name": "MONOGRAFIA EM SISTEMAS DE INFORMAÇÃO I",
+   "class": "TD",
+   "schedule": [],
+   "teachers": [
+    "JOAO GUILHERME MAIA DE MENEZES"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC046"
+   ],
+   "name": "MONOGRAFIA EM SISTEMAS DE INFORMAÇÃO I",
+   "class": "TE",
+   "schedule": [],
+   "teachers": [
+    "MICHELE AMARAL BRANDAO"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC046"
+   ],
+   "name": "MONOGRAFIA EM SISTEMAS DE INFORMAÇÃO I",
+   "class": "TF",
+   "schedule": [],
+   "teachers": [
+    "PEDRO OLMO STANCIOLI VAZ DE MELO"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC046"
+   ],
+   "name": "MONOGRAFIA EM SISTEMAS DE INFORMAÇÃO I",
+   "class": "TC",
+   "schedule": [],
+   "teachers": [
+    "ERICKSON RANGEL DO NASCIMENTO"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC051",
+    "DCC212",
+    "ICE072"
+   ],
+   "name": "INTRODUÇÃO À CIÊNCIA DOS DADOS",
+   "class": "TL2/TM/TTM",
+   "schedule": [
+    {
+     "day": 2,
+     "start": "13:00",
+     "end": "14:40"
+    },
+    {
+     "day": 4,
+     "start": "13:00",
+     "end": "14:40"
+    }
+   ],
+   "teachers": [
+    "URIEL MOREIRA SILVA",
+    "PEDRO OLMO STANCIOLI VAZ DE MELO",
+    "RODRYGO LUIS TEODORO SANTOS"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC051",
+    "DCC212"
+   ],
+   "name": "INTRODUÇÃO À CIÊNCIA DOS DADOS",
+   "class": "TL1/TZ",
+   "schedule": [
+    {
+     "day": 2,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 4,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "teachers": [
+    "HEITOR SOARES RAMOS FILHO"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC053"
+   ],
+   "name": "COMPILADORES I",
+   "class": "TN",
+   "schedule": [
+    {
+     "day": 2,
+     "start": "14:55",
+     "end": "16:35"
+    },
+    {
+     "day": 4,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "teachers": [
+    "RENATO ANTONIO CELSO FERREIRA"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC069"
+   ],
+   "name": "TÓPICOS ESPECIAIS EM INFORMÁTICA II - Seminários Avançados em Grafos e Algoritmos",
+   "class": "TLM2",
+   "schedule": [
+    {
+     "day": 5,
+     "start": "13:00",
+     "end": "14:40"
+    }
+   ],
+   "teachers": [
+    "GUILHERME DE CASTRO MENDES GOMES"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC069"
+   ],
+   "name": "TÓPICOS ESPECIAIS EM INFORMÁTICA II - Inclusão e acessibilidade",
+   "class": "TA1/TM/TLM1",
+   "schedule": [
+    {
+     "day": 5,
+     "start": "13:00",
+     "end": "14:40"
+    }
+   ],
+   "teachers": [
+    "PEDRO HENRIQUE SILVA SOUZA BARROS"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC069"
+   ],
+   "name": "TÓPICOS ESPECIAIS EM INFORMÁTICA II - Modelos Generativos para Imagens",
+   "class": "TLN1",
+   "schedule": [
+    {
+     "day": 4,
+     "start": "14:55",
+     "end": "16:35"
+    },
+    {
+     "day": 2,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "teachers": [
+    "ERICKSON RANGEL DO NASCIMENTO"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC071"
+   ],
+   "name": "TÓPICOS ESPECIAIS EM INFORMÁTICA IV - Empreendimentos em Informática",
+   "class": "TL18",
+   "schedule": [
+    {
+     "day": 4,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 2,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "teachers": [
+    "ADRIANO CESAR MACHADO PEREIRA"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC071"
+   ],
+   "name": "TÓPICOS ESPECIAIS EM INFORMÁTICA IV - Theory and Practice of SMT Solving",
+   "class": "TL6",
+   "schedule": [
+    {
+     "day": 3,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 1,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "teachers": [
+    "HANIEL MOREIRA BARBOSA"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC071",
+    "DCC187"
+   ],
+   "name": "TÓPICOS ESPECIAIS EM INFORMÁTICA IV - Algoritmos para Bioinformática II",
+   "class": "TL23/TL2",
+   "schedule": [
+    {
+     "day": 1,
+     "start": "13:00",
+     "end": "14:40"
+    },
+    {
+     "day": 3,
+     "start": "13:00",
+     "end": "14:40"
+    }
+   ],
+   "teachers": [
+    "MARCOS AUGUSTO DOS SANTOS"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC071"
+   ],
+   "name": "TÓPICOS ESPECIAIS EM INFORMÁTICA IV - Introdução à Computação Visual",
+   "class": "TL20",
+   "schedule": [
+    {
+     "day": 1,
+     "start": "14:55",
+     "end": "16:35"
+    },
+    {
+     "day": 3,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "teachers": [
+    "WILLIAM ROBSON SCHWARTZ"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC071"
+   ],
+   "name": "TÓPICOS ESPECIAIS EM INFORMÁTICA IV - Cryptography - Theory and Applications",
+   "class": "TL7",
+   "schedule": [
+    {
+     "day": 1,
+     "start": "19:00",
+     "end": "20:40"
+    },
+    {
+     "day": 3,
+     "start": "19:00",
+     "end": "20:40"
+    }
+   ],
+   "teachers": [
+    "JEROEN ANTONIUS MARIA VAN DE GRAAF"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC072"
+   ],
+   "name": "ENGENHARIA DE SOFTWARE II",
+   "class": "TL1",
+   "schedule": [
+    {
+     "day": 2,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 4,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "teachers": [
+    "ANDRE CAVALCANTE HORA"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC073"
+   ],
+   "name": "MONOGRAFIA EM SISTEMAS DE INFORMAÇÃO II",
+   "class": "TE",
+   "schedule": [],
+   "teachers": [
+    "DOUGLAS GUIMARAES MACHARET"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC073"
+   ],
+   "name": "MONOGRAFIA EM SISTEMAS DE INFORMAÇÃO II",
+   "class": "TD",
+   "schedule": [],
+   "teachers": [
+    "MARIO SERGIO FERREIRA ALVIM JUNIOR"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC073"
+   ],
+   "name": "MONOGRAFIA EM SISTEMAS DE INFORMAÇÃO II",
+   "class": "TA",
+   "schedule": [],
+   "teachers": [
+    "ALDRI LUIZ DOS SANTOS"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC073"
+   ],
+   "name": "MONOGRAFIA EM SISTEMAS DE INFORMAÇÃO II",
+   "class": "TB",
+   "schedule": [],
+   "teachers": [
+    "MARCIO COSTA SANTOS"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC073"
+   ],
+   "name": "MONOGRAFIA EM SISTEMAS DE INFORMAÇÃO II",
+   "class": "TC",
+   "schedule": [],
+   "teachers": [
+    "HANIEL MOREIRA BARBOSA"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC073"
+   ],
+   "name": "MONOGRAFIA EM SISTEMAS DE INFORMAÇÃO II",
+   "class": "TF",
+   "schedule": [],
+   "teachers": [
+    "ANDRE CAVALCANTE HORA"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC075"
+   ],
+   "name": "FUNDAMENTOS DE SISTEMAS COMPUTACIONAIS",
+   "class": "TTN",
+   "schedule": [
+    {
+     "day": 1,
+     "start": "14:55",
+     "end": "16:35"
+    },
+    {
+     "day": 3,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "teachers": [
+    "DORGIVAL OLAVO GUEDES NETO"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC080"
+   ],
+   "name": "CIBERSEGURANÇA",
+   "class": "TL4",
+   "schedule": [
+    {
+     "day": 4,
+     "start": "19:00",
+     "end": "20:40"
+    },
+    {
+     "day": 2,
+     "start": "19:00",
+     "end": "20:40"
+    }
+   ],
+   "teachers": [
+    "MICHELE NOGUEIRA LIMA"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC094",
+    "DCC603"
+   ],
+   "name": "ENGENHARIA DE SOFTWARE",
+   "class": "TL1/TN",
+   "schedule": [
+    {
+     "day": 1,
+     "start": "14:55",
+     "end": "16:35"
+    },
+    {
+     "day": 3,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "teachers": [
+    "MARCO TULIO DE OLIVEIRA VALENTE"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC094"
+   ],
+   "name": "ENGENHARIA DE SOFTWARE",
+   "class": "TL2",
+   "schedule": [
+    {
+     "day": 3,
+     "start": "19:00",
+     "end": "20:40"
+    },
+    {
+     "day": 1,
+     "start": "19:00",
+     "end": "20:40"
+    }
+   ],
+   "teachers": [
+    "EDUARDO MAGNO LAGES FIGUEIREDO"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC095"
+   ],
+   "name": "REDES DE COMPUTADORES",
+   "class": "TL2",
+   "schedule": [
+    {
+     "day": 1,
+     "start": "14:55",
+     "end": "16:35"
+    },
+    {
+     "day": 3,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "teachers": [
+    "MARCOS AUGUSTO MENEZES VIEIRA"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC095"
+   ],
+   "name": "REDES DE COMPUTADORES",
+   "class": "TL3",
+   "schedule": [
+    {
+     "day": 1,
+     "start": "19:00",
+     "end": "20:40"
+    },
+    {
+     "day": 3,
+     "start": "19:00",
+     "end": "20:40"
+    }
+   ],
+   "teachers": [
+    "DORGIVAL OLAVO GUEDES NETO"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC096"
+   ],
+   "name": "INTRODUÇÃO À COMPUTAÇÃO",
+   "class": "TA/TA1",
+   "schedule": [
+    {
+     "day": 5,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "teachers": [
+    "ALDRI LUIZ DOS SANTOS"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC114"
+   ],
+   "name": "INTRODUÇÃO AOS SISTEMAS LÓGICOS",
+   "class": "TZ1",
+   "schedule": [
+    {
+     "day": 2,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 4,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "teachers": [
+    "OMAR PARANAIBA VILELA NETO"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC114"
+   ],
+   "name": "INTRODUÇÃO AOS SISTEMAS LÓGICOS",
+   "class": "TZ2",
+   "schedule": [
+    {
+     "day": 2,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 4,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "teachers": [
+    "LUIZ FILIPE MENEZES VIEIRA"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC129"
+   ],
+   "name": "FUNDAMENTOS DA TEORIA DA COMPUTAÇÃO",
+   "class": "TZ",
+   "schedule": [
+    {
+     "day": 1,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 3,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "teachers": [
+    "MARIO SERGIO FERREIRA ALVIM JUNIOR"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC191"
+   ],
+   "name": "COMPUTAÇÃO NATURAL",
+   "class": "TL4",
+   "schedule": [
+    {
+     "day": 2,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 4,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "teachers": [
+    "GISELE LOBO PAPPA"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC194"
+   ],
+   "name": "INTERAÇÃO HUMANO- COMPUTADOR",
+   "class": "TL2",
+   "schedule": [
+    {
+     "day": 1,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 3,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "teachers": [
+    "RAQUEL OLIVEIRA PRATES"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC194"
+   ],
+   "name": "INTERAÇÃO HUMANO- COMPUTADOR",
+   "class": "TL1",
+   "schedule": [
+    {
+     "day": 2,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 4,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "teachers": [
+    "RAQUEL OLIVEIRA PRATES"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC199"
+   ],
+   "name": "TEORIA DOS GRAFOS",
+   "class": "TL4",
+   "schedule": [
+    {
+     "day": 2,
+     "start": "13:00",
+     "end": "14:40"
+    },
+    {
+     "day": 4,
+     "start": "13:00",
+     "end": "14:40"
+    }
+   ],
+   "teachers": [
+    "GABRIEL DE MORAIS COUTINHO"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC203"
+   ],
+   "name": "PROGRAMAÇÃO E DESENVOLVIMENTO DE SOFTWARE I",
+   "class": "TB",
+   "schedule": [
+    {
+     "day": 2,
+     "start": "09:25",
+     "end": "11:05"
+    },
+    {
+     "day": 4,
+     "start": "09:25",
+     "end": "11:05"
+    }
+   ],
+   "teachers": [
+    "MARCOS AUGUSTO DOS SANTOS"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC203"
+   ],
+   "name": "PROGRAMAÇÃO E DESENVOLVIMENTO DE SOFTWARE I",
+   "class": "TA1",
+   "schedule": [
+    {
+     "day": 2,
+     "start": "07:30",
+     "end": "09:10"
+    },
+    {
+     "day": 4,
+     "start": "07:30",
+     "end": "09:10"
+    }
+   ],
+   "teachers": [
+    "LEONARDO BARBOSA E OLIVEIRA"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC203"
+   ],
+   "name": "PROGRAMAÇÃO E DESENVOLVIMENTO DE SOFTWARE I",
+   "class": "TF",
+   "schedule": [
+    {
+     "day": 4,
+     "start": "19:00",
+     "end": "20:40"
+    },
+    {
+     "day": 2,
+     "start": "20:55",
+     "end": "22:35"
+    }
+   ],
+   "teachers": [
+    "GESTEFANE RABBI MAGALHAES"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC203"
+   ],
+   "name": "PROGRAMAÇÃO E DESENVOLVIMENTO DE SOFTWARE I",
+   "class": "TN1",
+   "schedule": [
+    {
+     "day": 2,
+     "start": "14:55",
+     "end": "16:35"
+    },
+    {
+     "day": 4,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "teachers": [
+    "CLODOVEU AUGUSTO DAVIS JUNIOR"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC203"
+   ],
+   "name": "PROGRAMAÇÃO E DESENVOLVIMENTO DE SOFTWARE I",
+   "class": "TN2",
+   "schedule": [
+    {
+     "day": 2,
+     "start": "14:55",
+     "end": "16:35"
+    },
+    {
+     "day": 4,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "teachers": [
+    "PEDRO OLMO STANCIOLI VAZ DE MELO"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC203"
+   ],
+   "name": "PROGRAMAÇÃO E DESENVOLVIMENTO DE SOFTWARE I",
+   "class": "TW",
+   "schedule": [
+    {
+     "day": 2,
+     "start": "19:00",
+     "end": "20:40"
+    },
+    {
+     "day": 4,
+     "start": "19:00",
+     "end": "20:40"
+    }
+   ],
+   "teachers": [
+    "JOAO GUILHERME MAIA DE MENEZES"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC203"
+   ],
+   "name": "PROGRAMAÇÃO E DESENVOLVIMENTO DE SOFTWARE I",
+   "class": "TM1",
+   "schedule": [
+    {
+     "day": 2,
+     "start": "13:00",
+     "end": "14:40"
+    },
+    {
+     "day": 4,
+     "start": "13:00",
+     "end": "14:40"
+    }
+   ],
+   "teachers": [
+    "MARCOS AUGUSTO DOS SANTOS"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC203"
+   ],
+   "name": "PROGRAMAÇÃO E DESENVOLVIMENTO DE SOFTWARE I",
+   "class": "TM2",
+   "schedule": [
+    {
+     "day": 2,
+     "start": "13:00",
+     "end": "14:40"
+    },
+    {
+     "day": 4,
+     "start": "13:00",
+     "end": "14:40"
+    }
+   ],
+   "teachers": [
+    "RAQUEL CARDOSO DE MELO MINARDI"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC204"
+   ],
+   "name": "PROGRAMAÇÃO E DESENVOLVIMENTO DE SOFTWARE II",
+   "class": "TM1",
+   "schedule": [
+    {
+     "day": 2,
+     "start": "13:00",
+     "end": "14:40"
+    },
+    {
+     "day": 4,
+     "start": "13:00",
+     "end": "14:40"
+    }
+   ],
+   "teachers": [
+    "PAULO ALFREDO FROTA REZECK"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC204"
+   ],
+   "name": "PROGRAMAÇÃO E DESENVOLVIMENTO DE SOFTWARE II",
+   "class": "TF",
+   "schedule": [
+    {
+     "day": 4,
+     "start": "19:00",
+     "end": "20:40"
+    },
+    {
+     "day": 2,
+     "start": "20:55",
+     "end": "22:35"
+    }
+   ],
+   "teachers": [
+    "ALEXANDRE ALVES DA ROCHA"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC204"
+   ],
+   "name": "PROGRAMAÇÃO E DESENVOLVIMENTO DE SOFTWARE II",
+   "class": "TA",
+   "schedule": [
+    {
+     "day": 4,
+     "start": "07:30",
+     "end": "09:10"
+    },
+    {
+     "day": 2,
+     "start": "07:30",
+     "end": "09:10"
+    }
+   ],
+   "teachers": [
+    "FERNANDO MAGNO QUINTAO PEREIRA"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC204"
+   ],
+   "name": "PROGRAMAÇÃO E DESENVOLVIMENTO DE SOFTWARE II",
+   "class": "TM2",
+   "schedule": [
+    {
+     "day": 2,
+     "start": "13:00",
+     "end": "14:40"
+    },
+    {
+     "day": 4,
+     "start": "13:00",
+     "end": "14:40"
+    }
+   ],
+   "teachers": [
+    "THIAGO FERREIRA DE NORONHA"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC205"
+   ],
+   "name": "ESTRUTURAS DE DADOS",
+   "class": "TF",
+   "schedule": [
+    {
+     "day": 4,
+     "start": "19:00",
+     "end": "20:40"
+    },
+    {
+     "day": 2,
+     "start": "20:55",
+     "end": "22:35"
+    }
+   ],
+   "teachers": [
+    "PEDRO HENRIQUE SILVA SOUZA BARROS"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC206"
+   ],
+   "name": "ALGORITMOS I",
+   "class": "TL2",
+   "schedule": [
+    {
+     "day": 2,
+     "start": "19:00",
+     "end": "20:40"
+    },
+    {
+     "day": 4,
+     "start": "19:00",
+     "end": "20:40"
+    }
+   ],
+   "teachers": [
+    "JUSSARA MARQUES DE ALMEIDA GONCALVES"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC206"
+   ],
+   "name": "ALGORITMOS I",
+   "class": "TL3",
+   "schedule": [
+    {
+     "day": 2,
+     "start": "14:55",
+     "end": "16:35"
+    },
+    {
+     "day": 4,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "teachers": [
+    "RAFAEL FOLLMANN FACCENDA"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC206"
+   ],
+   "name": "ALGORITMOS I",
+   "class": "TTN1",
+   "schedule": [
+    {
+     "day": 2,
+     "start": "13:00",
+     "end": "14:40"
+    },
+    {
+     "day": 4,
+     "start": "13:00",
+     "end": "14:40"
+    }
+   ],
+   "teachers": [
+    "GUILHERME DE CASTRO MENDES GOMES"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC206"
+   ],
+   "name": "ALGORITMOS I",
+   "class": "TL1",
+   "schedule": [
+    {
+     "day": 2,
+     "start": "14:55",
+     "end": "16:35"
+    },
+    {
+     "day": 4,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "teachers": [
+    "GUILHERME DE CASTRO MENDES GOMES"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC207"
+   ],
+   "name": "ALGORITMOS II",
+   "class": "TL3",
+   "schedule": [
+    {
+     "day": 2,
+     "start": "14:55",
+     "end": "16:35"
+    },
+    {
+     "day": 4,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "teachers": [
+    "RENATO VIMIEIRO"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC208"
+   ],
+   "name": "INTRODUÇÃO À PROGRAMAÇÃO DE COMPUTADORES",
+   "class": "TB",
+   "schedule": [
+    {
+     "day": 1,
+     "start": "09:25",
+     "end": "11:05"
+    },
+    {
+     "day": 3,
+     "start": "09:25",
+     "end": "11:05"
+    }
+   ],
+   "teachers": [
+    "JOSE LOPES DE SIQUEIRA NETO"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC208"
+   ],
+   "name": "INTRODUÇÃO À PROGRAMAÇÃO DE COMPUTADORES",
+   "class": "TN",
+   "schedule": [
+    {
+     "day": 1,
+     "start": "14:55",
+     "end": "16:35"
+    },
+    {
+     "day": 3,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "teachers": [
+    "JOSE LOPES DE SIQUEIRA NETO"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC208"
+   ],
+   "name": "INTRODUÇÃO À PROGRAMAÇÃO DE COMPUTADORES",
+   "class": "TE",
+   "schedule": [
+    {
+     "day": 2,
+     "start": "19:00",
+     "end": "20:40"
+    },
+    {
+     "day": 4,
+     "start": "20:55",
+     "end": "22:35"
+    }
+   ],
+   "teachers": [
+    "ALEXANDRE ALVES DA ROCHA"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC208"
+   ],
+   "name": "INTRODUÇÃO À PROGRAMAÇÃO DE COMPUTADORES",
+   "class": "TM",
+   "schedule": [
+    {
+     "day": 1,
+     "start": "13:00",
+     "end": "14:40"
+    },
+    {
+     "day": 3,
+     "start": "13:00",
+     "end": "14:40"
+    }
+   ],
+   "teachers": [
+    "JOSE LOPES DE SIQUEIRA NETO"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC215"
+   ],
+   "name": "HEURÍSTICAS E METAHEURÍSTICAS",
+   "class": "TN/TN1",
+   "schedule": [
+    {
+     "day": 2,
+     "start": "14:55",
+     "end": "16:35"
+    },
+    {
+     "day": 4,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "teachers": [
+    "THIAGO FERREIRA DE NORONHA"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC216"
+   ],
+   "name": "MATEMÁTICA DISCRETA",
+   "class": "TZ1",
+   "schedule": [
+    {
+     "day": 1,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 3,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "teachers": [
+    "JEROEN ANTONIUS MARIA VAN DE GRAAF"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC216"
+   ],
+   "name": "MATEMÁTICA DISCRETA",
+   "class": "TM1",
+   "schedule": [
+    {
+     "day": 2,
+     "start": "13:00",
+     "end": "14:40"
+    },
+    {
+     "day": 4,
+     "start": "13:00",
+     "end": "14:40"
+    }
+   ],
+   "teachers": [
+    "LOIC PASCAL GILLES CERF"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC216"
+   ],
+   "name": "MATEMÁTICA DISCRETA",
+   "class": "TW",
+   "schedule": [
+    {
+     "day": 1,
+     "start": "19:00",
+     "end": "20:40"
+    },
+    {
+     "day": 3,
+     "start": "19:00",
+     "end": "20:40"
+    }
+   ],
+   "teachers": [
+    "RENATO VIMIEIRO"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC217"
+   ],
+   "name": "MATEMÁTICA DISCRETA PARA ENGENHARIA",
+   "class": null,
+   "schedule": [],
+   "teachers": [
+    "GABRIEL DE MORAIS COUTINHO"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC218"
+   ],
+   "name": "INTRODUÇÃO A SISTEMAS COMPUTACIONAIS",
+   "class": "TISC",
+   "schedule": [
+    {
+     "day": 1,
+     "start": "19:00",
+     "end": "20:40"
+    },
+    {
+     "day": 3,
+     "start": "20:55",
+     "end": "22:35"
+    }
+   ],
+   "teachers": [
+    "ALDRI LUIZ DOS SANTOS"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC219"
+   ],
+   "name": "PROGRAMAÇÃO E DESENVOLVIMENTO DE SOFTWARE II",
+   "class": "TN2",
+   "schedule": [
+    {
+     "day": 2,
+     "start": "14:55",
+     "end": "16:35"
+    },
+    {
+     "day": 4,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "teachers": [
+    "HECTOR IGNACIO AZPURUA PEREZ IMAZ"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC219"
+   ],
+   "name": "PROGRAMAÇÃO E DESENVOLVIMENTO DE SOFTWARE II",
+   "class": "TL2",
+   "schedule": [
+    {
+     "day": 2,
+     "start": "14:55",
+     "end": "16:35"
+    },
+    {
+     "day": 4,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "teachers": [
+    "LUIZ CHAIMOWICZ"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC219"
+   ],
+   "name": "PROGRAMAÇÃO E DESENVOLVIMENTO DE SOFTWARE II",
+   "class": "TN",
+   "schedule": [
+    {
+     "day": 2,
+     "start": "14:55",
+     "end": "16:35"
+    },
+    {
+     "day": 4,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "teachers": [
+    "DOUGLAS GUIMARAES MACHARET"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC219"
+   ],
+   "name": "PROGRAMAÇÃO E DESENVOLVIMENTO DE SOFTWARE II",
+   "class": "TE1",
+   "schedule": [
+    {
+     "day": 2,
+     "start": "19:00",
+     "end": "20:40"
+    },
+    {
+     "day": 4,
+     "start": "19:00",
+     "end": "20:40"
+    }
+   ],
+   "teachers": [
+    "HECTOR IGNACIO AZPURUA PEREZ IMAZ"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC220"
+   ],
+   "name": "FUNDAMENTOS DA INTERAÇÃO HUMANO- COMPUTADOR",
+   "class": "TN",
+   "schedule": [
+    {
+     "day": 5,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "teachers": [
+    "LUCAS NASCIMENTO FERREIRA"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC221"
+   ],
+   "name": "ESTRUTURAS DE DADOS",
+   "class": "TE1",
+   "schedule": [
+    {
+     "day": 2,
+     "start": "19:00",
+     "end": "20:40"
+    },
+    {
+     "day": 4,
+     "start": "19:00",
+     "end": "20:40"
+    }
+   ],
+   "teachers": [
+    "WAGNER MEIRA JUNIOR"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC221"
+   ],
+   "name": "ESTRUTURAS DE DADOS",
+   "class": "TN2",
+   "schedule": [
+    {
+     "day": 4,
+     "start": "14:55",
+     "end": "16:35"
+    },
+    {
+     "day": 2,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "teachers": [
+    "ANISIO MENDES LACERDA"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC221"
+   ],
+   "name": "ESTRUTURAS DE DADOS",
+   "class": "TL3",
+   "schedule": [
+    {
+     "day": 2,
+     "start": "14:55",
+     "end": "16:35"
+    },
+    {
+     "day": 4,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "teachers": [
+    "MARCIO COSTA SANTOS"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC222"
+   ],
+   "name": "INTRODUÇÃO A BANCOS DE DADOS",
+   "class": "TZ1",
+   "schedule": [
+    {
+     "day": 1,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 5,
+     "start": "19:00",
+     "end": "20:40"
+    }
+   ],
+   "teachers": [
+    "MICHELE AMARAL BRANDAO"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC222"
+   ],
+   "name": "INTRODUÇÃO A BANCOS DE DADOS",
+   "class": "TE1",
+   "schedule": [
+    {
+     "day": 1,
+     "start": "19:00",
+     "end": "20:40"
+    },
+    {
+     "day": 3,
+     "start": "19:00",
+     "end": "20:40"
+    }
+   ],
+   "teachers": [
+    "MARCOS ANDRE GONCALVES"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC222"
+   ],
+   "name": "INTRODUÇÃO A BANCOS DE DADOS",
+   "class": "TL3",
+   "schedule": [
+    {
+     "day": 1,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 3,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "teachers": [
+    "MARCOS ANDRE GONCALVES"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC601"
+   ],
+   "name": "INTRODUCAO A INFORMATICA",
+   "class": "TBD",
+   "schedule": [
+    {
+     "day": 5,
+     "start": "07:30",
+     "end": "11:10"
+    }
+   ],
+   "teachers": [
+    "GESTEFANE RABBI MAGALHAES"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC603"
+   ],
+   "name": "ENGENHARIA DE SOFTWARE",
+   "class": "TE",
+   "schedule": [
+    {
+     "day": 1,
+     "start": "19:00",
+     "end": "20:40"
+    },
+    {
+     "day": 3,
+     "start": "19:00",
+     "end": "20:40"
+    }
+   ],
+   "teachers": [
+    "EDUARDO MAGNO LAGES FIGUEIREDO"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC604"
+   ],
+   "name": "PROJETO ORIENTADO EM COMPUTACAO I",
+   "class": "PM",
+   "schedule": [],
+   "teachers": [
+    "GISELE LOBO PAPPA"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC604"
+   ],
+   "name": "PROJETO ORIENTADO EM COMPUTACAO I",
+   "class": "PM2",
+   "schedule": [],
+   "teachers": [
+    "MARCIO COSTA SANTOS"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC604"
+   ],
+   "name": "PROJETO ORIENTADO EM COMPUTACAO I",
+   "class": "PM4",
+   "schedule": [],
+   "teachers": [
+    "MARIO SERGIO FERREIRA ALVIM JUNIOR"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC604"
+   ],
+   "name": "PROJETO ORIENTADO EM COMPUTACAO I",
+   "class": "PM3",
+   "schedule": [],
+   "teachers": [
+    "HANIEL MOREIRA BARBOSA"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC604"
+   ],
+   "name": "PROJETO ORIENTADO EM COMPUTACAO I",
+   "class": "PM6",
+   "schedule": [],
+   "teachers": [
+    "ANDRE CAVALCANTE HORA"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC604"
+   ],
+   "name": "PROJETO ORIENTADO EM COMPUTACAO I",
+   "class": "PM5",
+   "schedule": [],
+   "teachers": [
+    "DOUGLAS GUIMARAES MACHARET"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC604"
+   ],
+   "name": "PROJETO ORIENTADO EM COMPUTACAO I",
+   "class": "PM1",
+   "schedule": [],
+   "teachers": [
+    "ALDRI LUIZ DOS SANTOS"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC605"
+   ],
+   "name": "SISTEMAS OPERACIONAIS",
+   "class": "TZ",
+   "schedule": [
+    {
+     "day": 1,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 3,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "teachers": [
+    "ITALO FERNANDO SCOTA CUNHA"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC605"
+   ],
+   "name": "SISTEMAS OPERACIONAIS",
+   "class": "TM",
+   "schedule": [
+    {
+     "day": 1,
+     "start": "13:00",
+     "end": "14:40"
+    },
+    {
+     "day": 3,
+     "start": "13:00",
+     "end": "14:40"
+    }
+   ],
+   "teachers": [
+    "GEORGE LUIZ MEDEIROS TEODORO"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC636"
+   ],
+   "name": "ÉTICA NA COMPUTAÇÃO",
+   "class": "TL2",
+   "schedule": [
+    {
+     "day": 2,
+     "start": "19:00",
+     "end": "20:40"
+    }
+   ],
+   "teachers": [
+    "FABRICIO BENEVENUTO DE SOUZA"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC636"
+   ],
+   "name": "ÉTICA NA COMPUTAÇÃO",
+   "class": "TL3",
+   "schedule": [
+    {
+     "day": 2,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "teachers": [
+    "FABRICIO BENEVENUTO DE SOUZA"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC637"
+   ],
+   "name": "COMPUTAÇÃO E SOCIEDADE",
+   "class": "TL2",
+   "schedule": [
+    {
+     "day": 4,
+     "start": "19:00",
+     "end": "20:40"
+    }
+   ],
+   "teachers": [
+    "ANTONIO ALFREDO FERREIRA LOUREIRO"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC637"
+   ],
+   "name": "COMPUTAÇÃO E SOCIEDADE",
+   "class": "TL3",
+   "schedule": [
+    {
+     "day": 4,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "teachers": [
+    "ANTONIO ALFREDO FERREIRA LOUREIRO"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC638"
+   ],
+   "name": "INTRODUÇÃO À LÓGICA COMPUTACIONAL",
+   "class": "TN2/TA1/TN1/TN",
+   "schedule": [
+    {
+     "day": 1,
+     "start": "14:55",
+     "end": "16:35"
+    },
+    {
+     "day": 3,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "teachers": [
+    "HANIEL MOREIRA BARBOSA"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC638"
+   ],
+   "name": "INTRODUÇÃO À LÓGICA COMPUTACIONAL",
+   "class": "TA2",
+   "schedule": [
+    {
+     "day": 1,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 3,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "teachers": [
+    "OLGA NIKOLAEVNA GOUSSEVSKAIA"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC639"
+   ],
+   "name": "ÁLGEBRA LINEAR COMPUTACIONAL",
+   "class": "TTZ5",
+   "schedule": [
+    {
+     "day": 1,
+     "start": "13:00",
+     "end": "14:40"
+    },
+    {
+     "day": 3,
+     "start": "13:00",
+     "end": "14:40"
+    }
+   ],
+   "teachers": [
+    "ANA PAULA COUTO DA SILVA"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC639"
+   ],
+   "name": "ÁLGEBRA LINEAR COMPUTACIONAL",
+   "class": "TZ3",
+   "schedule": [
+    {
+     "day": 2,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 4,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "teachers": [
+    "FREDERICO GADELHA GUIMARAES"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC639"
+   ],
+   "name": "ÁLGEBRA LINEAR COMPUTACIONAL",
+   "class": "TL3",
+   "schedule": [
+    {
+     "day": 2,
+     "start": "13:00",
+     "end": "14:40"
+    },
+    {
+     "day": 4,
+     "start": "13:00",
+     "end": "14:40"
+    }
+   ],
+   "teachers": [
+    "ALEXANDRE SALLES DA CUNHA"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC639"
+   ],
+   "name": "ÁLGEBRA LINEAR COMPUTACIONAL",
+   "class": "TZ2",
+   "schedule": [
+    {
+     "day": 2,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 4,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "teachers": [
+    "ERICKSON RANGEL DO NASCIMENTO"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC641"
+   ],
+   "name": "FUNDAMENTOS DE SISTEMAS PARALELOS E DISTRIBUÍDOS",
+   "class": "TM2/TM1",
+   "schedule": [
+    {
+     "day": 1,
+     "start": "13:00",
+     "end": "14:40"
+    }
+   ],
+   "teachers": [
+    "DORGIVAL OLAVO GUEDES NETO"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "DCC642"
+   ],
+   "name": "INTRODUÇÃO À INTELIGÊNCIA ARTIFICIAL",
+   "class": "TL4",
+   "schedule": [
+    {
+     "day": 3,
+     "start": "13:00",
+     "end": "14:40"
+    }
+   ],
+   "teachers": [
+    "LUCAS NASCIMENTO FERREIRA"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "ICE145"
+   ],
+   "name": "CIÊNCIA DE DADOS E SOCIEDADE",
+   "class": "TZ",
+   "schedule": [
+    {
+     "day": 2,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "teachers": [
+    "ANTONIO ALFREDO FERREIRA LOUREIRO"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "ICE146"
+   ],
+   "name": "ÉTICA E CIÊNCIA DE DADOS",
+   "class": "TZ",
+   "schedule": [
+    {
+     "day": 4,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "teachers": [
+    "MARCOS OLIVEIRA PRATES"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "ICE181"
+   ],
+   "name": "APRENDIZADO DE MÁQUINA A",
+   "class": "TM",
+   "schedule": [
+    {
+     "day": 2,
+     "start": "13:00",
+     "end": "14:40"
+    },
+    {
+     "day": 4,
+     "start": "13:00",
+     "end": "14:40"
+    }
+   ],
+   "teachers": [
+    "LOURENCO RIBEIRO GROSSI ARAUJO",
+    "GISELE LOBO PAPPA"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "INU034"
+   ],
+   "name": "INTRODUÇÃO À ENGENHARIA DA COMPUTAÇÃO",
+   "class": "TN1",
+   "schedule": [
+    {
+     "day": 5,
+     "start": "14:55",
+     "end": "17:50"
+    }
+   ],
+   "teachers": [
+    "GEORGE LUIZ MEDEIROS TEODORO",
+    "RICARDO DE OLIVEIRA DUARTE"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "INU035"
+   ],
+   "name": "ARQUITETURA E ORGANIZAÇÃO DE COMPUTADORES I",
+   "class": "TTN",
+   "schedule": [
+    {
+     "day": 1,
+     "start": "14:55",
+     "end": "16:35"
+    },
+    {
+     "day": 3,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "teachers": [
+    "TIAGO COELHO MAGALHAES",
+    "OMAR PARANAIBA VILELA NETO"
+   ],
+   "plan": null
+  },
+  {
+   "codes": [
+    "UNI279"
+   ],
+   "name": "GESTÃO DE EMPRESAS JUNIORES I",
+   "class": "PA",
+   "schedule": [
+    {
+     "day": 6,
+     "start": "09:20",
+     "end": "11:00"
+    }
+   ],
+   "teachers": [
+    "ADRIANO CESAR MACHADO PEREIRA"
+   ],
+   "plan": null
+  }
+ ]
+}

@@ -1,0 +1,3 @@
+# DCCHub: projeto da comunidade estudantil, fora de mecanismos de busca
+User-agent: *
+Disallow: /

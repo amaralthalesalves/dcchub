@@ -1,0 +1,5 @@
+# crontab -e na VM (ajuste o caminho). Atualiza os dados públicos e faz backup do banco.
+# oportunidades: todo dia 6h; catálogo/oferta + materiais: segunda 6h30; backup: todo dia 3h
+0 6 * * *   cd /opt/dcchub/deploy && docker compose exec -T app python3 scripts/sync_oportunidades.py >> /var/log/dcchub-sync.log 2>&1
+30 6 * * 1  cd /opt/dcchub/deploy && docker compose exec -T app sh -c 'python3 scripts/sync_dcc.py && python3 scripts/sync_provas.py' >> /var/log/dcchub-sync.log 2>&1
+0 3 * * *   cd /opt/dcchub/deploy && ./backup.sh >> /var/log/dcchub-backup.log 2>&1

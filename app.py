@@ -1,0 +1,1245 @@
+#!/usr/bin/env python3
+"""DCCHub — avaliações anônimas, oferta, materiais e oportunidades do DCC/UFMG.
+
+Servidor HTTP + API JSON usando apenas a biblioteca padrão do Python (3.10+).
+
+    python3 app.py                       # http://localhost:8000
+    PORT=9000 python3 app.py
+    python3 scripts/sync_dcc.py          # atualiza docentes, disciplinas e ofertas a partir do site do DCC
+
+Variáveis de ambiente (todas opcionais):
+    DCCHUB_SECRET       chave HMAC dos identificadores anônimos (gerada e salva em secret.key, ao lado do banco, se ausente)
+    DCCHUB_ADMIN_TOKEN  token do painel de moderação (/#/moderacao); sem ele, a moderação fica desativada
+    DCCHUB_DB           caminho do banco SQLite (padrão: data/avaliacoes.db)
+    DCCHUB_TRUST_PROXY  "1" para usar X-Forwarded-For como IP (somente atrás de proxy confiável)
+    DCCHUB_ACCESS_CODES códigos de acesso da comunidade, separados por vírgula; se definido, os dados só saem
+                        para navegadores que digitaram um código válido (trocar o código revoga os acessos antigos)
+  Os nomes antigos (AVALIA_DCC_*) continuam aceitos.
+    HOST / PORT             endereço de escuta (padrão 0.0.0.0:8000)
+"""
+from __future__ import annotations
+
+import gzip
+import hashlib
+import hmac
+import json
+import mimetypes
+import os
+import re
+import secrets
+import signal
+import sqlite3
+import sys
+import threading
+import time
+import unicodedata
+from collections import Counter, defaultdict, deque
+from collections.abc import Iterator
+from contextlib import contextmanager
+from datetime import date
+from http import HTTPStatus
+from http.cookies import SimpleCookie
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from pathlib import Path
+from urllib.parse import parse_qs, unquote, urlparse
+
+import moderation
+
+ROOT = Path(__file__).resolve().parent
+STATIC = ROOT / "static"
+DATA = ROOT / "data"
+CATALOG_FILE = DATA / "catalog.json"
+def env(name: str, default: str | None = None) -> str | None:
+    """DCCHUB_<NOME>, com o nome antigo AVALIA_DCC_<NOME> como alternativa (instalações anteriores ao rebranding)."""
+    return os.environ.get(f"DCCHUB_{name}", os.environ.get(f"AVALIA_DCC_{name}", default))
+
+
+DB = Path(env("DB") or DATA / "avaliacoes.db")
+COOKIE = "avalia_dcc"  # nome mantido de propósito: trocar desconectaria todo mundo da própria identidade anônima
+TRUST_PROXY = env("TRUST_PROXY") == "1"
+ADMIN_TOKEN = env("ADMIN_TOKEN", "") or ""
+ACCESS_COOKIE = "dcchub_access"
+ACCESS_CODES = [c.strip() for c in (env("ACCESS_CODES") or "").split(",") if c.strip()]
+MAX_BODY = 16_384
+ACTIVE_TERMS = 4  # disciplina sem oferta nos últimos 4 semestres publicados (2 anos) = fora de oferta
+
+
+def load_secret() -> str:
+    given = env("SECRET")
+    if given:
+        return given
+    # a chave mora ao lado do banco (dados persistentes); data/secret.key é o local antigo
+    path = DB.parent / "secret.key"
+    legacy = DATA / "secret.key"
+    if not path.exists() and legacy.exists():
+        return legacy.read_text().strip()
+    if path.exists():
+        return path.read_text().strip()
+    path.parent.mkdir(parents=True, exist_ok=True)
+    value = secrets.token_urlsafe(48)
+    path.write_text(value)
+    os.chmod(path, 0o600)
+    return value
+
+
+SECRET = load_secret()
+
+# --------------------------------------------------------------------------- definições do formulário
+CRITERIA = [
+    {"key": "overall", "label": "Avaliação geral", "hint": "Sua experiência como um todo", "low": "Péssima", "high": "Excelente"},
+    {"key": "didactics", "label": "Didática", "hint": "Clareza das explicações e organização das aulas", "low": "Confusa", "high": "Muito clara"},
+    {"key": "fairness", "label": "Avaliações justas", "hint": "Provas e trabalhos coerentes com o que foi ensinado", "low": "Nada justas", "high": "Muito justas"},
+    {"key": "difficulty", "label": "Dificuldade", "hint": "Quão difícil foi aprender e ser aprovado", "low": "Muito fácil", "high": "Muito difícil", "neutral": True},
+    {"key": "workload", "label": "Carga de trabalho", "hint": "Tempo exigido fora da sala de aula", "low": "Leve", "high": "Muito pesada", "neutral": True},
+]
+CRITERIA_KEYS = [c["key"] for c in CRITERIA]
+TAGS = {
+    "positivo": ["Explica muito bem", "Aulas organizadas", "Bom material de apoio", "Acessível fora da aula", "Dá bons feedbacks",
+                 "Exemplos práticos", "Aulas gravadas", "Inspira os alunos", "Respeitoso(a)"],
+    "neutro": ["Muitos trabalhos práticos", "Listas de exercícios", "Provas difíceis", "Provas parecidas com as listas",
+               "Projeto em grupo", "Seminários", "Muita leitura", "Muita matemática", "Muita programação",
+               "Cobra presença", "Dá pontos extras", "Aulas em inglês"],
+    "negativo": ["Critérios pouco claros", "Aulas confusas", "Demora a corrigir", "Pouco disponível", "Material desatualizado"],
+}
+ALL_TAGS = [t for group in TAGS.values() for t in group]
+MAX_TAGS = 5
+GRADES = ["A", "B", "C", "D", "E", "F", "Trancou", "Cursando", "Prefiro não dizer"]
+COMMENT_MIN, COMMENT_MAX = 30, 2000
+REPORT_REASONS = ["Ofensivo ou desrespeitoso", "Expõe dados pessoais", "Spam ou sem relação", "Informação falsa", "Outro"]
+AUTO_HIDE_REPORTS = 3
+
+def fold(text: str) -> str:
+    text = unicodedata.normalize("NFKD", text).encode("ascii", "ignore").decode().lower()
+    return text
+
+
+def moderation_flags(comment: str, professor: str | None = None) -> list[str]:
+    """Motivos (mensagens) apontados pelo filtro automático — ver moderation.py. Lista vazia = publica direto."""
+    return [i.message for i in moderation.analyze(comment, professor)]
+
+
+def token_hash(token: str) -> str:
+    return hmac.new(SECRET.encode(), token.encode(), hashlib.sha256).hexdigest()
+
+
+def clean_line(value: object, limit: int) -> str:
+    return " ".join(str(value or "").split())[:limit]
+
+
+def clean_comment(value: object) -> str:
+    text = str(value or "").replace("\r\n", "\n").replace("\r", "\n")
+    text = "".join(ch for ch in text if ch == "\n" or ch == "\t" or unicodedata.category(ch)[0] != "C")
+    lines = [" ".join(line.split()) for line in text.split("\n")]
+    text = re.sub(r"\n{3,}", "\n\n", "\n".join(lines)).strip()
+    return text
+
+
+def current_term(today: date | None = None) -> str:
+    today = today or date.today()
+    return f"{today.year}.{1 if today.month < 8 else 2}"
+
+
+def valid_term(term: str) -> bool:
+    m = re.fullmatch(r"(20\d{2})\.([12])", term)
+    return bool(m) and "2010.1" <= term <= current_term()
+
+
+# --------------------------------------------------------------------------- catálogo
+class Catalog:
+    """Docentes, disciplinas e ofertas (data/catalog.json), recarregado quando o arquivo muda."""
+
+    def __init__(self, path: Path):
+        self.path = path
+        self.mtime = -1.0
+        self.version = 0
+        self.lock = threading.Lock()
+        self.refresh()
+
+    def refresh(self) -> None:
+        try:
+            mtime = self.path.stat().st_mtime
+            archive = self.path.with_name(self.path.stem + "-arquivo.json")
+            if archive.exists():
+                mtime = max(mtime, archive.stat().st_mtime)
+        except FileNotFoundError:
+            mtime = 0.0
+        if mtime == self.mtime:
+            return
+        with self.lock:
+            if mtime == self.mtime:
+                return
+            raw = json.loads(self.path.read_text()) if mtime else {"professors": [], "courses": [], "offerings": [], "terms": []}
+            archive = self.path.with_name(self.path.stem + "-arquivo.json")  # extintas: só para avaliações antigas
+            if archive.exists():
+                old = json.loads(archive.read_text())
+                raw = {**raw, "courses": raw["courses"] + [{**c, "retired": True} for c in old.get("courses", [])],
+                       "offerings": raw["offerings"] + old.get("offerings", [])}
+            self.raw = raw
+            self.professors = {p["slug"]: p for p in raw["professors"]}
+            self.courses = {c["id"]: c for c in raw["courses"]}
+            # códigos de versões antigas / de outros cursos -> código canônico (ver consolidate() no sync)
+            self.alias = {a: c["id"] for c in raw["courses"] for a in c.get("aliases", [])}
+            self.offerings = raw["offerings"]
+            self.terms = raw.get("terms", [])
+            self.latest_term = self.terms[-1] if self.terms else None
+            # "em oferta": apareceu em alguma das últimas ACTIVE_TERMS ofertas publicadas; o resto é currículo antigo
+            recent = set(self.terms[-ACTIVE_TERMS:])
+            self.active = {cid for cid, c in self.courses.items() if recent & set(c["terms"]) and not c.get("retired")}
+            self.generated_at = raw.get("generatedAt")
+            self.sources = raw.get("sources", {})
+            self.term_sources = raw.get("termSources", {})
+            self.pairs: dict[tuple[str, str], list[str]] = defaultdict(list)  # (prof, course) -> termos
+            self.prof_courses: dict[str, Counter] = defaultdict(Counter)
+            self.course_profs: dict[str, Counter] = defaultdict(Counter)
+            self.prof_terms: dict[str, set] = defaultdict(set)
+            for o in self.offerings:
+                for slug in o["professors"]:
+                    self.pairs[(slug, o["course"])].append(o["term"])
+                    self.prof_courses[slug][o["course"]] += 1
+                    self.course_profs[o["course"]][slug] += 1
+                    self.prof_terms[slug].add(o["term"])
+            self.version += 1
+            self.mtime = mtime
+
+    def canonical(self, cid: str) -> str:
+        return self.alias.get(cid, cid)
+
+    def taught(self, professor: str, course: str, term: str | None = None) -> bool:
+        terms = self.pairs.get((professor, course), [])
+        return bool(terms) and (term is None or term in terms)
+
+
+CATALOG = Catalog(CATALOG_FILE)
+
+
+class Exams:
+    """Acervo de provas antigas (data/provas.json, gerado por scripts/sync_provas.py), recarregado se mudar."""
+
+    def __init__(self, path: Path):
+        self.path, self.mtime, self.data, self.by_course = path, -1.0, None, {}
+
+    def refresh(self) -> None:
+        try:
+            mtime = self.path.stat().st_mtime
+        except FileNotFoundError:
+            self.data, self.by_course, self.mtime = None, {}, -1.0
+            return
+        if mtime == self.mtime:
+            return
+        data = json.loads(self.path.read_text())
+        by_course: dict[str, list] = defaultdict(list)
+        for sec in data.get("sections", []):
+            for e in sec.get("courses", []):
+                if e.get("course"):
+                    by_course[CATALOG.canonical(e["course"])].append({**e, "section": sec["title"]})
+        self.data, self.by_course, self.mtime = data, dict(by_course), mtime
+
+    def for_course(self, cid: str) -> dict | None:
+        if not self.data or cid not in self.by_course:
+            return None
+        items = sorted(self.by_course[cid], key=lambda e: -e["files"])
+        return {"name": self.data.get("name"), "url": self.data.get("url"), "items": items}
+
+
+EXAMS = Exams(DATA / "provas.json")
+
+
+class Opportunities:
+    """Oportunidades de pesquisa/bolsas do DCC (data/oportunidades.json, gerado por scripts/sync_oportunidades.py)."""
+
+    def __init__(self, path: Path):
+        self.path, self.mtime, self.data = path, -1.0, None
+
+    def refresh(self) -> None:
+        try:
+            mtime = self.path.stat().st_mtime
+        except FileNotFoundError:
+            self.data, self.mtime = None, -1.0
+            return
+        if mtime != self.mtime:
+            self.data, self.mtime = json.loads(self.path.read_text()), mtime
+
+    def for_professor(self, slug: str) -> list[dict]:
+        if not self.data:
+            return []
+        return [{k: o[k] for k in ("slug", "title", "url", "deadline", "types", "audiences", "stipends")}
+                for o in self.data["items"] if o["open"] and slug in o.get("professors", [])]
+
+
+OPPORTUNITIES = Opportunities(DATA / "oportunidades.json")
+
+
+# --------------------------------------------------------------------------- banco de dados
+SCHEMA = """
+CREATE TABLE IF NOT EXISTS reviews (
+  id INTEGER PRIMARY KEY,
+  professor TEXT NOT NULL,
+  course TEXT NOT NULL,
+  term TEXT NOT NULL,
+  overall INTEGER NOT NULL CHECK(overall BETWEEN 1 AND 5),
+  didactics INTEGER NOT NULL CHECK(didactics BETWEEN 1 AND 5),
+  fairness INTEGER NOT NULL CHECK(fairness BETWEEN 1 AND 5),
+  difficulty INTEGER NOT NULL CHECK(difficulty BETWEEN 1 AND 5),
+  workload INTEGER NOT NULL CHECK(workload BETWEEN 1 AND 5),
+  would_retake INTEGER CHECK(would_retake IN (0, 1)),
+  grade TEXT,
+  tags TEXT NOT NULL DEFAULT '[]',
+  comment TEXT NOT NULL,
+  status TEXT NOT NULL CHECK(status IN ('published', 'held', 'removed')),
+  held_reason TEXT,
+  reviewer_hash TEXT NOT NULL,
+  created_at INTEGER NOT NULL,
+  updated_at INTEGER,
+  UNIQUE(reviewer_hash, professor, course)
+);
+CREATE INDEX IF NOT EXISTS idx_reviews_professor ON reviews(professor, status);
+CREATE INDEX IF NOT EXISTS idx_reviews_course ON reviews(course, status);
+CREATE TABLE IF NOT EXISTS votes (
+  review_id INTEGER NOT NULL REFERENCES reviews(id) ON DELETE CASCADE,
+  voter_hash TEXT NOT NULL,
+  created_at INTEGER NOT NULL,
+  PRIMARY KEY (review_id, voter_hash)
+);
+CREATE TABLE IF NOT EXISTS class_reports (
+  term TEXT NOT NULL,
+  professor TEXT NOT NULL,
+  course TEXT NOT NULL,
+  reporter_hash TEXT NOT NULL,
+  created_at INTEGER NOT NULL,
+  PRIMARY KEY (term, professor, course, reporter_hash)
+);
+CREATE TABLE IF NOT EXISTS reports (
+  review_id INTEGER NOT NULL REFERENCES reviews(id) ON DELETE CASCADE,
+  reporter_hash TEXT NOT NULL,
+  reason TEXT NOT NULL,
+  detail TEXT,
+  created_at INTEGER NOT NULL,
+  resolved INTEGER NOT NULL DEFAULT 0,
+  PRIMARY KEY (review_id, reporter_hash)
+);
+"""
+
+
+@contextmanager
+def connect() -> Iterator[sqlite3.Connection]:
+    """Conexão por requisição: commit ao final (rollback em erro) e sempre fechada."""
+    conn = sqlite3.connect(DB, timeout=10)
+    try:
+        conn.row_factory = sqlite3.Row
+        conn.execute("PRAGMA foreign_keys = ON")
+        conn.execute("PRAGMA busy_timeout = 5000")
+        with conn:
+            yield conn
+    finally:
+        conn.close()
+
+
+def init_db() -> None:
+    DB.parent.mkdir(parents=True, exist_ok=True)
+    with connect() as conn:
+        conn.execute("PRAGMA journal_mode = WAL")
+        legacy = conn.execute("SELECT sql FROM sqlite_master WHERE name='reviews'").fetchone()
+        if legacy and "overall" not in legacy["sql"]:
+            conn.execute("ALTER TABLE reviews RENAME TO reviews_v1")  # versão antiga preservada, não migrada
+        conn.executescript(SCHEMA)
+    migrate_aliases()
+
+
+_migrated_version = -1
+
+
+def migrate_aliases() -> None:
+    """Avaliações feitas com o código antigo de uma disciplina passam para o código canônico.
+    Se a mesma pessoa avaliou o mesmo docente nas duas versões, a mais antiga fica com o código antigo (não é apagada)."""
+    global _migrated_version
+    if _migrated_version == CATALOG.version:
+        return
+    _migrated_version = CATALOG.version
+    if not CATALOG.alias:
+        return
+    with connect() as conn:
+        for old, new in CATALOG.alias.items():
+            conn.execute("UPDATE OR IGNORE reviews SET course=? WHERE course=?", (new, old))
+            conn.execute("UPDATE OR IGNORE class_reports SET course=? WHERE course=?", (new, old))
+
+
+REVIEW_COLUMNS = ["professor", "course", "term", *CRITERIA_KEYS, "would_retake", "grade", "tags", "comment"]
+
+
+def review_out(row: sqlite3.Row, viewer: str | None = None, voted: set[int] | None = None, helpful: dict[int, int] | None = None) -> dict:
+    out = {
+        "id": row["id"], "professor": row["professor"], "course": row["course"], "term": row["term"],
+        "ratings": {k: row[k] for k in CRITERIA_KEYS},
+        "wouldRetake": None if row["would_retake"] is None else bool(row["would_retake"]),
+        "grade": row["grade"], "tags": json.loads(row["tags"] or "[]"), "comment": row["comment"],
+        "createdAt": row["created_at"], "updatedAt": row["updated_at"],
+        "helpful": (helpful or {}).get(row["id"], 0),
+        "verified": CATALOG.taught(row["professor"], row["course"], row["term"]),
+    }
+    if viewer is not None:
+        out["mine"] = row["reviewer_hash"] == viewer
+        out["voted"] = row["id"] in (voted or set())
+        if out["mine"]:
+            out["status"] = row["status"]
+    return out
+
+
+def helpful_counts(conn: sqlite3.Connection, ids: list[int]) -> dict[int, int]:
+    if not ids:
+        return {}
+    marks = ",".join("?" * len(ids))
+    return {r[0]: r[1] for r in conn.execute(f"SELECT review_id, COUNT(*) FROM votes WHERE review_id IN ({marks}) GROUP BY review_id", ids)}
+
+
+def aggregate(rows: list[sqlite3.Row]) -> dict:
+    """Médias por critério, % que faria de novo, tags e distribuição de notas."""
+    n = len(rows)
+    if not n:
+        return {"count": 0}
+    avg = {k: round(sum(r[k] for r in rows) / n, 2) for k in CRITERIA_KEYS}
+    retake = [r["would_retake"] for r in rows if r["would_retake"] is not None]
+    tags = Counter(t for r in rows for t in json.loads(r["tags"] or "[]"))
+    grades = Counter(r["grade"] for r in rows if r["grade"] in GRADES[:6])
+    dist = Counter(r["overall"] for r in rows)
+    return {
+        "count": n, "avg": avg,
+        "retake": round(100 * sum(retake) / len(retake)) if retake else None,
+        "tags": [{"tag": t, "count": c} for t, c in tags.most_common(8)],
+        "grades": {g: grades.get(g, 0) for g in GRADES[:6]},
+        "distribution": {str(i): dist.get(i, 0) for i in range(1, 6)},
+    }
+
+
+def bayes(avg: float | None, n: int, prior: float, weight: int = 3) -> float | None:
+    if not n or avg is None:
+        return None
+    return round((avg * n + prior * weight) / (n + weight), 3)
+
+
+# --------------------------------------------------------------------------- limite de requisições
+class RateLimiter:
+    def __init__(self) -> None:
+        self.events: dict[tuple[str, str], deque[float]] = defaultdict(deque)
+        self.lock = threading.Lock()
+
+    def hit(self, bucket: str, key: str, limit: int, window: float) -> bool:
+        now = time.monotonic()
+        with self.lock:
+            queue = self.events[(bucket, key)]
+            while queue and queue[0] <= now - window:
+                queue.popleft()
+            if len(queue) >= limit:
+                return False
+            queue.append(now)
+            if len(self.events) > 50_000:  # memória limitada
+                for k in [k for k, q in self.events.items() if not q][:25_000]:
+                    del self.events[k]
+            return True
+
+
+LIMITS = {"check": (120, 60), "access": (10, 600), "classreport": (20, 600), "review": (6, 600), "vote": (60, 60), "report": (10, 600), "restore": (10, 600), "admin": (30, 60)}
+limiter = RateLimiter()
+
+
+class ApiError(Exception):
+    def __init__(self, status: int, message: str, **extra: object):
+        super().__init__(message)
+        self.status, self.message, self.extra = status, message, extra
+
+
+# --------------------------------------------------------------------------- HTTP
+_gzip_cache: dict[str, bytes] = {}
+
+
+def gzip_cached(etag: str, data: bytes) -> bytes:
+    if etag not in _gzip_cache:
+        if len(_gzip_cache) > 64:
+            _gzip_cache.clear()
+        _gzip_cache[etag] = gzip.compress(data, 9)
+    return _gzip_cache[etag]
+
+
+CSP = ("default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self'; "
+       "font-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'")
+
+
+class App(BaseHTTPRequestHandler):
+    server_version = "DCCHub/2.0"
+    sys_version = ""
+    protocol_version = "HTTP/1.1"
+
+    # ---- utilidades
+    def log_message(self, format: str, *args: object) -> None:  # noqa: A002
+        return  # anonimato: nenhum log de acesso com IP
+
+    def security_headers(self) -> None:
+        self.send_header("X-Content-Type-Options", "nosniff")
+        self.send_header("Referrer-Policy", "no-referrer")
+        self.send_header("X-Frame-Options", "DENY")
+        self.send_header("Permissions-Policy", "camera=(), microphone=(), geolocation=(), interest-cohort=()")
+        self.send_header("Content-Security-Policy", CSP)
+        self.send_header("X-Robots-Tag", "noindex, nofollow, noarchive")  # projeto da comunidade: fora de buscadores
+
+    def wants_gzip(self, size: int) -> bool:
+        return size > 1400 and "gzip" in self.headers.get("Accept-Encoding", "")
+
+    def send_json(self, data: object, status: int = 200) -> None:
+        body = json.dumps(data, ensure_ascii=False, separators=(",", ":")).encode()
+        self.send_response(status)
+        self.send_header("Content-Type", "application/json; charset=utf-8")
+        if self.wants_gzip(len(body)):
+            body = gzip.compress(body, 6)
+            self.send_header("Content-Encoding", "gzip")
+            self.send_header("Vary", "Accept-Encoding")
+        self.send_header("Content-Length", str(len(body)))
+        self.send_header("Cache-Control", "no-store")
+        if getattr(self, "new_cookie", None):
+            self.send_header("Set-Cookie", self.new_cookie)
+        if getattr(self, "access_cookie", None):
+            self.send_header("Set-Cookie", self.access_cookie)
+        self.security_headers()
+        self.end_headers()
+        if self.command != "HEAD":
+            self.wfile.write(body)
+
+    def client_ip(self) -> str:
+        if TRUST_PROXY and self.headers.get("X-Forwarded-For"):
+            return self.headers["X-Forwarded-For"].split(",")[0].strip()
+        return self.client_address[0]
+
+    def secure_request(self) -> bool:
+        return self.headers.get("X-Forwarded-Proto") == "https" if TRUST_PROXY else False
+
+    def make_cookie(self, token: str) -> str:
+        secure = "; Secure" if self.secure_request() else ""
+        return f"{COOKIE}={token}; Path=/; Max-Age=63072000; HttpOnly; SameSite=Strict{secure}"
+
+    def viewer(self, create: bool = False) -> str | None:
+        """Hash do identificador anônimo do navegador (cria um novo cookie se pedido)."""
+        if not hasattr(self, "_viewer"):
+            cookies = SimpleCookie()
+            try:
+                cookies.load(self.headers.get("Cookie", ""))
+            except Exception:  # noqa: BLE001
+                pass
+            token = cookies[COOKIE].value if COOKIE in cookies else ""
+            self._viewer = token_hash(token) if re.fullmatch(r"[A-Za-z0-9_-]{43}", token) else None
+        if self._viewer is None and create:
+            token = secrets.token_urlsafe(32)
+            self.new_cookie = self.make_cookie(token)
+            self._viewer = token_hash(token)
+        return self._viewer
+
+    def read_body(self) -> bytes:
+        """Lê (e descarta, se preciso) todo o corpo: com keep-alive, bytes não lidos corrompem a próxima requisição."""
+        try:
+            length = int(self.headers.get("Content-Length") or 0)
+        except ValueError:
+            length = -1
+        if length < 0 or length > MAX_BODY:
+            self.close_connection = True
+            raise ApiError(413 if length > MAX_BODY else 400, "Conteúdo grande demais." if length > MAX_BODY else "Requisição inválida.")
+        return self.rfile.read(length) if length else b""
+
+    def read_json(self) -> dict:
+        if "application/json" not in self.headers.get("Content-Type", ""):
+            raise ApiError(415, "Envie JSON.")
+        try:
+            data = json.loads(self.body or b"{}")
+        except (ValueError, UnicodeDecodeError):
+            raise ApiError(400, "JSON inválido.") from None
+        if not isinstance(data, dict):
+            raise ApiError(400, "JSON inválido.")
+        return data
+
+    def check_origin(self) -> None:
+        """Proteção CSRF: requisições de escrita precisam vir da própria origem."""
+        origin = self.headers.get("Origin")
+        if origin and urlparse(origin).netloc != self.headers.get("Host"):
+            raise ApiError(403, "Origem não permitida.")
+
+    def limit(self, bucket: str) -> None:
+        count, window = LIMITS[bucket]
+        if not limiter.hit(bucket, self.client_ip(), count, window):
+            raise ApiError(429, "Muitas ações em pouco tempo. Aguarde alguns minutos e tente de novo.")
+
+    # ---- roteamento
+    def do_HEAD(self) -> None:
+        self.do_GET()
+
+    def do_GET(self) -> None:
+        self.dispatch("GET")
+
+    def do_POST(self) -> None:
+        self.dispatch("POST")
+
+    def do_PUT(self) -> None:
+        self.dispatch("PUT")
+
+    def do_DELETE(self) -> None:
+        self.dispatch("DELETE")
+
+    ROUTES = [
+        ("POST", r"/api/access", "post_access"),
+        ("GET", r"/api/bootstrap", "get_bootstrap"),
+        ("GET", r"/api/offerings", "get_offerings"),
+        ("GET", r"/api/professors/([a-z0-9-]+)", "get_professor"),
+        ("GET", r"/api/courses/([A-Za-z0-9-]+)", "get_course"),
+        ("GET", r"/api/reviews", "get_reviews"),
+        ("GET", r"/api/provas", "get_provas"),
+        ("POST", r"/api/moderation/check", "post_moderation_check"),
+        ("GET", r"/api/oportunidades", "get_oportunidades"),
+        ("POST", r"/api/reviews", "post_review"),
+        ("PUT", r"/api/reviews/(\d+)", "put_review"),
+        ("DELETE", r"/api/reviews/(\d+)", "delete_review"),
+        ("POST", r"/api/reviews/(\d+)/helpful", "post_helpful"),
+        ("POST", r"/api/reviews/(\d+)/report", "post_report"),
+        ("GET", r"/api/me", "get_me"),
+        ("GET", r"/api/me/code", "get_me_code"),
+        ("POST", r"/api/me/restore", "post_restore"),
+        ("POST", r"/api/class-reports", "post_class_report"),
+        ("DELETE", r"/api/class-reports", "delete_class_report"),
+        ("GET", r"/api/admin/queue", "get_admin_queue"),
+        ("GET", r"/api/admin/class-reports", "get_admin_class_reports"),
+        ("POST", r"/api/admin/class-reports/delete", "post_admin_class_report_delete"),
+        ("POST", r"/api/admin/reviews/(\d+)", "post_admin_review"),
+        # compatibilidade com o front-end antigo
+        ("GET", r"/api/catalog", "get_bootstrap"),
+    ]
+
+    def dispatch(self, method: str) -> None:
+        url = urlparse(self.path)
+        path = unquote(url.path)
+        self.query = {k: v[0] for k, v in parse_qs(url.query).items()}
+        self.body = b""
+        if method not in ("GET", "HEAD"):
+            try:
+                self.body = self.read_body()
+            except ApiError as exc:
+                return self.send_json({"error": exc.message}, exc.status)
+        CATALOG.refresh()
+        EXAMS.refresh()
+        OPPORTUNITIES.refresh()
+        if CATALOG.version != _migrated_version:
+            migrate_aliases()
+        if not path.startswith("/api/"):
+            if method in ("GET", "HEAD"):
+                return self.serve_static(path)
+            return self.send_json({"error": "Método não permitido."}, 405)
+        if ACCESS_CODES and path != "/api/access" and not self.has_access():
+            # nada de dados sem o código da comunidade; o front mostra a tela de acesso
+            return self.send_json({"error": "Acesso restrito à comunidade. Digite o código de acesso.", "gate": True}, 401)
+        try:
+            for route_method, pattern, handler in self.ROUTES:
+                m = re.fullmatch(pattern, path)
+                if m and route_method == method:
+                    if method != "GET":
+                        self.check_origin()
+                    return getattr(self, handler)(*m.groups())
+            raise ApiError(404, "Não encontrado.")
+        except ApiError as exc:
+            self.send_json({"error": exc.message, **exc.extra}, exc.status)
+        except sqlite3.OperationalError:
+            self.send_json({"error": "Servidor ocupado, tente de novo em instantes."}, 503)
+
+    def serve_static(self, path: str) -> None:
+        if path in ("", "/"):
+            path = "/index.html"
+        target = (STATIC / path.lstrip("/")).resolve()
+        if not str(target).startswith(str(STATIC.resolve())) or not target.is_file():
+            # SPA: rotas desconhecidas sem extensão caem no index
+            if "." not in path.rsplit("/", 1)[-1]:
+                target = STATIC / "index.html"
+            else:
+                body = b"Not found"
+                self.send_response(404)
+                self.send_header("Content-Type", "text/plain")
+                self.send_header("Content-Length", str(len(body)))
+                self.security_headers()
+                self.end_headers()
+                if self.command != "HEAD":
+                    self.wfile.write(body)
+                return
+        data = target.read_bytes()
+        etag = '"' + hashlib.sha1(data).hexdigest()[:16] + '"'
+        ctype = mimetypes.guess_type(target.name)[0] or "application/octet-stream"
+        if ctype.startswith("text/") or ctype in ("application/javascript", "image/svg+xml", "application/manifest+json"):
+            ctype += "; charset=utf-8"
+        if self.headers.get("If-None-Match") == etag:
+            self.send_response(304)
+            self.send_header("ETag", etag)
+            self.send_header("Content-Length", "0")
+            self.end_headers()
+            return
+        self.send_response(200)
+        self.send_header("Content-Type", ctype)
+        compressible = ctype.startswith(("text/", "application/javascript", "application/json", "image/svg", "application/manifest"))
+        if compressible and self.wants_gzip(len(data)):
+            data = gzip_cached(etag, data)
+            self.send_header("Content-Encoding", "gzip")
+        if compressible:
+            self.send_header("Vary", "Accept-Encoding")
+        self.send_header("Content-Length", str(len(data)))
+        self.send_header("ETag", etag)
+        immutable = target.parent.name == "photos"
+        self.send_header("Cache-Control", "public, max-age=604800" if immutable else "no-cache")
+        self.security_headers()
+        self.end_headers()
+        if self.command != "HEAD":
+            self.wfile.write(data)
+
+    # ---- leitura
+    def all_stats(self, conn: sqlite3.Connection) -> tuple[dict, dict, dict]:
+        rows = conn.execute(f"""SELECT professor, course, COUNT(*) n, {', '.join(f'AVG({k}) {k}' for k in CRITERIA_KEYS)},
+                                       AVG(would_retake) retake, COUNT(would_retake) nretake
+                                FROM reviews WHERE status='published' GROUP BY professor, course""").fetchall()
+        total = sum(r["n"] for r in rows)
+        prior = (sum(r["overall"] * r["n"] for r in rows) / total) if total else 3.5
+        by_prof: dict[str, dict] = {}
+        by_course: dict[str, dict] = {}
+        for target, key in ((by_prof, "professor"), (by_course, "course")):
+            acc: dict[str, dict] = defaultdict(lambda: {"n": 0, **{k: 0.0 for k in CRITERIA_KEYS}, "retake": 0.0, "nretake": 0})
+            for r in rows:
+                a = acc[r[key]]
+                a["n"] += r["n"]
+                for k in CRITERIA_KEYS:
+                    a[k] += r[k] * r["n"]
+                if r["nretake"]:
+                    a["retake"] += r["retake"] * r["nretake"]
+                    a["nretake"] += r["nretake"]
+            for k, a in acc.items():
+                n = a["n"]
+                target[k] = {"count": n, **{c: round(a[c] / n, 2) for c in CRITERIA_KEYS},
+                             "retake": round(100 * a["retake"] / a["nretake"]) if a["nretake"] else None,
+                             "score": bayes(a["overall"] / n, n, prior)}
+        pair = {(r["professor"], r["course"]): {"count": r["n"], **{c: round(r[c], 2) for c in CRITERIA_KEYS},
+                                                 "retake": round(100 * r["retake"]) if r["nretake"] else None} for r in rows}
+        return by_prof, by_course, pair
+
+    @staticmethod
+    def reviewed_courses(conn: sqlite3.Connection) -> set[str]:
+        return {r[0] for r in conn.execute("SELECT DISTINCT course FROM reviews WHERE status='published'")}
+
+    @staticmethod
+    def shown(cid: str, reviewed: set[str]) -> bool:
+        """Disciplinas extintas (currículo antigo, sem oferta recente) não aparecem no site,
+        a menos que já tenham avaliações publicadas — essas nunca somem."""
+        return cid in CATALOG.active or cid in reviewed
+
+    def get_bootstrap(self) -> None:
+        with connect() as conn:
+            by_prof, by_course, _ = self.all_stats(conn)
+            totals = conn.execute("SELECT COUNT(*) n, COUNT(DISTINCT reviewer_hash) people FROM reviews WHERE status='published'").fetchone()
+            pending = conn.execute("SELECT COUNT(*) FROM reviews WHERE status='held'").fetchone()[0]
+            reviewed = self.reviewed_courses(conn)
+        latest = CATALOG.latest_term
+        current_profs = {s for o in CATALOG.offerings if o["term"] == latest for s in o["professors"]}
+        current_courses = {o["course"] for o in CATALOG.offerings if o["term"] == latest}
+        professors = []
+        for slug, p in CATALOG.professors.items():
+            professors.append({
+                "slug": slug, "name": p["name"], "status": p["status"], "photo": p.get("photo"), "areas": p.get("areas", []),
+                "courses": [c for c, _ in CATALOG.prof_courses[slug].most_common() if self.shown(c, reviewed)],
+                "lastTerm": max(CATALOG.prof_terms[slug]) if CATALOG.prof_terms[slug] else None,
+                "teachingNow": slug in current_profs, "stats": by_prof.get(slug),
+            })
+        courses = []
+        for cid, c in CATALOG.courses.items():
+            if not self.shown(cid, reviewed):
+                continue
+            courses.append({
+                "id": cid, "codes": c["codes"], "name": c["name"], "kind": c["kind"], "terms": c["terms"],
+                "professors": [s for s, _ in CATALOG.course_profs[cid].most_common()],
+                "offeredNow": cid in current_courses, "active": cid in CATALOG.active, "aliases": c.get("aliases", []),
+                "stats": by_course.get(cid),
+            })
+        self.send_json({
+            "professors": professors, "courses": courses, "terms": CATALOG.terms, "latestTerm": latest,
+            "currentTerm": current_term(), "offerPublished": latest == current_term(),
+            "communityTerm": self.community_term(), "activeTerms": CATALOG.terms[-ACTIVE_TERMS:], "generatedAt": CATALOG.generated_at, "sources": CATALOG.sources, "termSources": CATALOG.term_sources,
+            "criteria": CRITERIA, "tags": TAGS, "maxTags": MAX_TAGS, "grades": GRADES, "reportReasons": REPORT_REASONS,
+            "comment": {"min": COMMENT_MIN, "max": COMMENT_MAX},
+            "totals": {"reviews": totals["n"], "reviewers": totals["people"], "pending": pending},
+            "moderation": bool(ADMIN_TOKEN),
+        })
+
+    def get_offerings(self) -> None:
+        term = self.query.get("term") or CATALOG.latest_term
+        with connect() as conn:
+            _, _, pair = self.all_stats(conn)
+            reviewed = self.reviewed_courses(conn)
+        out = []
+        for o in CATALOG.offerings:
+            if o["term"] != term or not self.shown(o["course"], reviewed):
+                continue
+            out.append({**o, "stats": {s: pair.get((s, o["course"])) for s in o["professors"]}})
+        self.send_json({"term": term, "offerings": out})
+
+    def reviews_where(self, conn: sqlite3.Connection, where: str, args: list, sort: str = "helpful", limit: int = 500, offset: int = 0) -> list[dict]:
+        order = {"recent": "r.created_at DESC", "helpful": "helpful DESC, r.created_at DESC",
+                 "high": "r.overall DESC, r.created_at DESC", "low": "r.overall ASC, r.created_at DESC"}.get(sort, "helpful DESC, r.created_at DESC")
+        rows = conn.execute(f"""SELECT r.*, (SELECT COUNT(*) FROM votes v WHERE v.review_id=r.id) helpful
+                                FROM reviews r WHERE r.status='published' AND {where} ORDER BY {order} LIMIT ? OFFSET ?""",
+                            [*args, limit, offset]).fetchall()
+        viewer = self.viewer()
+        voted = set()
+        if viewer and rows:
+            marks = ",".join("?" * len(rows))
+            voted = {r[0] for r in conn.execute(f"SELECT review_id FROM votes WHERE voter_hash=? AND review_id IN ({marks})", [viewer, *[r["id"] for r in rows]])}
+        return [review_out(r, viewer or "", voted, {r["id"]: r["helpful"] for r in rows}) for r in rows]
+
+    def get_professor(self, slug: str) -> None:
+        prof = CATALOG.professors.get(slug)
+        if not prof:
+            raise ApiError(404, "Docente não encontrado.")
+        with connect() as conn:
+            rows = conn.execute("SELECT * FROM reviews WHERE professor=? AND status='published'", (slug,)).fetchall()
+            _, _, pair = self.all_stats(conn)
+            reviews = self.reviews_where(conn, "r.professor=?", [slug], self.query.get("sort", "helpful"))
+            reviewed = self.reviewed_courses(conn)
+        course_ids = {c for c in set(CATALOG.prof_courses[slug]) | {r["course"] for r in rows} if self.shown(c, reviewed)}
+        courses = []
+        for cid in course_ids:
+            c = CATALOG.courses.get(cid)
+            if not c:
+                continue
+            terms = sorted(set(CATALOG.pairs.get((slug, cid), [])))
+            courses.append({"id": cid, "name": c["name"], "codes": c["codes"], "kind": c["kind"], "terms": terms,
+                            "sections": CATALOG.prof_courses[slug][cid], "stats": pair.get((slug, cid))})
+        courses.sort(key=lambda c: (c["terms"][-1] if c["terms"] else "", c["sections"]), reverse=True)
+        history = [{"term": o["term"], "course": o["course"], "schedule": o["schedule"], "class": o.get("class"), "plan": o.get("plan"),
+                    "with": [s for s in o["professors"] if s != slug], "codes": o["codes"]}
+                   for o in CATALOG.offerings if slug in o["professors"] and self.shown(o["course"], reviewed)]
+        for c in courses:
+            c["active"] = c["id"] in CATALOG.active
+        self.send_json({"professor": prof, "summary": aggregate(rows), "courses": courses, "history": history, "reviews": reviews,
+                        "termsTaught": sorted(CATALOG.prof_terms[slug]),
+                        "opportunities": OPPORTUNITIES.for_professor(slug),  # todos os semestres, inclusive em disciplinas extintas
+                        "community": self.community_reports(professor=slug)})
+
+    def get_course(self, cid: str) -> None:
+        cid = CATALOG.canonical(cid)
+        course = CATALOG.courses.get(cid)
+        if not course:
+            raise ApiError(404, "Disciplina não encontrada.")
+        with connect() as conn:
+            rows = conn.execute("SELECT * FROM reviews WHERE course=? AND status='published'", (cid,)).fetchall()
+            _, _, pair = self.all_stats(conn)
+            reviews = self.reviews_where(conn, "r.course=?", [cid], self.query.get("sort", "helpful"))
+        if not rows and cid not in CATALOG.active:
+            successor = course.get("successor")
+            raise ApiError(404, f"{course['name']} é de um currículo antigo e não é mais ofertada pelo DCC"
+                           + (f"; o conteúdo hoje está em {CATALOG.courses[successor]['name']}." if successor in CATALOG.courses else "."),
+                           successor=successor if successor in CATALOG.courses else None)
+        prof_ids = set(CATALOG.course_profs[cid]) | {r["professor"] for r in rows}
+        professors = []
+        for slug in prof_ids:
+            p = CATALOG.professors.get(slug)
+            if not p:
+                continue
+            terms = sorted(set(CATALOG.pairs.get((slug, cid), [])))
+            professors.append({"slug": slug, "name": p["name"], "photo": p.get("photo"), "status": p["status"], "terms": terms,
+                               "sections": CATALOG.course_profs[cid][slug], "stats": pair.get((slug, cid))})
+        professors.sort(key=lambda p: (p["terms"][-1] if p["terms"] else "", p["sections"]), reverse=True)
+        history = [{"term": o["term"], "professors": o["professors"], "schedule": o["schedule"], "class": o.get("class"), "plan": o.get("plan"),
+                    "codes": o["codes"], "unresolved": o.get("unresolved", [])}
+                   for o in CATALOG.offerings if o["course"] == cid]
+        self.send_json({"course": {**course, "active": cid in CATALOG.active}, "summary": aggregate(rows), "professors": professors,
+                        "history": history, "reviews": reviews, "community": self.community_reports(course=cid),
+                        "exams": EXAMS.for_course(cid)})
+
+    def get_provas(self) -> None:
+        if not EXAMS.data:
+            raise ApiError(404, "O acervo de provas ainda não foi indexado (rode scripts/sync_provas.py).")
+        data = EXAMS.data
+        sections = [{**sec, "courses": [{**e, "course": CATALOG.canonical(e["course"]) if e.get("course") in CATALOG.courses
+                                          or e.get("course") in CATALOG.alias else None} for e in sec["courses"]]}
+                    for sec in data["sections"]]
+        self.send_json({**data, "sections": sections})
+
+    def get_oportunidades(self) -> None:
+        if not OPPORTUNITIES.data:
+            raise ApiError(404, "As oportunidades ainda não foram coletadas (rode scripts/sync_oportunidades.py).")
+        self.send_json(OPPORTUNITIES.data)
+
+    def get_reviews(self) -> None:
+        where, args = ["1=1"], []
+        for field in ("professor", "course"):
+            if self.query.get(field):
+                where.append(f"r.{field}=?")
+                args.append(CATALOG.canonical(self.query[field]) if field == "course" else self.query[field])
+        try:
+            limit = max(1, min(int(self.query.get("limit", 20)), 100))
+            offset = max(0, int(self.query.get("offset", 0)))
+        except ValueError:
+            raise ApiError(400, "Parâmetros inválidos.") from None
+        with connect() as conn:
+            reviews = self.reviews_where(conn, " AND ".join(where), args, self.query.get("sort", "recent"), limit, offset)
+        self.send_json({"reviews": reviews})
+
+    # ---- escrita
+    def validate_review(self, data: dict, keep_course: str | None = None) -> dict:
+        if data.get("website"):  # campo-armadilha
+            raise ApiError(400, "Não foi possível enviar esta avaliação.")
+        professor = clean_line(data.get("professor"), 120)
+        course = CATALOG.canonical(clean_line(data.get("course"), 120))
+        term = clean_line(data.get("term"), 10)
+        errors: dict[str, str] = {}
+        if professor not in CATALOG.professors:
+            errors["professor"] = "Escolha um docente da lista."
+        if course not in CATALOG.courses:
+            errors["course"] = "Escolha uma disciplina da lista."
+        elif course not in CATALOG.active and course != keep_course:  # editar avaliação antiga continua possível
+            errors["course"] = f"Esta disciplina não é ofertada desde {CATALOG.courses[course]['terms'][-1]} (currículo antigo)."
+        if not valid_term(term):
+            errors["term"] = f"Use o formato 2025.2 (entre 2010.1 e {current_term()})."
+        ratings = {}
+        for key in CRITERIA_KEYS:
+            try:
+                value = int(data.get("ratings", {}).get(key) if isinstance(data.get("ratings"), dict) else data.get(key))
+            except (TypeError, ValueError):
+                value = 0
+            if not 1 <= value <= 5:
+                errors[key] = "Dê uma nota de 1 a 5."
+            ratings[key] = value
+        retake = data.get("wouldRetake")
+        if retake not in (None, True, False):
+            errors["wouldRetake"] = "Resposta inválida."
+        grade = data.get("grade") or None
+        if grade is not None and grade not in GRADES:
+            errors["grade"] = "Conceito inválido."
+        tags = data.get("tags") or []
+        if not isinstance(tags, list) or any(t not in ALL_TAGS for t in tags) or len(set(tags)) > MAX_TAGS:
+            errors["tags"] = f"Escolha até {MAX_TAGS} marcadores da lista."
+            tags = []
+        comment = clean_comment(data.get("comment"))
+        if len(comment) < COMMENT_MIN:
+            errors["comment"] = f"Escreva pelo menos {COMMENT_MIN} caracteres — detalhes ajudam quem vai escolher a turma."
+        elif len(comment) > COMMENT_MAX:
+            errors["comment"] = f"Use no máximo {COMMENT_MAX} caracteres."
+        issues = []
+        if "comment" not in errors:
+            issues = moderation.analyze(comment, CATALOG.professors.get(professor, {}).get("name"))
+            rejected = [i for i in issues if i.action == moderation.REJECT]
+            if rejected:
+                errors["comment"] = " ".join(dict.fromkeys(i.message for i in rejected))
+        if errors:
+            raise ApiError(400, "Revise os campos destacados.", fields=errors,
+                           moderation=[{"category": i.category, "message": i.message, "evidence": i.evidence} for i in issues])
+        return {"professor": professor, "course": course, "term": term, **ratings,
+                "would_retake": None if retake is None else int(retake), "grade": grade,
+                "tags": json.dumps(list(dict.fromkeys(tags)), ensure_ascii=False), "comment": comment,
+                "_hold": [i.message for i in issues if i.action == moderation.HOLD]}
+
+    def post_review(self) -> None:
+        data = self.read_json()
+        review = self.validate_review(data)
+        self.limit("review")
+        viewer = self.viewer(create=True)
+        flags = review.pop("_hold")
+        status = "held" if flags else "published"
+        self.reject_duplicate(review["comment"], viewer)
+        try:
+            with connect() as conn:
+                cur = conn.execute(
+                    f"INSERT INTO reviews ({', '.join(REVIEW_COLUMNS)}, status, held_reason, reviewer_hash, created_at) "
+                    f"VALUES ({', '.join('?' * (len(REVIEW_COLUMNS) + 4))})",
+                    [*(review[c] for c in REVIEW_COLUMNS), status, "; ".join(flags) or None, viewer, int(time.time())])
+                review_id = cur.lastrowid
+        except sqlite3.IntegrityError:
+            with connect() as conn:
+                existing = conn.execute("SELECT id FROM reviews WHERE reviewer_hash=? AND professor=? AND course=?",
+                                        (viewer, review["professor"], review["course"])).fetchone()
+            raise ApiError(409, "Você já avaliou esta disciplina com este docente. Você pode editar a avaliação existente.",
+                           reviewId=existing["id"] if existing else None) from None
+        message = ("Avaliação publicada. Obrigado por ajudar a comunidade!" if status == "published"
+                   else "Recebemos sua avaliação. Por citar uma possível discriminação, uma pessoa da moderação vai ler antes de publicar.")
+        self.send_json({"id": review_id, "status": status, "message": message, "held": status == "held"}, 201)
+
+    @staticmethod
+    def reject_duplicate(comment: str, viewer: str, exclude_id: int | None = None) -> None:
+        """Comentário idêntico a outra avaliação (copiar-colar em massa, spam): devolve para reescrever."""
+        key = " ".join(moderation.fold(comment).split())
+        with connect() as conn:
+            # só de OUTRAS pessoas: reenviar a própria avaliação cai no aviso de "você já avaliou" (409)
+            for row in conn.execute("SELECT id, comment FROM reviews WHERE status!='removed' AND length(comment) = ? AND reviewer_hash != ?",
+                                    (len(comment), viewer)):
+                if row["id"] != exclude_id and " ".join(moderation.fold(row["comment"]).split()) == key:
+                    raise ApiError(400, "Revise os campos destacados.",
+                                   fields={"comment": "Este comentário é idêntico a outra avaliação. Escreva com as suas palavras."})
+
+    def post_moderation_check(self) -> None:
+        """Checagem enquanto a pessoa digita: diz o que seria barrado/segurado, sem guardar nada."""
+        self.limit("check")
+        data = self.read_json()
+        comment = clean_comment(data.get("comment"))[:COMMENT_MAX]
+        name = CATALOG.professors.get(clean_line(data.get("professor"), 120), {}).get("name")
+        issues = moderation.analyze(comment, name)
+        self.send_json({"decision": moderation.decide(issues),
+                        "issues": [{"category": i.category, "message": i.message, "evidence": i.evidence, "action": i.action} for i in issues]})
+
+    def own_review(self, conn: sqlite3.Connection, review_id: str) -> sqlite3.Row:
+        viewer = self.viewer()
+        row = conn.execute("SELECT * FROM reviews WHERE id=? AND status!='removed'", (int(review_id),)).fetchone()
+        if not row or not viewer or not hmac.compare_digest(row["reviewer_hash"], viewer):
+            raise ApiError(404, "Avaliação não encontrada neste navegador.")
+        return row
+
+    def put_review(self, review_id: str) -> None:
+        data = self.read_json()
+        with connect() as conn:
+            row = self.own_review(conn, review_id)
+        review = self.validate_review(data, keep_course=row["course"])
+        self.limit("review")
+        flags = review.pop("_hold")
+        self.reject_duplicate(review["comment"], row["reviewer_hash"], exclude_id=row["id"])
+        with connect() as conn:
+            row = self.own_review(conn, review_id)
+            if (row["professor"], row["course"]) != (review["professor"], review["course"]):
+                clash = conn.execute("SELECT 1 FROM reviews WHERE reviewer_hash=? AND professor=? AND course=? AND id!=?",
+                                     (row["reviewer_hash"], review["professor"], review["course"], row["id"])).fetchone()
+                if clash:
+                    raise ApiError(409, "Você já tem outra avaliação para esta combinação de docente e disciplina.")
+            status = "held" if flags else "published"
+            conn.execute(f"UPDATE reviews SET {', '.join(f'{c}=?' for c in REVIEW_COLUMNS)}, status=?, held_reason=?, updated_at=? WHERE id=?",
+                         [*(review[c] for c in REVIEW_COLUMNS), status, "; ".join(flags) or None, int(time.time()), row["id"]])
+        self.send_json({"id": row["id"], "status": status, "held": status == "held",
+                        "message": "Avaliação atualizada." if status == "published" else "Avaliação atualizada e enviada para revisão."})
+
+    def delete_review(self, review_id: str) -> None:
+        with connect() as conn:
+            row = self.own_review(conn, review_id)
+            conn.execute("DELETE FROM reviews WHERE id=?", (row["id"],))
+        self.send_json({"message": "Avaliação apagada."})
+
+    def post_helpful(self, review_id: str) -> None:
+        self.limit("vote")
+        viewer = self.viewer(create=True)
+        with connect() as conn:
+            row = conn.execute("SELECT reviewer_hash FROM reviews WHERE id=? AND status='published'", (int(review_id),)).fetchone()
+            if not row:
+                raise ApiError(404, "Avaliação não encontrada.")
+            if row["reviewer_hash"] == viewer:
+                raise ApiError(400, "Você não pode votar na sua própria avaliação.")
+            removed = conn.execute("DELETE FROM votes WHERE review_id=? AND voter_hash=?", (int(review_id), viewer)).rowcount
+            if not removed:
+                conn.execute("INSERT INTO votes (review_id, voter_hash, created_at) VALUES (?, ?, ?)", (int(review_id), viewer, int(time.time())))
+            count = conn.execute("SELECT COUNT(*) FROM votes WHERE review_id=?", (int(review_id),)).fetchone()[0]
+        self.send_json({"voted": not removed, "helpful": count})
+
+    def post_report(self, review_id: str) -> None:
+        data = self.read_json()
+        reason = clean_line(data.get("reason"), 60)
+        if reason not in REPORT_REASONS:
+            raise ApiError(400, "Escolha um motivo.")
+        self.limit("report")
+        viewer = self.viewer(create=True)
+        with connect() as conn:
+            row = conn.execute("SELECT id FROM reviews WHERE id=? AND status='published'", (int(review_id),)).fetchone()
+            if not row:
+                raise ApiError(404, "Avaliação não encontrada.")
+            conn.execute("INSERT OR IGNORE INTO reports (review_id, reporter_hash, reason, detail, created_at) VALUES (?, ?, ?, ?, ?)",
+                         (row["id"], viewer, reason, clean_line(data.get("detail"), 300) or None, int(time.time())))
+            n = conn.execute("SELECT COUNT(*) FROM reports WHERE review_id=? AND resolved=0", (row["id"],)).fetchone()[0]
+            if n >= AUTO_HIDE_REPORTS:
+                conn.execute("UPDATE reviews SET status='held', held_reason=? WHERE id=?", (f"{n} denúncias", row["id"]))
+        self.send_json({"message": "Obrigado. A denúncia foi registrada e será analisada."})
+
+    # ---- identidade anônima
+    def get_me(self) -> None:
+        viewer = self.viewer()
+        if not viewer:
+            return self.send_json({"reviews": [], "hasIdentity": False})
+        with connect() as conn:
+            rows = conn.execute("SELECT * FROM reviews WHERE reviewer_hash=? AND status!='removed' ORDER BY created_at DESC", (viewer,)).fetchall()
+            helpful = helpful_counts(conn, [r["id"] for r in rows])
+        self.send_json({"reviews": [review_out(r, viewer, set(), helpful) for r in rows], "hasIdentity": True})
+
+    def get_me_code(self) -> None:
+        cookies = SimpleCookie()
+        try:
+            cookies.load(self.headers.get("Cookie", ""))
+        except Exception:  # noqa: BLE001
+            pass
+        token = cookies[COOKIE].value if COOKIE in cookies else ""
+        if not re.fullmatch(r"[A-Za-z0-9_-]{43}", token):
+            raise ApiError(404, "Este navegador ainda não tem um identificador anônimo.")
+        self.send_json({"code": token})
+
+    def post_restore(self) -> None:
+        self.limit("restore")
+        code = clean_line(self.read_json().get("code"), 60)
+        if not re.fullmatch(r"[A-Za-z0-9_-]{43}", code):
+            raise ApiError(400, "Código inválido.")
+        with connect() as conn:
+            n = conn.execute("SELECT COUNT(*) FROM reviews WHERE reviewer_hash=? AND status!='removed'", (token_hash(code),)).fetchone()[0]
+        if not n:
+            raise ApiError(404, "Nenhuma avaliação encontrada para este código.")
+        self.new_cookie = self.make_cookie(code)
+        self.send_json({"message": f"Pronto! {n} avaliação(ões) vinculada(s) a este navegador.", "count": n})
+
+    # ---- moderação
+    # ---- turmas informadas pela comunidade (enquanto a oferta oficial do semestre não sai)
+    @staticmethod
+    def community_term() -> str | None:
+        """Semestre corrente, se o DCC ainda não publicou a oferta dele; senão None (a oferta oficial vale)."""
+        term = current_term()
+        return term if term not in CATALOG.terms else None
+
+    def community_reports(self, professor: str | None = None, course: str | None = None) -> dict | None:
+        term = self.community_term()
+        if not term:
+            return None
+        field, value = ("professor", professor) if professor else ("course", course)
+        viewer = self.viewer()
+        with connect() as conn:
+            rows = conn.execute(f"""SELECT professor, course, COUNT(*) n, MAX(reporter_hash=?) mine FROM class_reports
+                                    WHERE term=? AND {field}=? GROUP BY professor, course ORDER BY n DESC""",
+                                (viewer or "", term, value)).fetchall()
+        items = [{"professor": r["professor"], "course": r["course"], "count": r["n"], "mine": bool(r["mine"])}
+                 for r in rows if r["professor"] in CATALOG.professors and r["course"] in CATALOG.courses]
+        return {"term": term, "items": items}
+
+    def class_report_input(self) -> tuple[str, str, str]:
+        term = self.community_term()
+        if not term:
+            raise ApiError(409, "A oferta oficial deste semestre já foi publicada; ela é a fonte usada pelo site.")
+        data = self.read_json()
+        professor = clean_line(data.get("professor"), 120)
+        course = CATALOG.canonical(clean_line(data.get("course"), 120))
+        if CATALOG.professors.get(professor, {}).get("status") not in ("ativo", "voluntario", "externo", "substituto"):
+            raise ApiError(400, "Escolha um docente em atividade.", fields={"professor": "Escolha um docente em atividade."})
+        if course not in CATALOG.courses:
+            raise ApiError(400, "Escolha uma disciplina da lista.", fields={"course": "Escolha uma disciplina da lista."})
+        return term, professor, course
+
+    def post_class_report(self) -> None:
+        term, professor, course = self.class_report_input()
+        self.limit("classreport")
+        viewer = self.viewer(create=True)
+        with connect() as conn:
+            conn.execute("INSERT OR IGNORE INTO class_reports (term, professor, course, reporter_hash, created_at) VALUES (?,?,?,?,?)",
+                         (term, professor, course, viewer, int(time.time())))
+            n = conn.execute("SELECT COUNT(*) FROM class_reports WHERE term=? AND professor=? AND course=?", (term, professor, course)).fetchone()[0]
+        self.send_json({"term": term, "count": n, "message": "Obrigado! A turma aparece como informada por estudantes até sair a oferta oficial."}, 201)
+
+    def delete_class_report(self) -> None:
+        term, professor, course = self.class_report_input()
+        viewer = self.viewer()
+        if viewer:
+            with connect() as conn:
+                conn.execute("DELETE FROM class_reports WHERE term=? AND professor=? AND course=? AND reporter_hash=?",
+                             (term, professor, course, viewer))
+        self.send_json({"message": "Removido."})
+
+    def get_admin_class_reports(self) -> None:
+        self.require_admin()
+        with connect() as conn:
+            rows = conn.execute("""SELECT term, professor, course, COUNT(*) n, MAX(created_at) last FROM class_reports
+                                   GROUP BY term, professor, course ORDER BY term DESC, n DESC""").fetchall()
+        self.send_json({"items": [{"term": r["term"], "professor": r["professor"], "course": r["course"], "count": r["n"], "last": r["last"]} for r in rows]})
+
+    def post_admin_class_report_delete(self) -> None:
+        self.require_admin()
+        data = self.read_json()
+        with connect() as conn:
+            n = conn.execute("DELETE FROM class_reports WHERE term=? AND professor=? AND course=?",
+                             (str(data.get("term")), str(data.get("professor")), str(data.get("course")))).rowcount
+        self.send_json({"message": f"{n} relato(s) removido(s)."})
+
+    # ---- acesso da comunidade
+    @staticmethod
+    def access_token(code: str) -> str:
+        return hmac.new(SECRET.encode(), f"acesso:{code}".encode(), hashlib.sha256).hexdigest()[:40]
+
+    def has_access(self) -> bool:
+        cookies = SimpleCookie()
+        try:
+            cookies.load(self.headers.get("Cookie", ""))
+        except Exception:  # noqa: BLE001
+            return False
+        given = cookies[ACCESS_COOKIE].value if ACCESS_COOKIE in cookies else ""
+        # o cookie guarda um HMAC do código: remover/trocar o código em DCCHUB_ACCESS_CODES revoga quem entrou com ele
+        return bool(given) and any(hmac.compare_digest(given, self.access_token(c)) for c in ACCESS_CODES)
+
+    def post_access(self) -> None:
+        if not ACCESS_CODES:
+            return self.send_json({"ok": True})
+        self.limit("access")
+        code = clean_line(self.read_json().get("code"), 120)
+        match = next((c for c in ACCESS_CODES if hmac.compare_digest(code.lower().encode(), c.lower().encode())), None)
+        if not match:
+            raise ApiError(403, "Código inválido. Peça o código atual nos canais dos estudantes.")
+        secure = "; Secure" if self.secure_request() else ""
+        self.access_cookie = f"{ACCESS_COOKIE}={self.access_token(match)}; Path=/; Max-Age=15552000; HttpOnly; SameSite=Strict{secure}"
+        self.send_json({"ok": True})
+
+    def require_admin(self) -> None:
+        self.limit("admin")
+        given = self.headers.get("Authorization", "").removeprefix("Bearer ").strip()
+        if not ADMIN_TOKEN or not hmac.compare_digest(given.encode(), ADMIN_TOKEN.encode()):
+            raise ApiError(401, "Token de moderação inválido.")
+
+    def get_admin_queue(self) -> None:
+        self.require_admin()
+        with connect() as conn:
+            rows = conn.execute("""SELECT r.*, (SELECT COUNT(*) FROM reports p WHERE p.review_id=r.id AND p.resolved=0) nreports
+                                   FROM reviews r WHERE r.status='held'
+                                      OR EXISTS (SELECT 1 FROM reports p WHERE p.review_id=r.id AND p.resolved=0)
+                                   ORDER BY r.created_at DESC LIMIT 200""").fetchall()
+            reasons = defaultdict(list)
+            for rep in conn.execute("SELECT review_id, reason, detail FROM reports WHERE resolved=0"):
+                reasons[rep["review_id"]].append({"reason": rep["reason"], "detail": rep["detail"]})
+        out = []
+        for r in rows:
+            item = review_out(r)
+            item.update(status=r["status"], heldReason=r["held_reason"], reports=reasons.get(r["id"], []))
+            out.append(item)
+        self.send_json({"queue": out})
+
+    def post_admin_review(self, review_id: str) -> None:
+        self.require_admin()
+        action = self.read_json().get("action")
+        status = {"publish": "published", "remove": "removed", "hold": "held"}.get(action)
+        if not status:
+            raise ApiError(400, "Ação inválida.")
+        with connect() as conn:
+            if not conn.execute("UPDATE reviews SET status=?, held_reason=NULL WHERE id=?", (status, int(review_id))).rowcount:
+                raise ApiError(404, "Avaliação não encontrada.")
+            conn.execute("UPDATE reports SET resolved=1 WHERE review_id=?", (int(review_id),))
+        self.send_json({"message": "Feito.", "status": status})
+
+
+class Server(ThreadingHTTPServer):
+    daemon_threads = True
+
+    def handle_error(self, request, client_address) -> None:  # noqa: ANN001
+        if isinstance(sys.exc_info()[1], (ConnectionError, TimeoutError)):
+            return  # cliente desconectou: não é um erro do servidor
+        super().handle_error(request, client_address)
+
+
+def make_server(host: str = "0.0.0.0", port: int = 8000) -> ThreadingHTTPServer:
+    init_db()
+    server = Server((host, port), App)
+    return server
+
+
+if __name__ == "__main__":
+    mimetypes.add_type("application/javascript", ".js")
+    mimetypes.add_type("application/manifest+json", ".webmanifest")
+    host, port = os.environ.get("HOST", "0.0.0.0"), int(os.environ.get("PORT", "8000"))
+    server = make_server(host, port)
+    print(f"DCCHub em http://localhost:{port}  ({len(CATALOG.professors)} docentes, {len(CATALOG.courses)} disciplinas)")
+    if not ADMIN_TOKEN:
+        print("Moderação desativada: defina DCCHUB_ADMIN_TOKEN para habilitar o painel /#/moderacao.")
+    def stop(*_: object) -> None:
+        raise KeyboardInterrupt
+
+    signal.signal(signal.SIGTERM, stop)  # docker stop / systemd: encerra limpo
+    try:
+        server.serve_forever()
+    except KeyboardInterrupt:
+        pass
+    finally:
+        server.server_close()

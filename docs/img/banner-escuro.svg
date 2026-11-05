@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 280" width="1200" height="280" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif">
+  <rect width="1200" height="280" fill="#111317"/>
+  <rect x="24.5" y="24.5" width="1151" height="231" rx="14" fill="#171a1f" stroke="#2a2e35"/>
+  <g transform="translate(76 76) scale(4)"><rect width="32" height="32" rx="8" fill="#3a659f"/>
+    <path fill="#ffffff" fill-rule="evenodd" d="M10 8h5.2c5 0 8.3 3.2 8.3 8s-3.3 8-8.3 8H10zm2.6 2.4v11.2h2.5c3.4 0 5.6-2.2 5.6-5.6s-2.2-5.6-5.6-5.6z"/></g>
+  <text x="298" y="80" font-size="15" font-weight="600" fill="#8fb0e0">Departamento de Ciência da Computação · UFMG</text>
+  <text x="296" y="132" font-size="54" font-weight="700" letter-spacing="-1" fill="#e7e9ed">DCC<tspan fill="#8fb0e0">Hub</tspan></text>
+  <text x="300" y="160" font-size="17" fill="#969ca7">O hub dos estudantes: docentes, disciplinas e oportunidades do DCC em um só lugar.</text>
+  <rect x="300" y="176" width="170" height="30" rx="15" fill="#1d2735"/><text x="385" y="196" text-anchor="middle" font-size="14" font-weight="600" fill="#b5cbeb">Avaliações anônimas</text><rect x="479.9" y="176" width="129" height="30" rx="15" fill="#1d2735"/><text x="545" y="196" text-anchor="middle" font-size="14" font-weight="600" fill="#b5cbeb">Oferta &amp; grade</text><rect x="619.3" y="176" width="89" height="30" rx="15" fill="#1d2735"/><text x="664" y="196" text-anchor="middle" font-size="14" font-weight="600" fill="#b5cbeb">Materiais</text><rect x="718.1999999999999" y="176" width="121" height="30" rx="15" fill="#1d2735"/><text x="779" y="196" text-anchor="middle" font-size="14" font-weight="600" fill="#b5cbeb">Oportunidades</text>
+  <rect x="988" y="54" width="152" height="26" rx="13" fill="#17271e"/>
+  <circle cx="1004" cy="67" r="4" fill="#7cc49b"/>
+  <text x="1015" y="72" font-size="13" font-weight="600" fill="#7cc49b">projeto estudantil</text>
+  <text x="1140" y="232" text-anchor="end" font-size="12" font-family="ui-monospace, 'SF Mono', 'Cascadia Mono', Menlo, Consolas, monospace" fill="#969ca7">python3 app.py</text>
+</svg>

@@ -1,0 +1,1234 @@
+{
+ "generatedAt": "2026-11-05T12:09:53+00:00",
+ "source": "https://dcc.ufmg.br/oportunidades/",
+ "items": [
+  {
+   "slug": "vaga-para-pesquisador-desenvolvedor-soleam-dcc-ufmg-graduandos-pos-graduandos-ou-profissionais",
+   "title": "Vaga para pesquisador/desenvolvedor – SOLEAM – DCC/UFMG – Graduandos, pós-graduandos ou profissionais",
+   "url": "https://dcc.ufmg.br/oportunidade/vaga-para-pesquisador-desenvolvedor-soleam-dcc-ufmg-graduandos-pos-graduandos-ou-profissionais/",
+   "open": true,
+   "deadline": "As vagas ficarão abertas até o preenchimento",
+   "types": [
+    "Bolsa de pesquisa"
+   ],
+   "areas": [],
+   "groups": [
+    "VeRLab"
+   ],
+   "audiences": [
+    "Graduação",
+    "Profissionais"
+   ],
+   "summary": "O projeto “SOLEAM – Sistema de Otimização Logístico-Econômica de Alternativas Modais para Transporte de Fluidos”, em parceria com a Petrobras, está com vagas abertas para atuação como pesquisador e desenvolvedor de software.",
+   "stipends": [
+    {
+     "who": "",
+     "value": "R$ 1.092,00"
+    },
+    {
+     "who": "",
+     "value": "R$ 6.455,33"
+    }
+   ],
+   "hours": [
+    20
+   ],
+   "published": "2026-11-03",
+   "apply": "https://forms.gle/24CXLfik8kbUxnjk9",
+   "professors": []
+  },
+  {
+   "slug": "bolsa-de-pesquisa-iniciacao-cientifica-inteligencia-artificial-na-triagem-de-paciente",
+   "title": "Bolsa de pesquisa – Iniciação Científica – Inteligência Artificial na triagem de paciente",
+   "url": "https://dcc.ufmg.br/oportunidade/bolsa-de-pesquisa-iniciacao-cientifica-inteligencia-artificial-na-triagem-de-paciente/",
+   "open": true,
+   "deadline": "Inscrições até o dia 28/10/2026",
+   "types": [
+    "Bolsa de pesquisa",
+    "Iniciação científica"
+   ],
+   "areas": [
+    "Inteligência artificial"
+   ],
+   "groups": [],
+   "audiences": [
+    "Graduação"
+   ],
+   "summary": "Inteligência Artificial na triagem de pacientes: Desenvolvimento de um Escore Preditivo para Otimização do Cuidado Farmacêutico em Tuberculose no SUS (FarmaScore-TB)",
+   "stipends": [
+    {
+     "who": "",
+     "value": "R$ 700,00"
+    }
+   ],
+   "hours": [
+    15
+   ],
+   "published": "2026-10-21",
+   "apply": null,
+   "professors": [
+    "michele-amaral-brandao"
+   ]
+  },
+  {
+   "slug": "bolsa-de-pesquisa-mestrando-ci-ia-saude",
+   "title": "Bolsa de Pesquisa – Mestrando – CI-IA Saúde",
+   "url": "https://dcc.ufmg.br/oportunidade/bolsa-de-pesquisa-mestrando-ci-ia-saude/",
+   "open": true,
+   "deadline": "As inscrições estão abertas até o dia 31/10/2026",
+   "types": [
+    "Bolsa de pesquisa",
+    "Mestrado"
+   ],
+   "areas": [
+    "Inteligência artificial"
+   ],
+   "groups": [
+    "CI-IA Saúde"
+   ],
+   "audiences": [
+    "Mestrado"
+   ],
+   "summary": "Ciência da Computação, Engenharia de Software, Sistemas de Informação ou Inteligência Artificial",
+   "stipends": [],
+   "hours": [],
+   "published": "2026-10-07",
+   "apply": null,
+   "professors": []
+  },
+  {
+   "slug": "bolsa-de-pesquisa-para-graduandos-projeto-geoinsight-vale-ufmg",
+   "title": "Bolsa de pesquisa – graduandos – Projeto GeoInsight – VALE/UFMG",
+   "url": "https://dcc.ufmg.br/oportunidade/bolsa-de-pesquisa-para-graduandos-projeto-geoinsight-vale-ufmg/",
+   "open": true,
+   "deadline": "As inscrições ficarão abertas até o preenchimento da vaga.",
+   "types": [
+    "Bolsa de pesquisa"
+   ],
+   "areas": [],
+   "groups": [
+    "VeRLab"
+   ],
+   "audiences": [
+    "Graduação"
+   ],
+   "summary": "O projeto GeoInsight – VALE/UFMG está selecionando alunos de graduação da UFMG para atuar em atividades de pesquisa, desenvolvimento e experimentação relacionadas ao projeto. Desenvolvimento de módulos sensores com inteligência embarcada para monitoramento e interpretação de sinais de áudio e movimento com IMU em tempo real.",
+   "stipends": [
+    {
+     "who": "",
+     "value": "R$ 1.800,00"
+    }
+   ],
+   "hours": [
+    20
+   ],
+   "published": "2026-09-23",
+   "apply": "https://forms.gle/yyCXp3x9KebEvL2h6",
+   "professors": []
+  },
+  {
+   "slug": "bolsa-de-pesquisa-graduando-mestrando-doutorando-pos-doutorando-matematica-aplicada-e-inteligencia-artificial-em-geociencias-projeto-petrocycle",
+   "title": "Bolsa de pesquisa – graduando, mestrando, doutorando, pós-doutorando – Matemática Aplicada e Inteligência Artificial em Geociências – Projeto PetroCycle",
+   "url": "https://dcc.ufmg.br/oportunidade/bolsa-de-pesquisa-graduando-mestrando-doutorando-pos-doutorando-matematica-aplicada-e-inteligencia-artificial-em-geociencias-projeto-petrocycle/",
+   "open": true,
+   "deadline": "Inscrições abertas até fevereiro de 2027.",
+   "types": [
+    "Bolsa"
+   ],
+   "areas": [],
+   "groups": [],
+   "audiences": [
+    "Graduação",
+    "Mestrado",
+    "Doutorado"
+   ],
+   "summary": "O projeto consiste em aplicar técnicas de otimização, análise de sinais, ciência de dados e inteligência artificial para resolver problemas de geologia, geofísica e logística da indústria do petróleo. Trata-se de um projeto de pesquisa, e parte dos objetivos é desenvolver novas metodologias com forte embasamento teórico e empírico.",
+   "stipends": [],
+   "hours": [
+    20
+   ],
+   "published": "2026-09-18",
+   "apply": "https://forms.gle/jsjmizvpWpEqutcP7",
+   "professors": [
+    "douglas-guimaraes-macharet",
+    "flavio-vinicius-diniz-de-figueiredo",
+    "gabriel-de-morais-coutinho"
+   ]
+  },
+  {
+   "slug": "bolsista-de-pesquisa-nivel-mestrado-em-andamento",
+   "title": "Bolsista de Pesquisa – Nível Mestrado em Andamento – Projeto NIAR Saúde",
+   "url": "https://dcc.ufmg.br/oportunidade/bolsista-de-pesquisa-nivel-mestrado-em-andamento/",
+   "open": true,
+   "deadline": "As inscrições ficarão abertas até a vaga ser preenchida.",
+   "types": [
+    "Mestrado"
+   ],
+   "areas": [
+    "Inteligência artificial"
+   ],
+   "groups": [],
+   "audiences": [
+    "Mestrado"
+   ],
+   "summary": "O Núcleo de Inteligência Artificial Responsável para Saúde (NIAR Saúde UFMG) tem como objetivo projetar, implementar, validar, demonstrar e operar processos, metodologias, técnicas e tecnologias para garantir a responsabilidade no acesso a dados de saúde e na construção e utilização de modelos de inteligência artificial e afins com esses dados.",
+   "stipends": [
+    {
+     "who": "",
+     "value": "R$ 3.000,00"
+    }
+   ],
+   "hours": [],
+   "published": "2026-09-02",
+   "apply": "https://forms.gle/h4RTV7iWvKbRYsAB9",
+   "professors": []
+  },
+  {
+   "slug": "bolsista-de-pesquisa-nivel-graduacao-em-andamento-projeto-niar-saude",
+   "title": "Bolsista de Pesquisa – Nível Graduação em Andamento – Projeto NIAR Saúde",
+   "url": "https://dcc.ufmg.br/oportunidade/bolsista-de-pesquisa-nivel-graduacao-em-andamento-projeto-niar-saude/",
+   "open": true,
+   "deadline": "As inscrições ficarão abertas até o preenchimento das vagas.",
+   "types": [
+    "Bolsa de pesquisa"
+   ],
+   "areas": [
+    "Inteligência artificial"
+   ],
+   "groups": [],
+   "audiences": [
+    "Graduação"
+   ],
+   "summary": "O Núcleo de Inteligência Artificial Responsável para Saúde (NIAR Saúde UFMG) tem como objetivo projetar, implementar, validar, demonstrar e operar processos, metodologias, técnicas e tecnologias para garantir a responsabilidade no acesso a dados de saúde e na construção e utilização de modelos de inteligência artificial e afins com esses dados.",
+   "stipends": [
+    {
+     "who": "",
+     "value": "R$ 1.500,00"
+    }
+   ],
+   "hours": [],
+   "published": "2026-09-02",
+   "apply": "https://forms.gle/e42s5tqbUz17hnF88",
+   "professors": []
+  },
+  {
+   "slug": "bolsas-de-iniciacao-cientifica-ic-projeto-de-deteccao-de-golpes-digitais",
+   "title": "Bolsas de Iniciação Científica (IC) – Projeto de Detecção de Golpes Digitais",
+   "url": "https://dcc.ufmg.br/oportunidade/bolsas-de-iniciacao-cientifica-ic-projeto-de-deteccao-de-golpes-digitais/",
+   "open": true,
+   "deadline": "Inscrições abertas até o preenchimento da vaga.",
+   "types": [
+    "Bolsa de pesquisa",
+    "Iniciação científica"
+   ],
+   "areas": [],
+   "groups": [],
+   "audiences": [
+    "Graduação"
+   ],
+   "summary": "Estão abertas vagas de Iniciação Científica para atuar em um projeto de pesquisa da UFMG voltado ao estudo de golpes digitais e fraudes online.",
+   "stipends": [
+    {
+     "who": "",
+     "value": "R$ 1.500,00"
+    }
+   ],
+   "hours": [
+    20
+   ],
+   "published": "2026-08-21",
+   "apply": null,
+   "professors": []
+  },
+  {
+   "slug": "bolsa-de-pesquisa-automacao-de-processos-unidade-embrapii-dcc-ufmg-fapemig",
+   "title": "Bolsa de Pesquisa – Automação de processos – Unidade Embrapii DCC/UFMG – FAPEMIG",
+   "url": "https://dcc.ufmg.br/oportunidade/bolsa-de-pesquisa-automacao-de-processos-unidade-embrapii-dcc-ufmg-fapemig/",
+   "open": true,
+   "deadline": "As inscrições abertas até o preenchimeto da vaga.",
+   "types": [
+    "Bolsa de pesquisa"
+   ],
+   "areas": [],
+   "groups": [
+    "Embrapii"
+   ],
+   "audiences": [],
+   "summary": "A Unidade EMBRAPII do Departamento de Ciência da Computação (DCC) da Universidade Federal de Minas Gerais (UFMG) é credenciada para desenvolver projetos de Pesquisa, Desenvolvimento e Inovação (PD&I) em parceria com empresas, focando em Sistemas Ciberfísicos. Sua missão é criar plataformas computacionais que integrem componentes físicos, virtuais e…",
+   "stipends": [
+    {
+     "who": "",
+     "value": "R$ 5.720,00"
+    }
+   ],
+   "hours": [
+    40
+   ],
+   "published": "2026-07-17",
+   "apply": "https://forms.gle/vrcJPBKiKqJ6PXBk7",
+   "professors": []
+  },
+  {
+   "slug": "bolsa-de-iniciacao-cientifica-fapemig-sunus",
+   "title": "Bolsa de Iniciação Científica (FAPEMIG-SUNUS)",
+   "url": "https://dcc.ufmg.br/oportunidade/bolsa-de-iniciacao-cientifica-fapemig-sunus/",
+   "open": true,
+   "deadline": "Inscrições abertas até o preenchimento da vaga.",
+   "types": [
+    "Bolsa de pesquisa",
+    "Iniciação científica"
+   ],
+   "areas": [],
+   "groups": [],
+   "audiences": [
+    "Graduação"
+   ],
+   "summary": "O laboratório LIPS (https://www.instagram.com/stories/lips.ufmg/) está selecionando um aluno de graduação em cursos de computação (ciência da computação, sistemas de informação, engenharia de computação, matemática computacional, ciência de dados) para atuar em um projeto Fapemig de inovação em conjunto com a empresa SUNUS (https://sunus.com.br/).",
+   "stipends": [
+    {
+     "who": "",
+     "value": "R$ 850,00"
+    },
+    {
+     "who": "",
+     "value": "R$ 1.210,00"
+    }
+   ],
+   "hours": [
+    20
+   ],
+   "published": "2026-06-15",
+   "apply": "https://docs.google.com/forms/d/e/1FAIpQLScuPMMzlzRk3gnY1CII6hEGrFrwH4IqmdBG9XjlIDwruvHTiw/viewform",
+   "professors": []
+  },
+  {
+   "slug": "bolsa-de-pesquisa-graduando-inteligencia-artificial-no-contexto-de-trilhas-investigativas-programa-capacidades-analiticas-projeto-dcc-ufmg-gsi-mpmg",
+   "title": "Bolsa de Pesquisa – Graduando – Inteligência Artificial no Contexto de Trilhas Investigativas – Programa Capacidades Analíticas – Projeto DCC/UFMG – GSI/MPMG",
+   "url": "https://dcc.ufmg.br/oportunidade/bolsa-de-pesquisa-graduando-inteligencia-artificial-no-contexto-de-trilhas-investigativas-programa-capacidades-analiticas-projeto-dcc-ufmg-gsi-mpmg/",
+   "open": true,
+   "deadline": "Seleção por fluxo contínuo: ficará aberta até o preenchimento das vagas.",
+   "types": [
+    "Bolsa de pesquisa",
+    "Iniciação científica"
+   ],
+   "areas": [
+    "Inteligência artificial"
+   ],
+   "groups": [],
+   "audiences": [
+    "Graduação"
+   ],
+   "summary": "O Programa Capacidades Analíticas (PCA) é um projeto de pesquisa e desenvolvimento, uma parceria entre o DCC/UFMG e o GSI/MPMG.",
+   "stipends": [
+    {
+     "who": "Graduando",
+     "value": "R$ 1.344,00"
+    }
+   ],
+   "hours": [
+    20
+   ],
+   "published": "2026-04-17",
+   "apply": "https://forms.gle/BxELy9SqDhKGrUBY6",
+   "professors": [
+    "clodoveu-davis",
+    "michele-amaral-brandao"
+   ]
+  },
+  {
+   "slug": "bolsa-de-iniciacao-cientifica-na-area-de-inteligencia-artificial-e-computacao-de-alto-desempenho",
+   "title": "Bolsa de Iniciação Científica na área de Inteligência Artificial e Computação de Alto Desempenho – projeto em parceria com a Kunumi",
+   "url": "https://dcc.ufmg.br/oportunidade/bolsa-de-iniciacao-cientifica-na-area-de-inteligencia-artificial-e-computacao-de-alto-desempenho/",
+   "open": true,
+   "deadline": "Inscrições abertas até o preenchimento da vaga.",
+   "types": [
+    "Iniciação científica"
+   ],
+   "areas": [
+    "Inteligência artificial"
+   ],
+   "groups": [],
+   "audiences": [
+    "Graduação"
+   ],
+   "summary": "O projeto, desenvolvido em parceria com a empresa Kunumi, tem como objetivo principal o desenvolvimento de sistemas inteligentes capazes de automatizar o ciclo de ciência de dados — desde a estruturação de dados até o treinamento e avaliação de modelos de aprendizado de máquina.",
+   "stipends": [
+    {
+     "who": "",
+     "value": "R$ 1500,00"
+    }
+   ],
+   "hours": [
+    20
+   ],
+   "published": "2026-03-11",
+   "apply": null,
+   "professors": [
+    "george-luiz-medeiros-teodoro"
+   ]
+  },
+  {
+   "slug": "bolsa-de-pesquisa-graduando-seguranca-cibernetica-no-combate-ao-crime-organizado-programa-capacidades-analiticas-projeto-dcc-ufmg-gsi-mpmg",
+   "title": "Bolsa de pesquisa – Graduando – Segurança Cibernética no Combate ao Crime Organizado – Programa Capacidades Analíticas – Projeto DCC/UFMG – GSI/MPMG",
+   "url": "https://dcc.ufmg.br/oportunidade/bolsa-de-pesquisa-graduando-seguranca-cibernetica-no-combate-ao-crime-organizado-programa-capacidades-analiticas-projeto-dcc-ufmg-gsi-mpmg/",
+   "open": true,
+   "deadline": "Inscrições abertas até o preenchimento das vagas.",
+   "types": [
+    "Bolsa de pesquisa"
+   ],
+   "areas": [
+    "Cibersegurança",
+    "Inteligência artificial"
+   ],
+   "groups": [],
+   "audiences": [
+    "Graduação"
+   ],
+   "summary": "O Programa Capacidades Analíticas (PCA) é uma parceria entre o Departamento de Ciência da Computação (DCC/UFMG) e o Grupo de Atuação Especial de Combate ao Crime Organizado (GAECO/MPMG). Atualmente, o projeto está focado no desenvolvimento do PHARUS, uma plataforma tecnológica que utiliza Inteligência Artificial (IA) para auxiliar o Ministério Público de…",
+   "stipends": [
+    {
+     "who": "Graduando",
+     "value": "R$ 1.344,00"
+    }
+   ],
+   "hours": [
+    20
+   ],
+   "published": "2026-02-12",
+   "apply": "https://forms.gle/norzbxQU4CsNRirT6",
+   "professors": [
+    "daniel-fernandes-macedo",
+    "dorgival-olavo-guedes-neto",
+    "jose-marcos-silva-nogueira"
+   ]
+  },
+  {
+   "slug": "bolsa-de-pesquisa-graduandos-mestrandos-e-doutorandos-programa-capacidades-analiticas-projeto-dcc-ufmg-gsi-mpmg",
+   "title": "Bolsa de pesquisa – graduandos, mestrandos e doutorandos – Programa Capacidades Analíticas – Projeto DCC/UFMG – GSI/MPMG",
+   "url": "https://dcc.ufmg.br/oportunidade/bolsa-de-pesquisa-graduandos-mestrandos-e-doutorandos-programa-capacidades-analiticas-projeto-dcc-ufmg-gsi-mpmg/",
+   "open": true,
+   "deadline": "Inscrições abertas até o preenchimento das vagas.",
+   "types": [
+    "Bolsa de pesquisa"
+   ],
+   "areas": [
+    "Inteligência artificial"
+   ],
+   "groups": [],
+   "audiences": [
+    "Graduação",
+    "Mestrado",
+    "Doutorado"
+   ],
+   "summary": "O Programa Capacidades Analíticas (PCA) é um projeto de pesquisa e desenvolvimento, uma parceria entre o DCC/UFMG e o GSI/MPMG.",
+   "stipends": [
+    {
+     "who": "Graduando",
+     "value": "R$ 1.344,00"
+    },
+    {
+     "who": "Mestrando",
+     "value": "R$ 3.203,20"
+    },
+    {
+     "who": "Doutorando",
+     "value": "R$ 4.659,20"
+    }
+   ],
+   "hours": [
+    20
+   ],
+   "published": "2026-02-11",
+   "apply": "https://forms.gle/DtrD6FfcW6vcxkzE8",
+   "professors": [
+    "anisio-mendes-lacerda",
+    "gisele-lobo-pappa",
+    "wagner-meira-junior"
+   ]
+  },
+  {
+   "slug": "bolsa-de-pesquisa-no-laboratorio-de-visao-computacional-e-robotica-verlab",
+   "title": "Bolsa de Pesquisa – Graduandos, mestrandos, doutorandos – Laboratório de Visão Computacional e Robótica (VeRLab)",
+   "url": "https://dcc.ufmg.br/oportunidade/bolsa-de-pesquisa-no-laboratorio-de-visao-computacional-e-robotica-verlab/",
+   "open": true,
+   "deadline": "Inscrições abertas até o preenchimento da vaga",
+   "types": [
+    "Bolsa de pesquisa"
+   ],
+   "areas": [],
+   "groups": [
+    "VeRLab"
+   ],
+   "audiences": [
+    "Graduação",
+    "Mestrado",
+    "Doutorado"
+   ],
+   "summary": "O Laboratório de Visão Computacional e Robótica (VeRLab) do Departamento de Ciência da Computação (DCC) da UFMG está com vagas abertas para bolsistas de graduação e profissionais para atuarem no projeto “Espeleometria Digital: Metodologias de Espeleometria Utilizando Nuvens de Pontos em 3D”.",
+   "stipends": [
+    {
+     "who": "Graduandos",
+     "value": "R$ 1.200,00"
+    },
+    {
+     "who": "Mestrandos",
+     "value": "R$ 3.120,00"
+    },
+    {
+     "who": "Recém-mestre (Desenvolvimento Científico e Tecnológico)",
+     "value": "R$ 4.500,00"
+    },
+    {
+     "who": "Doutorandos",
+     "value": "R$ 5.200,00"
+    }
+   ],
+   "hours": [
+    20,
+    40
+   ],
+   "published": "2026-02-10",
+   "apply": "https://forms.gle/9RW3tkfrLZH19CAEA",
+   "professors": []
+  },
+  {
+   "slug": "bolsista-de-pesquisa-desenvolvedor-niar-saude",
+   "title": "Bolsista de Pesquisa – Desenvolvedor – NIAR Saúde",
+   "url": "https://dcc.ufmg.br/oportunidade/bolsista-de-pesquisa-desenvolvedor-niar-saude/",
+   "open": true,
+   "deadline": "Inscrições abertas até o preenchimento da vaga",
+   "types": [
+    "Bolsa de pesquisa"
+   ],
+   "areas": [
+    "Inteligência artificial"
+   ],
+   "groups": [],
+   "audiences": [
+    "Profissionais"
+   ],
+   "summary": "O Núcleo de Inteligência Artificial Responsável para Saúde (NIAR Saúde UFMG) tem como objetivo projetar, implementar, validar, demonstrar e operar processos, metodologias, técnicas e tecnologias para garantir a responsabilidade no acesso a dados de saúde e na construção e utilização de modelos de inteligência artificial e afins com esses dados.",
+   "stipends": [
+    {
+     "who": "",
+     "value": "R$ 12.000,00"
+    }
+   ],
+   "hours": [
+    40
+   ],
+   "published": "2025-12-03",
+   "apply": "https://forms.gle/buLqLyEfPzG4KXna6",
+   "professors": [
+    "gisele-lobo-pappa",
+    "michele-amaral-brandao",
+    "virgilio-augusto-fernandes-almeida",
+    "wagner-meira-junior"
+   ]
+  },
+  {
+   "slug": "bolsa-de-pesquisa-ciencia-dos-dados-aplicada-a-analise-preditiva-da-necessidade-de-reboque",
+   "title": "Bolsa de pesquisa – Graduação e Mestrado – Ciência dos Dados Aplicada à Análise Preditiva da Necessidade de Reboque – Projeto DCC/UFMG – Stellantis",
+   "url": "https://dcc.ufmg.br/oportunidade/bolsa-de-pesquisa-ciencia-dos-dados-aplicada-a-analise-preditiva-da-necessidade-de-reboque/",
+   "open": true,
+   "deadline": "Inscrições abertas até o preenchimento da vaga.",
+   "types": [
+    "Bolsa de pesquisa",
+    "Iniciação científica"
+   ],
+   "areas": [
+    "Ciência de dados"
+   ],
+   "groups": [],
+   "audiences": [
+    "Graduação",
+    "Mestrado"
+   ],
+   "summary": "Projeto de PD&I que visa gerar novas visualizações de dados em dashboards, investigar as principais causas de reboques analisando variáveis dos veículos, e elaborar modelos preditivos para estimar o tempo até a primeira falha e a probabilidade de sua ocorrência e desenvolvimento de modelos de Processamento de Linguagem Natural para reclassificar…",
+   "stipends": [
+    {
+     "who": "Graduando",
+     "value": "R$ 1.300,00"
+    },
+    {
+     "who": "Mestrando",
+     "value": "R$ 3.100,00"
+    }
+   ],
+   "hours": [
+    20
+   ],
+   "published": "2025-11-10",
+   "apply": "https://forms.gle/vA3PaPk77VYym4on7",
+   "professors": [
+    "heitor-soares-ramos-filho",
+    "rodrygo-luis-teodoro-santos"
+   ]
+  },
+  {
+   "slug": "bolsa-de-pesquisa-mestrando-direito-seguranca-cibernetica-e-lgpd-no-combate-ao-crime-organizado-projeto-gsi-mpmg",
+   "title": "Bolsa de pesquisa – Mestrando (Direito) – Segurança Cibernética e LGPD no Combate ao Crime Organizado – Projeto GSI/MPMG",
+   "url": "https://dcc.ufmg.br/oportunidade/bolsa-de-pesquisa-mestrando-direito-seguranca-cibernetica-e-lgpd-no-combate-ao-crime-organizado-projeto-gsi-mpmg/",
+   "open": true,
+   "deadline": "Inscrições abertas até o preenchimento da vaga",
+   "types": [
+    "Bolsa de pesquisa"
+   ],
+   "areas": [],
+   "groups": [],
+   "audiences": [
+    "Mestrado"
+   ],
+   "summary": "O Programa Capacidades Analíticas (PCA) é uma parceria entre o Departamento de Ciência da Computação (DCC/UFMG) e o Grupo de Atuação Especial de Combate ao Crime Organizado (GAECO/MPMG). Atualmente, o projeto está focado no desenvolvimento do PHARUS, uma plataforma tecnológica que utiliza Inteligência Artificial (IA) para auxiliar o Ministério Público de…",
+   "stipends": [
+    {
+     "who": "Mestrando",
+     "value": "R$ 3.203,20"
+    }
+   ],
+   "hours": [
+    20
+   ],
+   "published": "2025-09-11",
+   "apply": "https://forms.gle/EVYJ1mT4UmM4emNT8",
+   "professors": [
+    "daniel-fernandes-macedo",
+    "dorgival-olavo-guedes-neto",
+    "jose-marcos-silva-nogueira"
+   ]
+  },
+  {
+   "slug": "bolsista-de-pesquisa-graduando-mestrando-e-doutorando-inteligencia-artificial-no-contexto-de-trilhas-investigativas-projeto-dcc-ufmg-gsi-mpmg",
+   "title": "Bolsista de Pesquisa – graduando, mestrando e doutorando – Inteligência Artificial no Contexto de Trilhas Investigativas – Projeto DCC/UFMG – GSI/MPMG",
+   "url": "https://dcc.ufmg.br/oportunidade/bolsista-de-pesquisa-graduando-mestrando-e-doutorando-inteligencia-artificial-no-contexto-de-trilhas-investigativas-projeto-dcc-ufmg-gsi-mpmg/",
+   "open": true,
+   "deadline": "Inscrições abertas até o preenchimento da vaga",
+   "types": [
+    "Bolsa de pesquisa"
+   ],
+   "areas": [
+    "Inteligência artificial"
+   ],
+   "groups": [],
+   "audiences": [
+    "Graduação",
+    "Mestrado",
+    "Doutorado"
+   ],
+   "summary": "O Programa Capacidades Analíticas (PCA) é um projeto de pesquisa e desenvolvimento, uma parceria entre o DCC/UFMG e o GSI/MPMG.",
+   "stipends": [
+    {
+     "who": "Graduando",
+     "value": "R$ 1.344,00"
+    },
+    {
+     "who": "Mestrando",
+     "value": "R$ 3.203,20"
+    },
+    {
+     "who": "Doutorando",
+     "value": "R$ 4.659,20"
+    }
+   ],
+   "hours": [
+    20
+   ],
+   "published": "2025-08-26",
+   "apply": "https://forms.gle/KfxEypEjc29CKxcH8",
+   "professors": [
+    "clodoveu-davis",
+    "michele-amaral-brandao"
+   ]
+  },
+  {
+   "slug": "bolsa-de-pesquisa-graduando-mestrando-e-doutorando-inteligencia-artificial-no-contexto-de-trilhas-investigativas",
+   "title": "Bolsa de pesquisa – graduando, mestrando e doutorando – Inteligência Artificial no Contexto de Trilhas Investigativas",
+   "url": "https://dcc.ufmg.br/oportunidade/bolsa-de-pesquisa-graduando-mestrando-e-doutorando-inteligencia-artificial-no-contexto-de-trilhas-investigativas/",
+   "open": true,
+   "deadline": "Inscrições abertas até o preenchimento da vaga",
+   "types": [
+    "Bolsa de pesquisa"
+   ],
+   "areas": [
+    "Inteligência artificial"
+   ],
+   "groups": [],
+   "audiences": [
+    "Graduação",
+    "Mestrado",
+    "Doutorado"
+   ],
+   "summary": "O Programa Capacidades Analíticas (PCA) é um projeto de pesquisa e desenvolvimento, uma parceria entre o DCC/UFMG e o GSI/MPMG.",
+   "stipends": [
+    {
+     "who": "Graduando",
+     "value": "R$ 1.344,00"
+    },
+    {
+     "who": "Mestrando",
+     "value": "R$ 3.203,20"
+    },
+    {
+     "who": "Doutorando",
+     "value": "R$ 4.659,20"
+    }
+   ],
+   "hours": [
+    20
+   ],
+   "published": "2025-08-18",
+   "apply": "https://forms.gle/jXj37DPvt5UF2Nov7",
+   "professors": [
+    "lucas-n-ferreira",
+    "rodrygo-luis-teodoro-santos"
+   ]
+  },
+  {
+   "slug": "bolsa-de-pesquisa-para-graduando-mestrando-e-doutorando-inteligencia-artificial-no-contexto-de-trilhas-investigativas-programa-capacidades-analiticas-projeto-dcc-ufmg-gsi-mpmg",
+   "title": "Bolsa de pesquisa – Graduando, mestrando e doutorando – Inteligência Artificial – Projeto GSI/MPMG",
+   "url": "https://dcc.ufmg.br/oportunidade/bolsa-de-pesquisa-para-graduando-mestrando-e-doutorando-inteligencia-artificial-no-contexto-de-trilhas-investigativas-programa-capacidades-analiticas-projeto-dcc-ufmg-gsi-mpmg/",
+   "open": true,
+   "deadline": "Inscrições abertas até o preenchimento da vaga",
+   "types": [
+    "Bolsa de pesquisa"
+   ],
+   "areas": [
+    "Inteligência artificial"
+   ],
+   "groups": [
+    "SPEED"
+   ],
+   "audiences": [
+    "Graduação",
+    "Mestrado",
+    "Doutorado"
+   ],
+   "summary": "O Programa Capacidades Analíticas (PCA) é um projeto de pesquisa e desenvolvimento, uma parceria entre o DCC/UFMG e o GSI/MPMG. Em sua nova fase, o PCA está voltado para o desenvolvimento do PHARUS, uma plataforma tecnológica baseada em Inteligência Artificial (IA), concebida para apoiar as atividades de investigação criminal conduzidas pelo MPMG e…",
+   "stipends": [
+    {
+     "who": "Graduando",
+     "value": "R$ 1.344,00"
+    },
+    {
+     "who": "Mestrando",
+     "value": "R$ 3.203,20"
+    },
+    {
+     "who": "Doutorando",
+     "value": "R$ 4.659,20"
+    }
+   ],
+   "hours": [
+    20
+   ],
+   "published": "2025-08-06",
+   "apply": "https://forms.gle/LfzGU91fiQWgztmi7",
+   "professors": [
+    "anisio-mendes-lacerda",
+    "gisele-lobo-pappa",
+    "wagner-meira-junior"
+   ]
+  },
+  {
+   "slug": "bolsa-de-pesquisa-para-graduando-mestrando-e-doutorando-inteligencia-artificial-no-contexto-de-grafos-programa-capacidades-analiticas-projeto-dcc-ufmg-gsi-mpmg",
+   "title": "Bolsa de pesquisa – Graduando, mestrando e doutorando – Inteligência Artificial no Contexto de Grafos – Projeto GSI/MPMG",
+   "url": "https://dcc.ufmg.br/oportunidade/bolsa-de-pesquisa-para-graduando-mestrando-e-doutorando-inteligencia-artificial-no-contexto-de-grafos-programa-capacidades-analiticas-projeto-dcc-ufmg-gsi-mpmg/",
+   "open": true,
+   "deadline": "Inscrições abertas até o preenchimento da vaga",
+   "types": [
+    "Bolsa de pesquisa",
+    "Iniciação científica"
+   ],
+   "areas": [
+    "Inteligência artificial"
+   ],
+   "groups": [
+    "SPEED"
+   ],
+   "audiences": [
+    "Graduação",
+    "Mestrado",
+    "Doutorado"
+   ],
+   "summary": "O Programa Capacidades Analíticas (PCA) é um projeto de pesquisa e desenvolvimento, uma parceria entre o DCC/UFMG e o GSI/MPMG. Em sua nova fase, o PCA está voltado para o desenvolvimento do PHARUS, uma plataforma tecnológica baseada em Inteligência Artificial (IA), concebida para apoiar as atividades de investigação criminal conduzidas pelo MPMG e…",
+   "stipends": [
+    {
+     "who": "Graduando",
+     "value": "R$ 1.344,00"
+    },
+    {
+     "who": "Mestrando",
+     "value": "R$ 3.203,20"
+    },
+    {
+     "who": "Doutorando",
+     "value": "R$ 4.659,20"
+    }
+   ],
+   "hours": [
+    20
+   ],
+   "published": "2025-08-05",
+   "apply": "https://forms.gle/ysLfzYHYiZBL7xv69",
+   "professors": [
+    "gabriel-de-morais-coutinho",
+    "loic-pascal-gilles-cerf",
+    "renato-vimieiro",
+    "wagner-meira-junior"
+   ]
+  },
+  {
+   "slug": "iniciacao-cientifica-a02-projeto-gsi-mpmg-dcc-ufmg-2025",
+   "title": "Bolsa de Iniciação Científica – Projeto GSI/MPMG – DCC/UFMG",
+   "url": "https://dcc.ufmg.br/oportunidade/iniciacao-cientifica-a02-projeto-gsi-mpmg-dcc-ufmg-2025/",
+   "open": true,
+   "deadline": "Inscrições abertas até o preenchimento da vaga",
+   "types": [
+    "Iniciação científica"
+   ],
+   "areas": [],
+   "groups": [],
+   "audiences": [
+    "Graduação"
+   ],
+   "summary": "",
+   "stipends": [
+    {
+     "who": "IC",
+     "value": "R$ 1.200,00"
+    }
+   ],
+   "hours": [
+    20
+   ],
+   "published": "2025-02-06",
+   "apply": "https://forms.gle/xsy975mKv96VZohBA",
+   "professors": [
+    "daniel-fernandes-macedo",
+    "dorgival-olavo-guedes-neto",
+    "jose-marcos-silva-nogueira"
+   ]
+  },
+  {
+   "slug": "bolsa-de-pos-doutorado-vagas-abertas-em-ciberseguranca",
+   "title": "Bolsa de Pós-Doutorado – Cibersegurança",
+   "url": "https://dcc.ufmg.br/oportunidade/bolsa-de-pos-doutorado-vagas-abertas-em-ciberseguranca/",
+   "open": true,
+   "deadline": "Inscrições abertas até o preenchimento da vaga.",
+   "types": [
+    "Pós-doutorado"
+   ],
+   "areas": [
+    "Cibersegurança",
+    "Internet das coisas"
+   ],
+   "groups": [],
+   "audiences": [],
+   "summary": "Temos duas vagas para os cargos de pós-doutorado em Ciência da Computação – Segurança Cibernética, a partir de julho de 2024, no Brasil. Os candidatos aprovados se juntarão a nós no projeto de pesquisa perspicaz e desafiador “MENTORED: Da Modelagem à Experimentação – Predição e Detecção de ataques DDoS e Zero-day” do MCTIC/FAPESP. A equipe do projeto…",
+   "stipends": [
+    {
+     "who": "",
+     "value": "R$ 9.047,40"
+    }
+   ],
+   "hours": [],
+   "published": null,
+   "apply": null,
+   "professors": [
+    "michele-nogueira-lima"
+   ]
+  },
+  {
+   "slug": "vaga-speed-lab-coordenador-de-recursos-computacionais",
+   "title": "Coordenador de Recursos Computacionais – Speed/DCC/UFMG",
+   "url": "https://dcc.ufmg.br/oportunidade/vaga-speed-lab-coordenador-de-recursos-computacionais/",
+   "open": true,
+   "deadline": "Inscrições abertas até o preenchimento da vaga.",
+   "types": [
+    "Emprego"
+   ],
+   "areas": [],
+   "groups": [],
+   "audiences": [
+    "Profissionais"
+   ],
+   "summary": "O Coordenador de Recursos Computacionais é o profissional que atua em assuntos que envolvem a infraestrutura de TI (Tecnologia da Informação) em uma organização, neste caso, no Laboratório SPEED e associados.",
+   "stipends": [],
+   "hours": [
+    40
+   ],
+   "published": null,
+   "apply": null,
+   "professors": []
+  },
+  {
+   "slug": "bolsa-de-iniciacao-cientifica-suporte-a-infraestrutura-de-ti",
+   "title": "Bolsa de Iniciação Científica – Suporte à Infraestrutura de TI",
+   "url": "https://dcc.ufmg.br/oportunidade/bolsa-de-iniciacao-cientifica-suporte-a-infraestrutura-de-ti/",
+   "open": true,
+   "deadline": "Até a vaga ser preenchida.",
+   "types": [
+    "Bolsa de pesquisa",
+    "Iniciação científica"
+   ],
+   "areas": [],
+   "groups": [],
+   "audiences": [
+    "Graduação"
+   ],
+   "summary": "O Laboratório de Incerteza em Inteligência Artificial (LabUAI) está selecionando um(a) estudante de graduação para atuar no suporte à infraestrutura de TI.",
+   "stipends": [
+    {
+     "who": "",
+     "value": "R$ 1.092,00"
+    }
+   ],
+   "hours": [
+    20
+   ],
+   "published": null,
+   "apply": null,
+   "professors": []
+  },
+  {
+   "slug": "postdoctoral-fellowship-open-positions-in-cybersecurity",
+   "title": "Postdoctoral Fellowship – Open Positions in Cybersecurity",
+   "url": "https://dcc.ufmg.br/oportunidade/postdoctoral-fellowship-open-positions-in-cybersecurity/",
+   "open": true,
+   "deadline": "Application deadline: until the position is filled.",
+   "types": [
+    "Pós-doutorado"
+   ],
+   "areas": [
+    "Cibersegurança"
+   ],
+   "groups": [],
+   "audiences": [
+    "Pós-doutorado"
+   ],
+   "summary": "We have three postdoctoral positions in Computer Science – Cybersecurity, starting from November 2022 in Brazil. Successful candidates will join us in the insightful and challenging research project “MENTORED: From Modeling to Experimentation – Predicting and Detecting DDoS and Zero-day attacks” from MCTIC/FAPESP. The team of the MENTORED project…",
+   "stipends": [
+    {
+     "who": "",
+     "value": "R$ 9.047,40"
+    }
+   ],
+   "hours": [],
+   "published": null,
+   "apply": null,
+   "professors": [
+    "aldri-luiz-dos-santos",
+    "michele-nogueira-lima"
+   ]
+  },
+  {
+   "slug": "bolsa-dtc-mestrando-laboratorio-de-compiladores-dcc-ufmg",
+   "title": "Bolsa DTC – Mestrando – Laboratório de Compiladores – DCC/UFMG",
+   "url": "https://dcc.ufmg.br/oportunidade/bolsa-dtc-mestrando-laboratorio-de-compiladores-dcc-ufmg/",
+   "open": true,
+   "deadline": "Inscrições abertas até o preenchimento da vaga",
+   "types": [
+    "Bolsa"
+   ],
+   "areas": [
+    "Compiladores"
+   ],
+   "groups": [],
+   "audiences": [
+    "Mestrado"
+   ],
+   "summary": "O laboratório de compiladores tem vagas para Projeto de Desenvolvimento, a saber:",
+   "stipends": [
+    {
+     "who": "Bolsa DTC (para aluno em programa de mestrado)",
+     "value": "R$ 3.000,00"
+    }
+   ],
+   "hours": [],
+   "published": null,
+   "apply": null,
+   "professors": []
+  },
+  {
+   "slug": "estagio-tecnico-lips-ufmg",
+   "title": "Estágio – Técnico – LIPS/UFMG",
+   "url": "https://dcc.ufmg.br/oportunidade/estagio-tecnico-lips-ufmg/",
+   "open": false,
+   "deadline": null,
+   "types": [
+    "Estágio"
+   ],
+   "areas": [],
+   "groups": [],
+   "audiences": [],
+   "summary": "",
+   "stipends": [],
+   "hours": [],
+   "published": "2026-09-15",
+   "apply": null,
+   "professors": []
+  },
+  {
+   "slug": "estagio-graduandos-pesquisa-e-desenvolvimento-de-software-banco-de-dados-grafos-speed-dcc-ufmg",
+   "title": "Estágio – Graduandos – Pesquisa e Desenvolvimento de Software, Banco de Dados, Grafos – SPEED/DCC/UFMG",
+   "url": "https://dcc.ufmg.br/oportunidade/estagio-graduandos-pesquisa-e-desenvolvimento-de-software-banco-de-dados-grafos-speed-dcc-ufmg/",
+   "open": false,
+   "deadline": null,
+   "types": [
+    "Estágio"
+   ],
+   "areas": [],
+   "groups": [],
+   "audiences": [
+    "Graduação"
+   ],
+   "summary": "",
+   "stipends": [],
+   "hours": [],
+   "published": "2026-09-14",
+   "apply": "https://forms.gle/oRj7iZafHWQXdnDM8",
+   "professors": []
+  },
+  {
+   "slug": "bolsa-de-pesquisa-comunicacao-unidade-embrapii-dcc-ufmg-fapemig",
+   "title": "Bolsa de Pesquisa – Comunicação – Unidade Embrapii DCC/UFMG – FAPEMIG",
+   "url": "https://dcc.ufmg.br/oportunidade/bolsa-de-pesquisa-comunicacao-unidade-embrapii-dcc-ufmg-fapemig/",
+   "open": false,
+   "deadline": null,
+   "types": [
+    "Bolsa de pesquisa"
+   ],
+   "areas": [],
+   "groups": [
+    "Embrapii"
+   ],
+   "audiences": [],
+   "summary": "A Unidade EMBRAPII do Departamento de Ciência da Computação (DCC) da Universidade Federal de Minas Gerais (UFMG) é credenciada para desenvolver projetos de Pesquisa, Desenvolvimento e Inovação (PD&I) em parceria com empresas, focando em Sistemas Ciberfísicos. Sua missão é criar plataformas computacionais que integrem componentes físicos, virtuais e…",
+   "stipends": [
+    {
+     "who": "",
+     "value": "R$ 5.720,00"
+    }
+   ],
+   "hours": [
+    40
+   ],
+   "published": "2026-09-04",
+   "apply": "https://forms.gle/JAGipUkn3S6urGxE7",
+   "professors": []
+  },
+  {
+   "slug": "estagio-graduandos-engenharia-software-pesquisa-e-desenvolvimento-de-software-dcc-ufmg",
+   "title": "Estágio – Graduandos – Engenharia Software, Pesquisa e Desenvolvimento de Software – DCC/UFMG",
+   "url": "https://dcc.ufmg.br/oportunidade/estagio-graduandos-engenharia-software-pesquisa-e-desenvolvimento-de-software-dcc-ufmg/",
+   "open": false,
+   "deadline": null,
+   "types": [
+    "Estágio"
+   ],
+   "areas": [],
+   "groups": [],
+   "audiences": [
+    "Graduação"
+   ],
+   "summary": "Vagas para trabalhar no setor de sistemas de informação e comunicação do DCC/UFMG.",
+   "stipends": [],
+   "hours": [],
+   "published": "2026-08-30",
+   "apply": "https://forms.gle/UbgtveZWzh2QvgLg9",
+   "professors": []
+  },
+  {
+   "slug": "bolsas-para-o-repositorio-de-recursos-linguisticos-do-inct-tildiar-graduandos-graduados-e-doutor",
+   "title": "Bolsas para o Repositório de Recursos Linguísticos do INCT-TILDIAR – Graduandos, graduados e doutor",
+   "url": "https://dcc.ufmg.br/oportunidade/bolsas-para-o-repositorio-de-recursos-linguisticos-do-inct-tildiar-graduandos-graduados-e-doutor/",
+   "open": false,
+   "deadline": null,
+   "types": [
+    "Bolsa"
+   ],
+   "areas": [],
+   "groups": [],
+   "audiences": [
+    "Graduação",
+    "Profissionais"
+   ],
+   "summary": "O *INCT-TILDIAR* está selecionando *5 bolsistas* para atuar no desenvolvimento do *Repositório de Recursos Linguísticos para o Português Brasileiro, projeto coordenado pelos professores **Tiago Torrent (UFJF), **Adriana Pagano (Faculdade de Letras/UFMG)* e *Marcos André Gonçalves (DCC/UFMG)*.",
+   "stipends": [
+    {
+     "who": "1 bolsa para pesquisador doutor",
+     "value": "R$ 5.850"
+    },
+    {
+     "who": "",
+     "value": "R$ 7.800"
+    },
+    {
+     "who": "1 bolsa para profissional com graduação concluída",
+     "value": "R$ 1.430"
+    },
+    {
+     "who": "",
+     "value": "R$ 5.200"
+    },
+    {
+     "who": "",
+     "value": "R$ 1.430"
+    },
+    {
+     "who": "3 bolsas SET-I para estudantes de graduação",
+     "value": "R$ 1.040"
+    }
+   ],
+   "hours": [],
+   "published": "2026-08-24",
+   "apply": null,
+   "professors": [
+    "marcos-andre-goncalves"
+   ]
+  },
+  {
+   "slug": "bolsa-de-iniciacao-cientifica-projeto-geoinsight-vale-ufmg",
+   "title": "Bolsa de Iniciação Científica – Projeto GeoInsight – VALE/UFMG",
+   "url": "https://dcc.ufmg.br/oportunidade/bolsa-de-iniciacao-cientifica-projeto-geoinsight-vale-ufmg/",
+   "open": false,
+   "deadline": null,
+   "types": [
+    "Bolsa de pesquisa",
+    "Iniciação científica"
+   ],
+   "areas": [],
+   "groups": [],
+   "audiences": [
+    "Graduação"
+   ],
+   "summary": "O projeto GeoInsight – VALE/UFMG está selecionando alunos de graduação da UFMG para atuar em atividades de pesquisa, desenvolvimento e experimentação relacionadas ao projeto.",
+   "stipends": [
+    {
+     "who": "",
+     "value": "R$ 1.800,00"
+    }
+   ],
+   "hours": [
+    20
+   ],
+   "published": "2026-08-10",
+   "apply": null,
+   "professors": []
+  },
+  {
+   "slug": "inscricao-para-monitoria-voluntaria",
+   "title": "Inscrição para Monitoria Voluntária",
+   "url": "https://dcc.ufmg.br/oportunidade/inscricao-para-monitoria-voluntaria/",
+   "open": false,
+   "deadline": null,
+   "types": [
+    "Monitoria"
+   ],
+   "areas": [],
+   "groups": [],
+   "audiences": [],
+   "summary": "O Departamento de Ciência da Computação irá oferecer novamente, no segundo semestre de 2026, um Programa de Monitoria Voluntária, conforme edital publicado.",
+   "stipends": [],
+   "hours": [
+    10
+   ],
+   "published": "2026-08-04",
+   "apply": "https://forms.gle/cdywPPYpkSdL2KE29",
+   "professors": []
+  },
+  {
+   "slug": "bolsa-de-iniciacao-cientifica-inct-tildiar-university-of-turin-unito",
+   "title": "Bolsa de Iniciação Científica Internacional – INCT TILDIAR / University of Turin (UNITO)",
+   "url": "https://dcc.ufmg.br/oportunidade/bolsa-de-iniciacao-cientifica-inct-tildiar-university-of-turin-unito/",
+   "open": false,
+   "deadline": null,
+   "types": [
+    "Bolsa de pesquisa",
+    "Iniciação científica"
+   ],
+   "areas": [],
+   "groups": [],
+   "audiences": [
+    "Graduação"
+   ],
+   "summary": "O INCT TILDIAR (Instituto Nacional de Ciência e Tecnologia em Inteligência Artificial Confiável, Inteligente e Responsável) está selecionando estudantes de graduação para atuar em um projeto internacional de pesquisa em colaboração entre a University of Turin (Itália) e a Universidade Federal de Minas Gerais (UFMG).",
+   "stipends": [],
+   "hours": [
+    20
+   ],
+   "published": "2026-07-31",
+   "apply": null,
+   "professors": [
+    "marcos-andre-goncalves"
+   ]
+  },
+  {
+   "slug": "bolsas-de-iniciacao-cientifica-inct-tildiar",
+   "title": "Bolsas de Iniciação Científica – INCT TILDIAR",
+   "url": "https://dcc.ufmg.br/oportunidade/bolsas-de-iniciacao-cientifica-inct-tildiar/",
+   "open": false,
+   "deadline": null,
+   "types": [
+    "Bolsa de pesquisa",
+    "Iniciação científica"
+   ],
+   "areas": [],
+   "groups": [
+    "INCT",
+    "TILD-IAR"
+   ],
+   "audiences": [
+    "Graduação"
+   ],
+   "summary": "O INCT TILDIAR (Instituto Nacional de Ciência e Tecnologia em Inteligência Artificial Responsável para Linguística Computacional, Tratamento e Disseminação de Informação) está selecionando dois alunos de graduação em cursos de computação (ciência da computação, sistemas de informação, engenharia de computação, matemática computacional, ciência de dados)…",
+   "stipends": [
+    {
+     "who": "",
+     "value": "R$ 700,00"
+    }
+   ],
+   "hours": [
+    20
+   ],
+   "published": "2026-07-21",
+   "apply": "https://forms.gle/ojz2iebNjnfCGcGH9",
+   "professors": [
+    "ana-paula-couto-da-silva",
+    "michele-amaral-brandao"
+   ]
+  },
+  {
+   "slug": "iniciacao-cientifica-projeto-i-phm",
+   "title": "Iniciação Científica – Projeto I-PHM",
+   "url": "https://dcc.ufmg.br/oportunidade/iniciacao-cientifica-projeto-i-phm/",
+   "open": false,
+   "deadline": null,
+   "types": [
+    "Bolsa de pesquisa",
+    "Iniciação científica"
+   ],
+   "areas": [
+    "Aprendizado de máquina",
+    "Inteligência artificial"
+   ],
+   "groups": [],
+   "audiences": [
+    "Graduação"
+   ],
+   "summary": "I-PHM: Plataforma inteligente de manutenção preditiva para monitoramento e prognóstico da saúde de ativos industriais",
+   "stipends": [
+    {
+     "who": "",
+     "value": "R$ 1.500,00"
+    }
+   ],
+   "hours": [
+    20
+   ],
+   "published": "2026-07-13",
+   "apply": "https://forms.gle/Bc64bv2ZRbGLbqwt5",
+   "professors": []
+  }
+ ]
+}

@@ -1,0 +1,10 @@
+data/avaliacoes.db*
+data/secret.key
+__pycache__
+tests
+# relatórios do SIGAA (uso restrito, com nº de inscrição): nunca versionar/empacotar
+*.pdf
+docs
+.git
+deploy/.env
+deploy/backups

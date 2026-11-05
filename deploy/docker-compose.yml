@@ -1,0 +1,25 @@
+# DCCHub + Caddy (HTTPS automático via Let's Encrypt) numa VM qualquer (Oracle Always Free, GCP e2-micro…).
+#   cd deploy && cp .env.example .env  (edite DOMAIN e DCCHUB_ADMIN_TOKEN)  &&  docker compose up -d --build
+services:
+  app:
+    build: ..
+    restart: unless-stopped
+    environment:
+      DCCHUB_TRUST_PROXY: "1"            # o IP real vem do Caddy (X-Forwarded-For)
+      DCCHUB_ADMIN_TOKEN: ${DCCHUB_ADMIN_TOKEN:-}
+      DCCHUB_ACCESS_CODES: ${DCCHUB_ACCESS_CODES:-}   # código(s) da comunidade; vazio = site aberto
+    volumes:
+      - dcchub-var:/app/var              # banco SQLite + chave secreta: é ISTO que precisa de backup
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    ports: ["80:80", "443:443"]
+    environment:
+      DOMAIN: ${DOMAIN}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+    depends_on: [app]
+volumes:
+  dcchub-var:
+  caddy-data:

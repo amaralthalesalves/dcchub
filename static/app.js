@@ -1,0 +1,1637 @@
+/* DCCHub — front-end sem dependências (SPA com rotas por hash). */
+'use strict';
+
+// ---------------------------------------------------------------- utilidades
+const $ = (sel, root = document) => root.querySelector(sel);
+const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
+const main = $('#main');
+const DAYS = ['', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+const STATUS_LABEL = { ativo: 'Ativo', voluntario: 'Voluntário', emerito: 'Emérito', aposentado: 'Aposentado', externo: 'Externo', substituto: 'Substituto' };
+
+const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const fold = (v) => String(v ?? '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+const fmt = (n, d = 1) => (n == null ? '—' : Number(n).toLocaleString('pt-BR', { minimumFractionDigits: d, maximumFractionDigits: d }));
+const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
+const store = {
+  get(key, fallback) { try { const v = localStorage.getItem(key); return v == null ? fallback : JSON.parse(v); } catch (_) { return fallback; } },
+  set(key, value) { try { localStorage.setItem(key, JSON.stringify(value)); } catch (_) { /* sem armazenamento */ } },
+  del(key) { try { localStorage.removeItem(key); } catch (_) { /* idem */ } },
+};
+
+function timeAgo(ts) {
+  const s = Math.max(1, Math.floor(Date.now() / 1000 - ts));
+  const steps = [[60, 'segundo'], [3600, 'minuto', 60], [86400, 'hora', 3600], [2592000, 'dia', 86400], [31536000, 'mês', 2592000], [Infinity, 'ano', 31536000]];
+  for (const [limit, unit, div = 1] of steps) {
+    if (s < limit) {
+      const n = Math.floor(s / div);
+      const units = unit === 'mês' ? (n === 1 ? 'mês' : 'meses') : n === 1 ? unit : `${unit}s`;
+      return `há ${n} ${units}`;
+    }
+  }
+  return '';
+}
+
+async function api(path, { method = 'GET', body, headers = {} } = {}) {
+  const opts = { method, headers: { Accept: 'application/json', ...headers }, credentials: 'same-origin' };
+  if (body !== undefined) { opts.body = JSON.stringify(body); opts.headers['Content-Type'] = 'application/json'; }
+  let res;
+  try { res = await fetch(path, opts); } catch (_) { throw Object.assign(new Error('Sem conexão com o servidor.'), { status: 0 }); }
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw Object.assign(new Error(data.error || 'Algo deu errado.'), { status: res.status, data });
+  return data;
+}
+
+let toastTimer;
+function toast(message, kind = 'ok') {
+  const el = $('#toast');
+  el.textContent = message;
+  el.dataset.kind = kind;
+  el.hidden = false;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { el.hidden = true; }, 4200);
+}
+
+function scoreClass(v, neutral = false) {
+  if (v == null) return 'none';
+  if (neutral) return v >= 4 ? 'n-high' : v >= 2.6 ? 'n-mid' : 'n-low';
+  return v >= 4 ? 'good' : v >= 3 ? 'ok' : 'bad';
+}
+const pill = (v, { neutral = false, title = '' } = {}) =>
+  `<span class="pill ${scoreClass(v, neutral)}" ${title ? `title="${esc(title)}"` : ''}>${v == null ? '—' : fmt(v)}</span>`;
+
+function stars(v) {
+  const pct = v == null ? 0 : (v / 5) * 100;
+  return `<span class="stars" role="img" aria-label="${v == null ? 'sem nota' : `${fmt(v)} de 5`}"><span class="stars-fill" style="width:${pct}%"></span></span>`;
+}
+
+function initials(name) {
+  const parts = String(name).split(/\s+/).filter((w) => w.length > 2 || /^[A-ZÁÉÍÓÚ]/.test(w));
+  return ((parts[0] || '')[0] || '') + ((parts[parts.length - 1] || '')[0] || '');
+}
+function avatar(p, size = 'md') {
+  if (p && p.photo) return `<img class="avatar avatar-${size}" src="${esc(p.photo)}" alt="" loading="lazy" decoding="async">`;
+  const hue = [...String(p?.name || '')].reduce((a, c) => a + c.charCodeAt(0), 0) % 360;
+  return `<span class="avatar avatar-${size} avatar-initials" style="--h:${hue}" aria-hidden="true">${esc(initials(p?.name || '?'))}</span>`;
+}
+
+const fmtSlot = (s) => `${DAYS[s.day]} ${s.start}–${s.end}`;
+function fmtSchedule(schedule) {
+  if (!schedule || !schedule.length) return '<span class="muted">horário não informado</span>';
+  // agrupa dias com o mesmo horário: "Ter/Qui 14:55–16:35"
+  const groups = new Map();
+  schedule.forEach((s) => { const k = `${s.start}–${s.end}`; groups.set(k, [...(groups.get(k) || []), DAYS[s.day]]); });
+  return [...groups].map(([time, days]) => `<span class="slot">${days.join('/')} ${time}</span>`).join(' ');
+}
+const courseCode = (c) => (c.kind === 'topico' ? `Tópicos · ${c.codes.join('/')}` : c.codes.join(' / '));
+const firstName = (name) => String(name).split(' ')[0];
+
+// ---------------------------------------------------------------- estado
+const state = {
+  boot: null,
+  prof: new Map(),
+  course: new Map(),
+  me: null,
+};
+
+async function loadBoot(force = false) {
+  if (state.boot && !force) return state.boot;
+  const boot = await api('/api/bootstrap');
+  state.boot = boot;
+  state.prof = new Map(boot.professors.map((p) => [p.slug, p]));
+  state.course = new Map(boot.courses.map((c) => [c.id, c]));
+  boot.courses.forEach((c) => (c.aliases || []).forEach((a) => state.course.set(a, c))); // códigos antigos -> versão atual
+  boot.searchIndex = [
+    ...boot.professors.map((p) => ({ type: 'prof', key: fold(p.name), label: p.name, sub: p.areas.slice(0, 2).join(' · ') || STATUS_LABEL[p.status], href: `#/professor/${p.slug}`, item: p, weight: p.status === 'ativo' || p.status === 'voluntario' ? 2 : 1 })),
+    ...boot.courses.filter((c) => c.active).map((c) => ({ type: 'course', key: fold(`${c.name} ${c.codes.join(' ')}`), label: c.name, sub: courseCode(c), href: `#/disciplina/${encodeURIComponent(c.id)}`, item: c, weight: c.offeredNow ? 2 : 1 })),
+  ];
+  const card = $('#sidebar-card');
+  if (card && boot.latestTerm) {
+    const live = boot.courses.filter((c) => c.offeredNow).length;
+    card.innerHTML = boot.offerPublished
+      ? `<span class="small"><span class="live-dot" aria-hidden="true"></span>Semestre atual</span><b>Oferta ${esc(boot.latestTerm)}</b><span>${plural(live, 'disciplina ofertada', 'disciplinas ofertadas')}${boot.termSources?.[boot.latestTerm] === 'SIGAA' ? ' · fonte: SIGAA' : ''}</span><a href="#/oferta">Montar minha grade →</a>`
+      : `<span class="small"><span class="live-dot pending" aria-hidden="true"></span>Semestre ${esc(boot.currentTerm)}</span><b>Oferta ainda não publicada</b><span>O DCC não publicou a oferta de ${esc(boot.currentTerm)}. Mostramos a última oficial (${esc(boot.latestTerm)}).</span><a href="#/sobre#atual">Como ajudar →</a>`;
+    card.hidden = false;
+  }
+  const note = $('#footer-note');
+  if (note) note.innerHTML = `Dados públicos do <a href="${esc(boot.sources.professors || 'https://dcc.ufmg.br/professores/')}" rel="noreferrer" target="_blank">site do DCC</a>, ofertas de ${esc(boot.terms[0] || '')} a ${esc(boot.latestTerm || '')}${boot.generatedAt ? ` · sincronizado em ${new Date(boot.generatedAt).toLocaleDateString('pt-BR')}` : ''}.`;
+  return boot;
+}
+
+async function loadMe(force = false) {
+  if (state.me && !force) return state.me;
+  state.me = await api('/api/me').catch(() => ({ reviews: [] }));
+  return state.me;
+}
+
+function search(query, limit = 8) {
+  const q = fold(query).trim();
+  if (!q) return [];
+  const words = q.split(/\s+/);
+  return state.boot.searchIndex
+    .map((e) => {
+      if (!words.every((w) => e.key.includes(w))) return null;
+      let score = e.weight;
+      if (e.key.startsWith(q)) score += 4;
+      if (e.key.split(/\s+/).some((w) => w.startsWith(words[0]))) score += 2;
+      if (e.type === 'course' && e.item.codes.some((c) => fold(c) === q)) score += 10;
+      return { ...e, score };
+    })
+    .filter(Boolean)
+    .sort((a, b) => b.score - a.score || a.label.localeCompare(b.label))
+    .slice(0, limit);
+}
+
+// ---------------------------------------------------------------- busca global
+function setupGlobalSearch() {
+  const input = $('#global-search');
+  const box = $('#global-results');
+  let active = -1;
+  let results = [];
+  const close = () => { box.hidden = true; input.setAttribute('aria-expanded', 'false'); active = -1; };
+  const render = () => {
+    if (!results.length) {
+      box.innerHTML = input.value.trim() ? '<p class="search-empty">Nada encontrado. Tente o código (ex.: DCC206) ou parte do nome.</p>' : '';
+      box.hidden = !input.value.trim();
+      return;
+    }
+    box.innerHTML = results.map((r, i) => `
+      <a role="option" id="sr-${i}" class="search-item ${i === active ? 'active' : ''}" href="${r.href}" aria-selected="${i === active}">
+        ${r.type === 'prof' ? avatar(r.item, 'sm') : '<span class="search-kind" aria-hidden="true"><svg class="ico"><use href="#i-book"/></svg></span>'}
+        <span><b>${esc(r.label)}</b><small>${esc(r.sub)}</small></span>
+        ${r.item.stats ? pill(r.item.stats.overall) : ''}
+      </a>`).join('');
+    box.hidden = false;
+    input.setAttribute('aria-expanded', 'true');
+    if (active >= 0) input.setAttribute('aria-activedescendant', `sr-${active}`); else input.removeAttribute('aria-activedescendant');
+  };
+  input.addEventListener('input', () => { if (!state.boot) return; results = search(input.value); active = results.length ? 0 : -1; render(); });
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowDown') { e.preventDefault(); active = Math.min(results.length - 1, active + 1); render(); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); active = Math.max(0, active - 1); render(); }
+    else if (e.key === 'Enter') {
+      const pick = results[active] || results[0];
+      if (pick) { location.hash = pick.href; input.value = ''; close(); input.blur(); }
+      else if (input.value.trim()) { location.hash = `#/professores?q=${encodeURIComponent(input.value.trim())}`; close(); }
+    } else if (e.key === 'Escape') { close(); input.blur(); }
+  });
+  input.addEventListener('focus', () => { if (input.value.trim()) render(); });
+  box.addEventListener('click', () => { input.value = ''; close(); });
+  document.addEventListener('click', (e) => { if (!e.target.closest('.global-search')) close(); });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === '/' && !/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)) { e.preventDefault(); input.focus(); }
+  });
+}
+
+// ---------------------------------------------------------------- roteador
+const routes = [
+  [/^$/, viewHome],
+  [/^professores$/, viewProfessors],
+  [/^professor\/([^/]+)$/, viewProfessor],
+  [/^disciplinas$/, viewCourses],
+  [/^disciplina\/([^/]+)$/, viewCourse],
+  [/^oferta$/, viewOffer],
+  [/^avaliar$/, viewReviewForm],
+  [/^minhas$/, viewMine],
+  [/^sobre$/, viewAbout],
+  [/^materiais$/, viewProvas],
+  [/^oportunidades$/, viewOportunidades],
+  [/^provas$/, () => location.replace('#/materiais')], // endereço antigo
+  [/^moderacao$/, viewModeration],
+];
+
+function parseHash() {
+  const raw = location.hash.replace(/^#\/?/, '');
+  const [path, qs = ''] = raw.split('?');
+  const [cleanPath, anchor] = path.split('#');
+  return { path: decodeURIComponent(cleanPath.replace(/\/$/, '')), params: new URLSearchParams(qs), anchor };
+}
+
+function setQuery(params, { replace = true } = {}) {
+  const { path } = parseHash();
+  const qs = params.toString();
+  const url = `#/${path}${qs ? `?${qs}` : ''}`;
+  if (replace) history.replaceState(null, '', url); else location.hash = url;
+}
+
+let renderToken = 0;
+async function router() {
+  const token = ++renderToken;
+  const { path, params, anchor } = parseHash();
+  $$('#nav a[data-nav]').forEach((a) => a.toggleAttribute('aria-current', a.dataset.nav ? path.startsWith(a.dataset.nav) : path === ''));
+  for (const [re, view] of routes) {
+    const m = path.match(re);
+    if (!m) continue;
+    try {
+      await loadBoot();
+      if (token !== renderToken) return;
+      await view({ params, args: m.slice(1).map(decodeURIComponent), anchor, isCurrent: () => token === renderToken });
+      if (token !== renderToken) return;
+      if (anchor) document.getElementById(anchor)?.scrollIntoView();
+      else if (!history.state?.keepScroll) window.scrollTo(0, 0);
+    } catch (err) {
+      if (token !== renderToken) return;
+      if (err.data?.gate) { viewGate(); return; }
+      main.innerHTML = errorBlock(err);
+    }
+    return;
+  }
+  main.innerHTML = `<section class="page narrow empty-state"><h1>Página não encontrada</h1><p>O endereço não existe ou mudou.</p><a class="btn" href="#/">Voltar ao início</a></section>`;
+}
+
+// Tela de acesso: o servidor só entrega dados a quem digitou o código da comunidade (DCCHUB_ACCESS_CODES)
+function viewGate() {
+  setTitle('Acesso da comunidade');
+  document.body.classList.add('gated');
+  main.innerHTML = `<section class="page narrow gate">
+    <div class="gate-card">
+      <span class="brand-logo" aria-hidden="true">D</span>
+      <h1>DCC<span>Hub</span></h1>
+      <p>Espaço da comunidade estudantil do DCC/UFMG: avaliações anônimas de turmas, oferta do semestre, materiais e oportunidades.</p>
+      <form id="gate-form" class="gate-form">
+        <label class="field">Código de acesso<input name="code" autocomplete="off" autocapitalize="off" spellcheck="false" required placeholder="Digite o código"></label>
+        <button class="btn btn-lg" type="submit">Entrar</button>
+        <p class="err" id="gate-err" role="alert"></p>
+      </form>
+      <p class="small muted">O código é divulgado nos canais dos estudantes (centro acadêmico, grupos de turma). Ele não identifica você: o acesso continua anônimo.</p>
+      <p class="small muted">Projeto independente de estudantes, sem vínculo com o DCC ou com a UFMG.</p>
+    </div>
+  </section>`;
+  $('#gate-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = $('button', e.target);
+    btn.disabled = true;
+    try {
+      await api('/api/access', { method: 'POST', body: { code: new FormData(e.target).get('code').trim() } });
+      document.body.classList.remove('gated');
+      state.boot = null;
+      router();
+    } catch (err) {
+      $('#gate-err').textContent = err.message;
+      btn.disabled = false;
+    }
+  });
+  $('input[name=code]').focus();
+}
+
+function errorBlock(err) {
+  const notFound = err.status === 404;
+  return `<section class="page narrow empty-state"><h1>${notFound ? 'Não encontrado' : 'Não deu para carregar'}</h1>
+    <p>${esc(err.message)}</p><a class="btn" href="#/">Voltar ao início</a> ${notFound ? '' : '<button class="btn btn-ghost" data-action="reload">Tentar de novo</button>'}</section>`;
+}
+
+function setTitle(title) { document.title = title ? `${title} · DCCHub` : 'DCCHub — avaliações, oferta, materiais e oportunidades do DCC/UFMG'; }
+
+// ---------------------------------------------------------------- componentes
+function profCard(p) {
+  const s = p.stats;
+  return `<a class="card prof-card" href="#/professor/${p.slug}">
+    ${avatar(p)}
+    <div class="prof-card-body">
+      <h3>${esc(p.name)}</h3>
+      <p class="muted small">${esc(p.areas.slice(0, 2).join(' · ') || STATUS_LABEL[p.status])}</p>
+      <div class="prof-card-meta">
+        ${s ? `${pill(s.overall)} <span class="small">${plural(s.count, 'avaliação', 'avaliações')}</span>${s.retake != null ? `<span class="small muted retake-note">${s.retake}% faria de novo</span>` : ''}`
+            : '<span class="small muted">Sem avaliações ainda</span>'}
+      </div>
+      <div class="badges">${p.teachingNow ? `<span class="badge badge-live">Em ${esc(state.boot.latestTerm)}</span>` : ''}${p.status !== 'ativo' ? `<span class="badge">${STATUS_LABEL[p.status]}</span>` : ''}</div>
+    </div>
+  </a>`;
+}
+
+function courseRow(c) {
+  const s = c.stats;
+  const profs = c.professors.slice(0, 3).map((slug) => state.prof.get(slug)?.name).filter(Boolean);
+  return `<a class="card course-card" href="#/disciplina/${encodeURIComponent(c.id)}">
+    <div class="course-card-main">
+      <span class="code">${esc(courseCode(c))}</span>
+      <h3>${esc(c.name)}</h3>
+      <p class="muted small">${profs.length ? esc(profs.map(firstNameLast).join(', ')) + (c.professors.length > 3 ? ` +${c.professors.length - 3}` : '') : 'Docentes não informados'}</p>
+    </div>
+    <div class="course-card-side">
+      ${s ? `${pill(s.overall)}<span class="small">${plural(s.count, 'avaliação', 'avaliações')}</span>` : '<span class="small muted">sem avaliações</span>'}
+      <span class="small muted">${plural(c.terms.length, 'semestre', 'semestres')}</span>
+      ${c.offeredNow ? `<span class="badge badge-live">Em ${esc(state.boot.latestTerm)}</span>` : c.active ? '' : `<span class="badge">até ${esc(c.terms[c.terms.length - 1])}</span>`}
+    </div>
+  </a>`;
+}
+function firstNameLast(name) { const p = name.split(' '); return p.length > 1 ? `${p[0]} ${p[p.length - 1]}` : name; }
+
+function bars(avg, criteria) {
+  return `<dl class="bars">${criteria.map((c) => {
+    const v = avg?.[c.key];
+    return `<div class="bar-row" title="${esc(c.hint)}">
+      <dt>${esc(c.label)}</dt>
+      <dd><span class="bar"><span class="bar-fill ${scoreClass(v, c.neutral)}" style="width:${v ? (v / 5) * 100 : 0}%"></span></span><b>${fmt(v)}</b></dd>
+    </div>`;
+  }).join('')}</dl>`;
+}
+
+function summaryBlock(summary, { subject = 'docente' } = {}) {
+  const crit = state.boot.criteria;
+  if (!summary || !summary.count) {
+    return `<div class="summary summary-empty"><p class="big-muted">Ainda sem avaliações</p><p class="muted">Cursou com ${subject === 'docente' ? 'este docente' : 'esta disciplina'}? Sua experiência ajuda muita gente a decidir.</p></div>`;
+  }
+  const dist = summary.distribution;
+  const max = Math.max(...Object.values(dist), 1);
+  const grades = Object.entries(summary.grades || {});
+  const gradeTotal = grades.reduce((a, [, n]) => a + n, 0);
+  return `<div class="summary">
+    <div class="summary-score">
+      <div class="ring ${scoreClass(summary.avg.overall)}" style="--p:${(summary.avg.overall / 5) * 100}"><span class="score-big">${fmt(summary.avg.overall)}</span><small>de 5</small></div>
+      ${stars(summary.avg.overall)}
+      <span class="muted small">${plural(summary.count, 'avaliação', 'avaliações')}</span>
+      ${summary.retake != null ? `<span class="retake"><b>${summary.retake}%</b> faria de novo</span>` : ''}
+    </div>
+    <div class="summary-bars">${bars(summary.avg, crit.filter((c) => c.key !== 'overall'))}</div>
+    <div class="summary-dist" aria-label="Distribuição das notas gerais">
+      ${[5, 4, 3, 2, 1].map((n) => `<div class="dist-row"><span>${n}★</span><span class="bar"><span class="bar-fill ${scoreClass(n)}" style="width:${(dist[n] / max) * 100}%"></span></span><span class="muted">${dist[n]}</span></div>`).join('')}
+    </div>
+    ${summary.tags.length ? `<div class="summary-tags"><h4>O que mais dizem</h4><div class="chips">${summary.tags.map((t) => `<span class="chip ${tagTone(t.tag)}">${esc(t.tag)} <b>${t.count}</b></span>`).join('')}</div></div>` : ''}
+    ${gradeTotal ? `<div class="summary-grades"><h4>Conceitos informados</h4><div class="grade-bars">${grades.map(([g, n]) => `<div class="grade-col" title="${n} × ${g}"><span class="grade-bar" style="height:${(n / gradeTotal) * 100}%"></span><span>${g}</span></div>`).join('')}</div></div>` : ''}
+  </div>`;
+}
+
+function tagTone(tag) {
+  const t = state.boot.tags;
+  return t.positivo.includes(tag) ? 'pos' : t.negativo.includes(tag) ? 'neg' : 'neu';
+}
+
+function reviewCard(r, { show = 'course' } = {}) {
+  const course = state.course.get(r.course);
+  const prof = state.prof.get(r.professor);
+  const crit = state.boot.criteria.filter((c) => c.key !== 'overall');
+  const heading = show === 'course'
+    ? `<a href="#/disciplina/${encodeURIComponent(r.course)}">${esc(course?.name || r.course)}</a>`
+    : show === 'both'
+      ? `<a href="#/professor/${r.professor}">${esc(prof?.name || r.professor)}</a> · <a href="#/disciplina/${encodeURIComponent(r.course)}">${esc(course?.name || r.course)}</a>`
+      : `<a href="#/professor/${r.professor}">${esc(prof?.name || r.professor)}</a>`;
+  const paragraphs = esc(r.comment).split(/\n{2,}/).map((p) => `<p>${p.replace(/\n/g, '<br>')}</p>`).join('');
+  return `<article class="review" id="review-${r.id}">
+    <header class="review-head">
+      <span class="score-tile ${scoreClass(r.ratings.overall)}" aria-label="Nota geral ${r.ratings.overall} de 5">${r.ratings.overall}</span>
+      <div>
+        <h3>${heading}</h3>
+        <p class="muted small">${esc(r.term)}${r.verified ? ' · <span class="verified" title="Esta turma consta na oferta oficial publicada pelo DCC">✓ turma confirmada</span>' : ''}
+          · ${timeAgo(r.createdAt)}${r.updatedAt ? ' · editada' : ''}${r.status === 'held' ? ' · <span class="badge badge-warn">em revisão</span>' : ''}</p>
+      </div>
+    </header>
+    <ul class="review-metrics">
+      ${crit.map((c) => `<li><span>${esc(c.label)}</span>${pill(r.ratings[c.key], { neutral: c.neutral })}</li>`).join('')}
+      ${r.wouldRetake != null ? `<li><span>Faria de novo</span><b class="${r.wouldRetake ? 'yes' : 'no'}">${r.wouldRetake ? 'Sim' : 'Não'}</b></li>` : ''}
+      ${r.grade ? `<li><span>Conceito</span><b>${esc(r.grade)}</b></li>` : ''}
+    </ul>
+    ${r.tags.length ? `<div class="chips">${r.tags.map((t) => `<span class="chip ${tagTone(t)}">${esc(t)}</span>`).join('')}</div>` : ''}
+    <div class="review-text">${paragraphs}</div>
+    <footer class="review-foot">
+      ${r.mine
+        ? `<span class="muted small">Esta é a sua avaliação</span>
+           <a class="link-btn" href="#/avaliar?edit=${r.id}">Editar</a>
+           <button class="link-btn danger" data-action="delete-review" data-id="${r.id}">Apagar</button>`
+        : `<button class="helpful ${r.voted ? 'on' : ''}" data-action="helpful" data-id="${r.id}" aria-pressed="${!!r.voted}">▲ Útil <b>${r.helpful || ''}</b></button>
+           <button class="link-btn muted" data-action="report" data-id="${r.id}">Denunciar</button>`}
+    </footer>
+  </article>`;
+}
+
+function reviewsSection({ reviews, show, filterOptions, filterLabel, ctaHref, subjectName }) {
+  const opts = filterOptions?.length > 1
+    ? `<label class="select-inline">${esc(filterLabel)} <select data-filter="reviews"><option value="">Todas</option>${filterOptions.map((o) => `<option value="${esc(o.value)}">${esc(o.label)} (${o.count})</option>`).join('')}</select></label>` : '';
+  return `<section class="reviews-section" id="avaliacoes">
+    <div class="section-head">
+      <h2>Avaliações <span class="count">${reviews.length}</span></h2>
+      <div class="row-gap">${opts}
+        <label class="select-inline">Ordenar <select data-sort="reviews">
+          <option value="helpful">Mais úteis</option><option value="recent">Mais recentes</option><option value="high">Melhores notas</option><option value="low">Piores notas</option>
+        </select></label>
+      </div>
+    </div>
+    <div class="review-list" data-show="${show}">
+      ${reviews.length ? reviews.map((r) => reviewCard(r, { show })).join('') : `<div class="empty-state small-empty"><p>Ninguém avaliou ${esc(subjectName)} ainda.</p>${ctaHref ? `<a class="btn" href="${ctaHref}">Escrever a primeira avaliação</a>` : ''}</div>`}
+    </div>
+  </section>`;
+}
+
+function wireReviewList(reviews, show) {
+  const list = $('.review-list');
+  if (!list) return;
+  let filter = '';
+  let sort = 'helpful';
+  const redraw = () => {
+    const sorted = reviews.filter((r) => !filter || r.course === filter || r.professor === filter);
+    const by = {
+      helpful: (a, b) => b.helpful - a.helpful || b.createdAt - a.createdAt,
+      recent: (a, b) => b.createdAt - a.createdAt,
+      high: (a, b) => b.ratings.overall - a.ratings.overall || b.createdAt - a.createdAt,
+      low: (a, b) => a.ratings.overall - b.ratings.overall || b.createdAt - a.createdAt,
+    }[sort];
+    list.innerHTML = sorted.sort(by).map((r) => reviewCard(r, { show })).join('') || '<p class="muted">Nenhuma avaliação com esse filtro.</p>';
+  };
+  $('[data-filter="reviews"]')?.addEventListener('change', (e) => { filter = e.target.value; redraw(); });
+  $('[data-sort="reviews"]')?.addEventListener('change', (e) => { sort = e.target.value; redraw(); });
+  list._reviews = reviews;
+}
+
+// ---------------------------------------------------------------- ações globais (delegação)
+document.addEventListener('click', async (e) => {
+  const el = e.target.closest('[data-action]');
+  if (!el) return;
+  const { action, id } = el.dataset;
+  if (action === 'reload') { router(); return; }
+  if (action === 'helpful') {
+    e.preventDefault();
+    el.disabled = true;
+    try {
+      const res = await api(`/api/reviews/${id}/helpful`, { method: 'POST', body: {} });
+      el.classList.toggle('on', res.voted);
+      el.setAttribute('aria-pressed', String(res.voted));
+      el.querySelector('b').textContent = res.helpful || '';
+      const r = $('.review-list')?._reviews?.find((x) => String(x.id) === id);
+      if (r) { r.voted = res.voted; r.helpful = res.helpful; }
+    } catch (err) { toast(err.message, 'error'); }
+    el.disabled = false;
+  }
+  if (action === 'report') openReportDialog(id);
+  if (action === 'delete-review') {
+    if (!confirm('Apagar esta avaliação? Isso não pode ser desfeito.')) return;
+    try {
+      await api(`/api/reviews/${id}`, { method: 'DELETE' });
+      toast('Avaliação apagada.');
+      state.me = null;
+      await loadBoot(true);
+      router();
+    } catch (err) { toast(err.message, 'error'); }
+  }
+});
+
+// Aviso quando o semestre corrente ainda não tem oferta oficial: o que aparece como "atual" é a última publicada.
+// Nome que a oferta oficial traz mas não corresponde a ninguém da lista do DCC (substituto, só o primeiro nome…)
+function unidentified(o, fallback) {
+  if (!o.unresolved?.length) return fallback;
+  return `<span class="muted" title="Nome como aparece na oferta do DCC. Não foi possível identificar com segurança na lista de docentes (substituto, docente de outro departamento ou só o primeiro nome).">${esc(o.unresolved.join(', '))} <small>(não identificado)</small></span>`;
+}
+
+// Semestre importado do mapa de oferta do SIGAA (o DCC ainda não publicou a página oficial)
+const viaSigaa = (term) => state.boot.termSources?.[term] === 'SIGAA';
+
+function staleNotice(extra = '') {
+  const b = state.boot;
+  if (b.offerPublished || !b.communityTerm) return '';
+  return `<div class="notice" role="note"><svg class="ico" aria-hidden="true"><use href="#i-info"/></svg><div>
+    <b>A oferta de ${esc(b.currentTerm)} ainda não foi publicada pelo DCC.</b>
+    Turmas e horários marcados como “${esc(b.latestTerm)}” são da última oferta oficial. ${extra}</div></div>`;
+}
+
+// Turmas do semestre corrente informadas por estudantes (só existem enquanto a oferta oficial não sai).
+function communityBlock(community, { mode, subject }) {
+  if (!community) return '';
+  const t = esc(community.term);
+  const rows = community.items.map((it) => {
+    const p = state.prof.get(it.professor);
+    const c = state.course.get(it.course);
+    const label = mode === 'prof'
+      ? `<a href="#/disciplina/${encodeURIComponent(it.course)}"><b>${esc(c?.name || it.course)}</b></a> <span class="code">${esc(c ? courseCode(c) : '')}</span>`
+      : `<a class="prof-inline" href="#/professor/${it.professor}">${p ? avatar(p, 'sm') : ''} <span>${esc(p?.name || it.professor)}</span></a>`;
+    return `<li>${label}
+      <span class="small muted">${plural(it.count, 'estudante confirmou', 'estudantes confirmaram')}</span>
+      ${it.mine ? `<button class="link-btn small" data-creport="del" data-prof="${esc(it.professor)}" data-course="${esc(it.course)}">desfazer meu relato</button>`
+                : `<button class="btn btn-sm btn-ghost" data-creport="add" data-prof="${esc(it.professor)}" data-course="${esc(it.course)}">Confirmar</button>`}</li>`;
+  }).join('');
+  return `<section class="block community" id="comunidade">
+    <div class="section-head"><div><h2>Em ${t}, segundo estudantes</h2><p class="small muted">Não é dado oficial: some quando o DCC publicar a oferta de ${t}.</p></div>
+      <button class="btn btn-sm" data-creport="new">${mode === 'prof' ? `Informar disciplina de ${esc(subject)}` : 'Informar docente'}</button></div>
+    ${rows ? `<ul class="community-list">${rows}</ul>` : `<p class="muted small">Ninguém informou ainda. Sabe ${mode === 'prof' ? `o que ${esc(subject)} está dando` : 'quem está dando esta disciplina'} em ${t}?</p>`}
+  </section>`;
+}
+
+function wireCommunity({ professor, course, mode, reload }) {
+  const box = $('#comunidade');
+  if (!box) return;
+  const send = async (method, prof, crs) => {
+    try {
+      const res = await api('/api/class-reports', { method, body: { professor: prof, course: crs } });
+      toast(res.message || 'Feito.');
+      reload();
+    } catch (err) { toast(err.message, 'error'); }
+  };
+  box.addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-creport]');
+    if (!btn) return;
+    const kind = btn.dataset.creport;
+    if (kind === 'add') return send('POST', btn.dataset.prof, btn.dataset.course);
+    if (kind === 'del') return send('DELETE', btn.dataset.prof, btn.dataset.course);
+    // novo relato: escolhe a disciplina (página do docente) ou o docente (página da disciplina)
+    const b = state.boot;
+    const dlg = $('#dialog');
+    let options;
+    if (mode === 'prof') {
+      const prof = state.prof.get(professor);
+      const mine = new Set(prof?.courses || []);
+      const list = b.courses.filter((c) => c.active).sort((x, y) => (mine.has(y.id) - mine.has(x.id)) || (x.kind === y.kind ? x.name.localeCompare(y.name) : x.kind === 'regular' ? -1 : 1));
+      options = list.map((c) => `<option value="${esc(c.id)}">${esc(c.name)} — ${esc(c.codes.join('/'))}${mine.has(c.id) ? ' ★' : ''}</option>`).join('');
+    } else {
+      const crs = state.course.get(course);
+      const before = new Set(crs?.professors || []);
+      const list = b.professors.filter((p) => ['ativo', 'voluntario', 'externo', 'substituto'].includes(p.status)).sort((x, y) => (before.has(y.slug) - before.has(x.slug)) || x.name.localeCompare(y.name));
+      options = list.map((p) => `<option value="${esc(p.slug)}">${esc(p.name)}${before.has(p.slug) ? ' ★' : ''}</option>`).join('');
+    }
+    dlg.innerHTML = `<form method="dialog" class="dialog-body" id="creport-form">
+      <h2>${mode === 'prof' ? 'Qual disciplina?' : 'Qual docente?'}</h2>
+      <p class="muted">Informe só o que você sabe de fonte direta (está matriculado, viu no SIGA). ★ = já lecionou ${mode === 'prof' ? 'antes' : 'esta disciplina'}.</p>
+      <label class="field">${mode === 'prof' ? 'Disciplina' : 'Docente'}<select name="pick" required><option value="">Selecione…</option>${options}</select></label>
+      <div class="row-gap end"><button class="btn btn-ghost" value="cancel" formnovalidate>Cancelar</button><button class="btn" value="send">Informar turma de ${esc(b.communityTerm)}</button></div>
+    </form>`;
+    dlg.showModal();
+    $('#creport-form').addEventListener('submit', (ev) => {
+      if (ev.submitter?.value !== 'send') return;
+      ev.preventDefault();
+      const pick = new FormData(ev.target).get('pick');
+      if (!pick) return;
+      dlg.close();
+      send('POST', mode === 'prof' ? professor : pick, mode === 'prof' ? pick : course);
+    });
+  });
+}
+
+function openReportDialog(id) {
+  const dlg = $('#dialog');
+  dlg.innerHTML = `<form method="dialog" class="dialog-body" id="report-form">
+    <h2>Denunciar avaliação</h2>
+    <p class="muted">Denúncias são anônimas. Após ${3} denúncias a avaliação sai do ar até ser revisada.</p>
+    <fieldset class="radio-list">${state.boot.reportReasons.map((r, i) => `<label><input type="radio" name="reason" value="${esc(r)}" ${i === 0 ? 'checked' : ''}> ${esc(r)}</label>`).join('')}</fieldset>
+    <label class="field">Detalhes (opcional)<textarea name="detail" maxlength="300" rows="3"></textarea></label>
+    <div class="row-gap end"><button class="btn btn-ghost" value="cancel" formnovalidate>Cancelar</button><button class="btn" value="send">Enviar denúncia</button></div>
+  </form>`;
+  dlg.showModal();
+  $('#report-form').addEventListener('submit', async (e) => {
+    if (e.submitter?.value !== 'send') return;
+    e.preventDefault();
+    const fd = new FormData(e.target);
+    try {
+      const res = await api(`/api/reviews/${id}/report`, { method: 'POST', body: { reason: fd.get('reason'), detail: fd.get('detail') } });
+      toast(res.message);
+      dlg.close();
+    } catch (err) { toast(err.message, 'error'); }
+  });
+}
+
+// ---------------------------------------------------------------- páginas
+async function viewHome() {
+  setTitle('');
+  const b = state.boot;
+  const recent = await api('/api/reviews?sort=recent&limit=6').then((d) => d.reviews).catch(() => []);
+  const rated = b.professors.filter((p) => p.stats && p.stats.count >= 2 && (p.status === 'ativo' || p.status === 'voluntario'))
+    .sort((x, y) => y.stats.score - x.stats.score).slice(0, 6);
+  const live = b.courses.filter((c) => c.offeredNow && c.kind === 'regular');
+  const mostReviewed = b.courses.filter((c) => c.stats).sort((x, y) => y.stats.count - x.stats.count).slice(0, 6);
+  const featuredCourses = mostReviewed.length >= 3 ? mostReviewed : live.sort((x, y) => y.terms.length - x.terms.length || x.name.localeCompare(y.name)).slice(0, 6);
+  const activeCount = b.professors.filter((p) => p.status === 'ativo' || p.status === 'voluntario').length;
+  main.innerHTML = `
+  <section class="page">
+    <div class="hero">
+      <div class="hero-inner">
+        <div class="hero-copy">
+          <p class="eyebrow">Departamento de Ciência da Computação · UFMG · semestre ${esc(b.currentTerm || '')}</p>
+          <h1>Docentes, disciplinas e oportunidades do DCC em um só lugar</h1>
+          <p class="lead">Avaliações anônimas de estudantes, a oferta do semestre com montador de grade, provas antigas e chamadas de pesquisa do Departamento de Ciência da Computação da UFMG.</p>
+          <form class="hero-search" id="hero-search" role="search">
+            <input type="search" id="hero-q" placeholder="Ex.: Algoritmos I, DCC206, Eduardo…" aria-label="Buscar docente ou disciplina" autocomplete="off">
+            <button class="btn" type="submit">Buscar</button>
+            <div class="search-results hero-results" id="hero-results" hidden></div>
+          </form>
+          <div class="hero-actions"><a href="#/professores?sort=score">Docentes por avaliação</a><a href="#/disciplinas?now=1">Disciplinas de ${esc(b.latestTerm || '')}</a><a href="#/sobre">Como funciona</a></div>
+        </div>
+        <aside class="hero-card" aria-label="Números">
+          <div class="stat"><b>${b.totals.reviews}</b><span>${b.totals.reviews === 1 ? 'avaliação publicada' : 'avaliações publicadas'}</span></div>
+          <div class="stat"><b>${activeCount}</b><span>docentes em atividade</span></div>
+          <div class="stat"><b>${b.courses.filter((c) => c.active).length}</b><span>disciplinas e tópicos em oferta (${esc(b.activeTerms?.[0] || '')}–${esc(b.latestTerm || '')})</span></div>
+          <div class="stat"><b>${b.terms.length}</b><span>semestres de oferta oficial</span></div>
+        </aside>
+      </div>
+    </div>
+    <nav class="quick" aria-label="Atalhos">
+      <a href="#/oferta"><span class="q-ico"><svg class="ico"><use href="#i-calendar"/></svg></span><span><b>Montar minha grade</b><small>Oferta ${esc(b.latestTerm || '')} com notas e conflitos</small></span></a>
+      <a href="#/avaliar"><span class="q-ico"><svg class="ico"><use href="#i-pen"/></svg></span><span><b>Avaliar uma turma</b><small>Anônimo, sem cadastro</small></span></a>
+      <a href="#/disciplinas"><span class="q-ico"><svg class="ico"><use href="#i-book"/></svg></span><span><b>Comparar docentes</b><small>Quem já deu cada disciplina</small></span></a>
+      <a href="#/materiais"><span class="q-ico"><svg class="ico"><use href="#i-archive"/></svg></span><span><b>Materiais</b><small>Provas e listas de semestres anteriores</small></span></a>
+      <a href="#/oportunidades"><span class="q-ico"><svg class="ico"><use href="#i-briefcase"/></svg></span><span><b>Oportunidades</b><small>Bolsas de IC, pesquisa e estágios</small></span></a>
+    </nav>
+    ${rated.length ? `<div class="section-head"><div><p class="eyebrow">Destaques</p><h2>Docentes mais bem avaliados</h2></div><a href="#/professores?sort=score">Ver todos →</a></div>
+      <div class="grid grid-3">${rated.map(profCard).join('')}</div>` : ''}
+
+    <div class="section-head"><div><p class="eyebrow">${mostReviewed.length >= 3 ? 'Mais comentadas' : `Oferta ${esc(b.latestTerm || '')}`}</p><h2>${mostReviewed.length >= 3 ? 'Disciplinas mais avaliadas' : b.offerPublished ? 'Disciplinas deste semestre' : `Disciplinas da oferta ${esc(b.latestTerm || '')}`}</h2></div><a href="#/disciplinas">Todas as disciplinas →</a></div>
+    <div class="grid grid-2">${featuredCourses.map(courseRow).join('')}</div>
+
+    <div class="section-head"><div><p class="eyebrow">Comunidade</p><h2>Avaliações recentes</h2></div>${recent.length ? '' : ''}</div>
+    ${recent.length ? `<div class="review-grid">${recent.map((r) => reviewCard(r, { show: 'both' })).join('')}</div>`
+      : `<div class="empty-state callout"><h3>Ainda não há avaliações publicadas</h3><p>As avaliações aparecem aqui assim que forem publicadas. São anônimas e não exigem cadastro.</p><a class="btn" href="#/avaliar">Avaliar uma turma</a></div>`}
+
+    <div class="how">
+      <article><b>01</b><h3>Anonimato</h3><p>Sem conta, nome, e-mail ou matrícula. Seu navegador guarda um identificador aleatório; o servidor só conhece um hash dele.</p></article>
+      <article><b>02</b><h3>Ligado à oferta oficial</h3><p>Docentes, disciplinas e horários vêm do site do DCC. Avaliações de turmas que constam na oferta ganham o selo “turma confirmada”.</p></article>
+      <article><b>03</b><h3>Moderação</h3><p>Várias dimensões (didática, avaliações, dificuldade, carga), marcadores e comentários. Ataques pessoais não são publicados.</p></article>
+    </div>
+  </section>`;
+  setupInlineSearch($('#hero-q'), $('#hero-results'), $('#hero-search'));
+}
+
+function setupInlineSearch(input, box, form) {
+  let results = [];
+  const render = () => {
+    results = search(input.value, 6);
+    box.innerHTML = results.map((r) => `<a class="search-item" href="${r.href}">${r.type === 'prof' ? avatar(r.item, 'sm') : '<span class="search-kind" aria-hidden="true"><svg class="ico"><use href="#i-book"/></svg></span>'}<span><b>${esc(r.label)}</b><small>${esc(r.sub)}</small></span>${r.item.stats ? pill(r.item.stats.overall) : ''}</a>`).join('');
+    box.hidden = !results.length;
+  };
+  input.addEventListener('input', render);
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    if (results[0]) location.hash = results[0].href;
+    else if (input.value.trim()) location.hash = `#/professores?q=${encodeURIComponent(input.value.trim())}`;
+  });
+}
+
+// ---- lista de docentes
+async function viewProfessors({ params }) {
+  setTitle('Docentes');
+  const b = state.boot;
+  const areas = [...new Set(b.professors.flatMap((p) => p.areas))].sort((x, y) => x.localeCompare(y));
+  main.innerHTML = `<section class="page">
+    <div class="page-head"><p class="eyebrow">Diretório</p><h1>Docentes</h1><p class="lead-sm">Corpo docente do DCC/UFMG e quem mais lecionou disciplinas do departamento desde ${esc(b.terms[0])}.</p></div>
+    <form class="filters" id="filters" role="search">
+      <label class="field grow"><span class="sr-only">Buscar</span><input type="search" name="q" placeholder="Nome ou área de pesquisa…" value="${esc(params.get('q') || '')}"></label>
+      <label class="field"><span class="sr-only">Área</span><select name="area"><option value="">Todas as áreas</option>${areas.map((a) => `<option ${params.get('area') === a ? 'selected' : ''}>${esc(a)}</option>`).join('')}</select></label>
+      <label class="field"><span class="sr-only">Situação</span><select name="status">
+        <option value="atuais" ${!params.get('status') || params.get('status') === 'atuais' ? 'selected' : ''}>Em atividade</option>
+        <option value="agora" ${params.get('status') === 'agora' ? 'selected' : ''}>Lecionando em ${esc(b.latestTerm)}</option>
+        <option value="todos" ${params.get('status') === 'todos' ? 'selected' : ''}>Todos (inclui aposentados e externos)</option>
+      </select></label>
+      <label class="field"><span class="sr-only">Ordenar</span><select name="sort">
+        <option value="name">Nome (A–Z)</option>
+        <option value="score" ${params.get('sort') === 'score' ? 'selected' : ''}>Melhor avaliados</option>
+        <option value="count" ${params.get('sort') === 'count' ? 'selected' : ''}>Mais avaliados</option>
+        <option value="easy" ${params.get('sort') === 'easy' ? 'selected' : ''}>Menor dificuldade</option>
+      </select></label>
+    </form>
+    <p class="result-count muted" id="result-count" aria-live="polite"></p>
+    <div class="grid grid-3" id="prof-grid"></div>
+  </section>`;
+  const form = $('#filters');
+  const draw = () => {
+    const fd = new FormData(form);
+    const q = fold(fd.get('q'));
+    const area = fd.get('area');
+    const status = fd.get('status');
+    const sort = fd.get('sort');
+    let list = b.professors.filter((p) => {
+      if (status === 'atuais' && !['ativo', 'voluntario', 'substituto'].includes(p.status)) return false;
+      if (status === 'agora' && !p.teachingNow) return false;
+      if (area && !p.areas.includes(area)) return false;
+      if (q && !q.split(/\s+/).every((w) => fold(`${p.name} ${p.areas.join(' ')}`).includes(w))) return false;
+      return true;
+    });
+    const by = {
+      name: (x, y) => x.name.localeCompare(y.name),
+      score: (x, y) => (y.stats?.score ?? -1) - (x.stats?.score ?? -1) || x.name.localeCompare(y.name),
+      count: (x, y) => (y.stats?.count ?? 0) - (x.stats?.count ?? 0) || x.name.localeCompare(y.name),
+      easy: (x, y) => (x.stats?.difficulty ?? 9) - (y.stats?.difficulty ?? 9) || x.name.localeCompare(y.name),
+    }[sort];
+    list = list.sort(by);
+    $('#result-count').textContent = plural(list.length, 'docente', 'docentes');
+    $('#prof-grid').innerHTML = list.map(profCard).join('') || '<div class="empty-state"><p>Ninguém encontrado com esses filtros.</p></div>';
+    const qs = new URLSearchParams();
+    for (const [k, v] of fd) if (v && !(k === 'status' && v === 'atuais') && !(k === 'sort' && v === 'name')) qs.set(k, v);
+    setQuery(qs);
+  };
+  form.addEventListener('input', draw);
+  form.addEventListener('submit', (e) => e.preventDefault());
+  draw();
+}
+
+// ---- página do docente
+async function viewProfessor({ args, isCurrent }) {
+  const [slug] = args;
+  main.innerHTML = '<div class="loading-screen"><span class="spinner"></span></div>';
+  const data = await api(`/api/professors/${encodeURIComponent(slug)}`);
+  if (!isCurrent()) return;
+  const p = data.professor;
+  const boot = state.prof.get(slug) || {};
+  setTitle(p.name);
+  const links = [
+    p.room && `<span>Sala ${esc(p.room)}</span>`,
+    p.email && `<a href="mailto:${esc(p.email)}">${esc(p.email)}</a>`,
+    p.homepage && `<a href="${esc(p.homepage)}" target="_blank" rel="noreferrer">Página pessoal ↗</a>`,
+    p.lattes && `<a href="${esc(p.lattes)}" target="_blank" rel="noreferrer">Lattes ↗</a>`,
+    p.scholar && `<a href="${esc(p.scholar)}" target="_blank" rel="noreferrer">Google Scholar ↗</a>`,
+    p.dccUrl && `<a href="${esc(p.dccUrl)}" target="_blank" rel="noreferrer">Perfil no DCC ↗</a>`,
+  ].filter(Boolean);
+  const terms = [...new Set(data.history.map((h) => h.term))].sort();
+  const allTerms = data.termsTaught || terms; // contagem inclui semestres só com disciplinas hoje extintas
+  const current = data.history.filter((h) => h.term === state.boot.latestTerm);
+  const reviewCounts = {};
+  data.reviews.forEach((r) => { reviewCounts[r.course] = (reviewCounts[r.course] || 0) + 1; });
+  const activeCourses = data.courses.filter((c) => c.active || c.stats);
+  const oldCourses = data.courses.filter((c) => !c.active && !c.stats);
+  const published = state.boot.offerPublished;
+  main.innerHTML = `<section class="page">
+    <nav class="crumbs" aria-label="Trilha"><a href="#/professores">Docentes</a> <span>›</span> ${esc(p.name)}</nav>
+    ${staleNotice(data.community ? `Sabe o que ${esc(firstName(p.name))} está dando agora? <a href="#comunidade">Informe abaixo</a>.` : '')}
+    <header class="profile">
+      ${avatar(p, 'xl')}
+      <div class="profile-main">
+        <h1>${esc(p.name)}</h1>
+        <div class="badges">
+          <span class="badge">${STATUS_LABEL[p.status]}</span>
+          ${boot.teachingNow ? `<span class="badge badge-live">${published ? 'Lecionando em' : 'Na oferta de'} ${esc(state.boot.latestTerm)}</span>` : ''}
+          ${allTerms.length ? `<span class="badge">${plural(allTerms.length, 'semestre', 'semestres')} na oferta (${esc(allTerms[0])}–${esc(allTerms[allTerms.length - 1])})</span>` : ''}
+        </div>
+        ${p.areas?.length ? `<div class="chips">${p.areas.map((a) => `<a class="chip" href="#/professores?area=${encodeURIComponent(a)}&status=todos">${esc(a)}</a>`).join('')}</div>` : ''}
+        ${links.length ? `<p class="profile-links">${links.join('<span aria-hidden="true">·</span>')}</p>` : ''}
+      </div>
+      <div class="profile-cta"><a class="btn" href="#/avaliar?professor=${slug}">Avaliar ${esc(firstName(p.name))}</a></div>
+    </header>
+
+    ${summaryBlock(data.summary)}
+
+    ${communityBlock(data.community, { mode: 'prof', subject: firstName(p.name) })}
+
+    ${profOpportunities(data.opportunities, firstName(p.name))}
+
+    ${current.length ? `<section class="block"><h2>Turmas em ${esc(state.boot.latestTerm)}${published ? '' : ' <small class="muted">· última oferta oficial</small>'}</h2>
+      <ul class="turmas">${current.map((h) => {
+        const c = state.course.get(h.course);
+        return `<li><a href="#/disciplina/${encodeURIComponent(h.course)}"><b>${esc(c?.name || h.course)}</b></a> <span class="code">${esc(c?.kind === 'topico' ? courseCode(c) : (h.codes || []).join(' / '))}</span> ${fmtSchedule(h.schedule)}${h.plan ? ` <a class="small" href="${esc(h.plan)}" target="_blank" rel="noreferrer">plano de ensino ↗</a>` : ''}</li>`;
+      }).join('')}</ul></section>` : ''}
+
+    <section class="block">
+      <div class="section-head"><h2>Disciplinas</h2><span class="muted small">segundo a oferta oficial do DCC</span></div>
+      ${activeCourses.length ? `<div class="table-wrap"><table class="table">
+        <thead><tr><th>Disciplina</th><th>Semestres</th><th>Geral</th><th>Didática</th><th>Dificuldade</th><th>Carga</th><th></th></tr></thead>
+        <tbody>${activeCourses.map((c) => `<tr>
+          <td><a href="#/disciplina/${encodeURIComponent(c.id)}"><b>${esc(c.name)}</b></a><br><span class="code">${esc(courseCode(c))}</span></td>
+          <td>${c.terms.length ? `${c.terms.length}× <span class="muted small">(último ${esc(c.terms[c.terms.length - 1])})</span>` : '<span class="muted small">—</span>'}</td>
+          <td>${pill(c.stats?.overall)} <span class="muted small">${c.stats ? c.stats.count : ''}</span></td>
+          <td>${pill(c.stats?.didactics)}</td><td>${pill(c.stats?.difficulty, { neutral: true })}</td><td>${pill(c.stats?.workload, { neutral: true })}</td>
+          <td>${c.active ? `<a class="link-btn" href="#/avaliar?professor=${slug}&course=${encodeURIComponent(c.id)}">Avaliar</a>` : '<span class="small muted">fora de oferta</span>'}</td>
+        </tr>`).join('')}</tbody></table></div>` : '<p class="muted">Nenhuma disciplina em oferta nos últimos semestres.</p>'}
+      ${oldCourses.length ? `<p class="small muted old-courses">Também lecionou, em currículos ou temas que não são mais ofertados: ${oldCourses.map((c) => `<a href="#/disciplina/${encodeURIComponent(c.id)}">${esc(c.name)}</a> (${esc(c.terms[c.terms.length - 1])})`).join(', ')}.</p>` : ''}
+    </section>
+
+    ${terms.length ? `<details class="block history"><summary><h2>Histórico de turmas</h2><span class="muted small">${plural(data.history.length, 'turma', 'turmas')}</span></summary>
+      <div class="timeline">${terms.slice().reverse().map((t) => `<div class="timeline-term"><b>${esc(t)}</b><ul>${data.history.filter((h) => h.term === t).map((h) => {
+        const c = state.course.get(h.course);
+        const co = h.with.map((s) => state.prof.get(s)).filter(Boolean);
+        return `<li><a href="#/disciplina/${encodeURIComponent(h.course)}">${esc(c?.name || h.course)}</a> ${fmtSchedule(h.schedule)}${co.length ? ` <span class="muted small">com ${co.map((x) => `<a href="#/professor/${x.slug}">${esc(firstNameLast(x.name))}</a>`).join(', ')}</span>` : ''}${h.plan ? ` <a class="small" href="${esc(h.plan)}" target="_blank" rel="noreferrer">plano ↗</a>` : ''}</li>`;
+      }).join('')}</ul></div>`).join('')}</div></details>` : ''}
+
+    ${reviewsSection({
+      reviews: data.reviews, show: 'course', subjectName: firstName(p.name), ctaHref: `#/avaliar?professor=${slug}`, filterLabel: 'Disciplina',
+      filterOptions: Object.entries(reviewCounts).map(([id, count]) => ({ value: id, label: state.course.get(id)?.name || id, count })),
+    })}
+  </section>`;
+  wireReviewList(data.reviews, 'course');
+  wireCommunity({ professor: slug, mode: 'prof', reload: () => router() });
+}
+
+// ---- lista de disciplinas
+async function viewCourses({ params }) {
+  setTitle('Disciplinas');
+  const b = state.boot;
+  main.innerHTML = `<section class="page">
+    <div class="page-head"><p class="eyebrow">Catálogo</p><h1>Disciplinas</h1><p class="lead-sm">Disciplinas ofertadas pelo DCC de ${esc(b.activeTerms?.[0] || b.terms[0])} a ${esc(b.latestTerm)}. Versões de currículo (ex.: Estruturas de Dados DCC205 → DCC221) aparecem como uma só; tópicos especiais aparecem separados por tema.</p></div>
+    <form class="filters" id="filters" role="search">
+      <label class="field grow"><span class="sr-only">Buscar</span><input type="search" name="q" placeholder="Nome ou código (DCC206)…" value="${esc(params.get('q') || '')}"></label>
+      <label class="field"><span class="sr-only">Tipo</span><select name="kind">
+        <option value="">Regulares e tópicos</option>
+        <option value="regular" ${params.get('kind') === 'regular' ? 'selected' : ''}>Só disciplinas regulares</option>
+        <option value="topico" ${params.get('kind') === 'topico' ? 'selected' : ''}>Só tópicos especiais</option>
+      </select></label>
+      <label class="check"><input type="checkbox" name="now" value="1" ${params.get('now') ? 'checked' : ''}> Ofertadas em ${esc(b.latestTerm)}</label>
+      <label class="field"><span class="sr-only">Ordenar</span><select name="sort">
+        <option value="code">Código</option>
+        <option value="name" ${params.get('sort') === 'name' ? 'selected' : ''}>Nome (A–Z)</option>
+        <option value="score" ${params.get('sort') === 'score' ? 'selected' : ''}>Melhor avaliadas</option>
+        <option value="count" ${params.get('sort') === 'count' ? 'selected' : ''}>Mais avaliadas</option>
+        <option value="frequent" ${params.get('sort') === 'frequent' ? 'selected' : ''}>Mais ofertadas</option>
+      </select></label>
+    </form>
+    <p class="result-count muted" id="result-count" aria-live="polite"></p>
+    <div class="grid grid-2" id="course-grid"></div>
+  </section>`;
+  const form = $('#filters');
+  const draw = () => {
+    const fd = new FormData(form);
+    const q = fold(fd.get('q'));
+    const kind = fd.get('kind');
+    const now = fd.get('now');
+    const sort = fd.get('sort');
+    let list = b.courses.filter((c) => (!kind || c.kind === kind) && (!now || c.offeredNow) && c.active
+      && (!q || q.split(/\s+/).every((w) => fold(`${c.name} ${c.codes.join(' ')}`).includes(w))));
+    const by = {
+      code: (x, y) => (x.kind === y.kind ? (x.kind === 'regular' ? x.id.localeCompare(y.id) : x.name.localeCompare(y.name)) : x.kind === 'regular' ? -1 : 1),
+      name: (x, y) => x.name.localeCompare(y.name),
+      score: (x, y) => (y.stats?.score ?? -1) - (x.stats?.score ?? -1) || x.name.localeCompare(y.name),
+      count: (x, y) => (y.stats?.count ?? 0) - (x.stats?.count ?? 0) || x.name.localeCompare(y.name),
+      frequent: (x, y) => y.terms.length - x.terms.length || x.name.localeCompare(y.name),
+    }[sort];
+    list = list.sort(by);
+    $('#result-count').textContent = plural(list.length, 'disciplina', 'disciplinas');
+    $('#course-grid').innerHTML = list.map(courseRow).join('') || '<div class="empty-state"><p>Nenhuma disciplina com esses filtros.</p></div>';
+    const qs = new URLSearchParams();
+    for (const [k, v] of fd) if (v && !(k === 'sort' && v === 'code')) qs.set(k, v);
+    setQuery(qs);
+  };
+  form.addEventListener('input', draw);
+  form.addEventListener('submit', (e) => e.preventDefault());
+  draw();
+}
+
+// ---- página da disciplina
+async function viewCourse({ args, isCurrent }) {
+  const [id] = args;
+  main.innerHTML = '<div class="loading-screen"><span class="spinner"></span></div>';
+  let data;
+  try {
+    data = await api(`/api/courses/${encodeURIComponent(id)}`);
+  } catch (err) {
+    // disciplina extinta: leva para a que a substituiu no currículo atual
+    if (err.data?.successor && isCurrent()) { toast(err.message); location.replace(`#/disciplina/${encodeURIComponent(err.data.successor)}`); return; }
+    throw err;
+  }
+  if (!isCurrent()) return;
+  const c = data.course;
+  if (c.id !== id) history.replaceState(null, '', `#/disciplina/${encodeURIComponent(c.id)}`); // código antigo -> versão atual
+  setTitle(c.name);
+  const published = state.boot.offerPublished;
+  const otherCodes = c.kind === 'regular' ? c.codes.slice(1) : [];
+  const latest = state.boot.latestTerm;
+  const current = data.history.filter((h) => h.term === latest);
+  const reviewCounts = {};
+  data.reviews.forEach((r) => { reviewCounts[r.professor] = (reviewCounts[r.professor] || 0) + 1; });
+  const crit = state.boot.criteria;
+  main.innerHTML = `<section class="page">
+    <nav class="crumbs" aria-label="Trilha"><a href="#/disciplinas">Disciplinas</a> <span>›</span> ${esc(c.name)}</nav>
+    ${c.active ? staleNotice(data.community ? `Sabe quem está dando esta disciplina agora? <a href="#comunidade">Informe abaixo</a>.` : '') : `<div class="notice notice-old" role="note"><svg class="ico" aria-hidden="true"><use href="#i-info"/></svg><div>
+      <b>Fora de oferta desde ${esc(c.terms[c.terms.length - 1])}.</b> Esta disciplina (ou este tema) não aparece nas ofertas do DCC dos últimos dois anos — provavelmente é de um currículo antigo. O histórico e as avaliações antigas continuam aqui, mas ela não recebe novas avaliações.</div></div>`}
+    <header class="course-head">
+      <div>
+        <span class="code code-lg">${esc(c.kind === 'regular' ? c.codes[0] : courseCode(c))}</span>
+        <h1>${esc(c.name)}</h1>
+        ${otherCodes.length ? `<p class="small muted versions">Inclui ${otherCodes.length === 1 ? 'a versão' : 'as versões'} ${otherCodes.map((x) => `<span class="code">${esc(x)}</span>`).join(' ')} — mesmo conteúdo com código de outro currículo ou curso.</p>` : ''}
+        <div class="badges">
+          ${c.kind === 'topico' ? '<span class="badge">Tópico especial</span>' : ''}
+          <span class="badge">${plural(c.terms.length, 'semestre', 'semestres')} ofertada (${esc(c.terms[0])}–${esc(c.terms[c.terms.length - 1])})</span>
+          ${current.length ? `<span class="badge badge-live">${plural(current.length, 'turma', 'turmas')} em ${esc(latest)}</span>` : ''}
+        </div>
+      </div>
+      ${c.active ? `<div class="profile-cta"><a class="btn" href="#/avaliar?course=${encodeURIComponent(c.id)}">Avaliar esta disciplina</a></div>` : ''}
+    </header>
+
+    ${c.active || data.summary.count ? summaryBlock(data.summary, { subject: 'disciplina' }) : ''}
+
+    ${c.active ? communityBlock(data.community, { mode: 'course' }) : ''}
+
+    ${examsBlock(data.exams)}
+
+    ${current.length ? `<section class="block"><h2>Turmas em ${esc(latest)}${published ? '' : ' <small class="muted">· última oferta oficial</small>'}</h2>
+      <div class="turma-cards">${current.map((h) => `<div class="turma-card">
+        <div class="turma-profs">${h.professors.length ? h.professors.map((s) => { const p = state.prof.get(s); const st = data.professors.find((x) => x.slug === s)?.stats; return p ? `<div><a href="#/professor/${s}">${avatar(p, 'sm')} ${esc(p.name)}</a> ${pill(st?.overall, { title: st ? `${st.count} avaliação(ões) nesta disciplina` : 'sem avaliações nesta disciplina' })}</div>` : ''; }).join('') : unidentified(h, '<span class="muted">Docente a definir</span>')}</div>
+        <div>${fmtSchedule(h.schedule)}${h.class ? ` <span class="muted small">turma ${esc(h.class)}</span>` : ''}${otherCodes.length ? ` <span class="code">${esc(h.codes.join(' / '))}</span>` : ''}</div>
+        ${h.plan ? `<a class="small" href="${esc(h.plan)}" target="_blank" rel="noreferrer">Plano de ensino ↗</a>` : ''}
+      </div>`).join('')}</div>
+      <p class="small muted">Confirme sala e vagas no <a href="https://sistemas.ufmg.br/siga" target="_blank" rel="noreferrer">SIGA ↗</a>. <a href="#/oferta?q=${encodeURIComponent(c.codes[0])}">Adicionar à minha grade →</a></p>
+    </section>` : ''}
+
+    <section class="block">
+      <div class="section-head"><h2>Comparar docentes</h2><span class="muted small">notas apenas desta disciplina</span></div>
+      ${data.professors.length ? `<div class="table-wrap"><table class="table compare" id="compare">
+        <thead><tr><th data-k="name">Docente</th><th data-k="sections" class="num">Turmas</th><th data-k="last">Último</th>
+          ${crit.map((k) => `<th data-k="${k.key}" class="num" title="${esc(k.hint)}">${esc(k.label.replace('Avaliação geral', 'Geral').replace('Avaliações justas', 'Justiça').replace('Carga de trabalho', 'Carga'))}</th>`).join('')}
+          <th data-k="retake" class="num">Faria de novo</th><th data-k="count" class="num">Aval.</th></tr></thead>
+        <tbody></tbody></table></div>
+        <p class="small muted">Clique no cabeçalho para ordenar. Dificuldade e carga: valores maiores = mais pesada.</p>`
+        : '<p class="muted">Nenhum docente identificado na oferta para esta disciplina.</p>'}
+    </section>
+
+    <details class="block history"><summary><h2>Histórico de ofertas</h2><span class="muted small">${plural(data.history.length, 'turma', 'turmas')}</span></summary>
+      <div class="timeline">${[...new Set(data.history.map((h) => h.term))].sort().reverse().map((t) => `<div class="timeline-term"><b>${esc(t)}</b><ul>${data.history.filter((h) => h.term === t).map((h) => `<li>${h.professors.map((s) => { const p = state.prof.get(s); return p ? `<a href="#/professor/${s}">${esc(firstNameLast(p.name))}</a>` : ''; }).join(', ') || unidentified(h, '<span class="muted" title="A página oficial de oferta não traz o docente desta turma">docente não informado pelo DCC</span>')} ${fmtSchedule(h.schedule)}${otherCodes.length ? ` <span class="code">${esc(h.codes.join(' / '))}</span>` : ''}${h.plan ? ` <a class="small" href="${esc(h.plan)}" target="_blank" rel="noreferrer">plano ↗</a>` : ''}</li>`).join('')}</ul></div>`).join('')}</div>
+    </details>
+
+    ${reviewsSection({
+      reviews: data.reviews, show: 'prof', subjectName: 'esta disciplina', ctaHref: c.active ? `#/avaliar?course=${encodeURIComponent(c.id)}` : '', filterLabel: 'Docente',
+      filterOptions: Object.entries(reviewCounts).map(([slug, count]) => ({ value: slug, label: state.prof.get(slug)?.name || slug, count })),
+    })}
+  </section>`;
+  wireReviewList(data.reviews, 'prof');
+  wireCommunity({ course: c.id, mode: 'course', reload: () => router() });
+  const table = $('#compare');
+  if (table) {
+    let key = 'last';
+    let dir = -1;
+    const val = (p, k) => (k === 'name' ? p.name : k === 'sections' ? p.sections : k === 'last' ? (p.terms[p.terms.length - 1] || '') : p.stats?.[k] ?? null);
+    const draw = () => {
+      const rows = data.professors.slice().sort((a, b) => {
+        const x = val(a, key); const y = val(b, key);
+        if (x == null && y == null) return 0;
+        if (x == null) return 1;
+        if (y == null) return -1;
+        return (typeof x === 'string' ? x.localeCompare(y) : x - y) * dir;
+      });
+      $('tbody', table).innerHTML = rows.map((p) => `<tr class="${p.terms.includes(latest) ? 'row-live' : ''}">
+        <td><a class="prof-inline" href="#/professor/${p.slug}">${avatar(p, 'sm')} <span>${esc(p.name)}</span></a>${p.terms.includes(latest) ? ` <span class="badge badge-live">${esc(latest)}</span>` : ''}</td>
+        <td class="num">${p.sections || '—'}</td><td>${esc(p.terms[p.terms.length - 1] || '—')}</td>
+        ${crit.map((k) => `<td class="num">${pill(p.stats?.[k.key], { neutral: k.neutral })}</td>`).join('')}
+        <td class="num">${p.stats?.retake != null ? `${p.stats.retake}%` : '—'}</td><td class="num">${p.stats?.count || 0}</td></tr>`).join('');
+      $$('th', table).forEach((th) => th.setAttribute('aria-sort', th.dataset.k === key ? (dir > 0 ? 'ascending' : 'descending') : 'none'));
+    };
+    $('thead', table).addEventListener('click', (e) => {
+      const th = e.target.closest('th');
+      if (!th) return;
+      if (key === th.dataset.k) dir = -dir; else { key = th.dataset.k; dir = key === 'name' || key === 'difficulty' || key === 'workload' ? 1 : -1; }
+      draw();
+    });
+    draw();
+  }
+}
+
+// ---- oferta e montador de grade
+let offerClick = null;
+const SLOTS = ['07:30', '09:25', '11:10', '13:00', '14:55', '17:00', '19:00', '20:55'];
+const shiftOf = (start) => (start < '12:00' ? 'manha' : start < '18:50' ? 'tarde' : 'noite');
+const toMin = (t) => { const [h, m] = t.split(':').map(Number); return h * 60 + m; };
+
+async function viewOffer({ params, isCurrent }) {
+  const b = state.boot;
+  const term = b.terms.includes(params.get('term')) ? params.get('term') : b.latestTerm;
+  setTitle(`Oferta ${term}`);
+  main.innerHTML = '<div class="loading-screen"><span class="spinner"></span></div>';
+  const data = await api(`/api/offerings?term=${encodeURIComponent(term)}`);
+  if (!isCurrent()) return;
+  const key = `avalie-grade-${term}`;
+  let picked = new Set(store.get(key, []));
+  const offerings = data.offerings.map((o, i) => ({ ...o, uid: `${o.course}|${o.class || ''}|${o.professors.join(',')}|${o.schedule.map(fmtSlot).join(',')}|${i}` }));
+  // ids estáveis entre visitas: sem o índice quando possível
+  offerings.forEach((o) => { o.key = o.uid.replace(/\|\d+$/, ''); });
+  main.innerHTML = `<section class="page wide">
+    <div class="page-head"><p class="eyebrow">Planejamento</p><h1>Oferta ${esc(term)}</h1>
+      <p class="lead-sm">Turmas publicadas pelo DCC com a nota de cada docente <em>naquela disciplina</em>. Marque turmas para montar sua grade e ver conflitos de horário.</p></div>
+    ${term === b.latestTerm ? staleNotice('Use esta grade como referência e confira no SIGA.') : ''}
+    ${viaSigaa(term) ? `<div class="notice notice-old" role="note"><svg class="ico" aria-hidden="true"><use href="#i-info"/></svg><div><b>Oferta de ${esc(term)} obtida do mapa de oferta do SIGAA.</b> O DCC ainda não publicou a página deste semestre; quando publicar, ela passa a ser a fonte. Confirme sala e vagas no SIGA.</div></div>` : ''}
+    ${data.offerings.length && data.offerings.every((o) => !o.professors.length && !o.unresolved?.length) ? `<div class="notice notice-old" role="note"><svg class="ico" aria-hidden="true"><use href="#i-info"/></svg><div><b>A oferta oficial de ${esc(term)} não lista docentes.</b> A página publicada pelo DCC para este semestre traz só disciplina, turma e horário.</div></div>` : ''}
+    <form class="filters" id="filters" role="search">
+      <label class="field"><span class="sr-only">Semestre</span><select name="term">${b.terms.slice().reverse().map((t) => `<option ${t === term ? 'selected' : ''}>${esc(t)}</option>`).join('')}</select></label>
+      <label class="field grow"><span class="sr-only">Buscar</span><input type="search" name="q" placeholder="Disciplina, código ou docente…" value="${esc(params.get('q') || '')}"></label>
+      <label class="field"><span class="sr-only">Turno</span><select name="shift"><option value="">Qualquer turno</option><option value="manha">Manhã</option><option value="tarde">Tarde</option><option value="noite">Noite</option></select></label>
+      <label class="field"><span class="sr-only">Dia</span><select name="day"><option value="">Qualquer dia</option>${[1, 2, 3, 4, 5, 6].map((d) => `<option value="${d}">${DAYS[d]}</option>`).join('')}</select></label>
+      <label class="check"><input type="checkbox" name="fits" value="1"> Só o que cabe na grade</label>
+    </form>
+    <div class="offer-layout">
+      <div>
+        <p class="result-count muted" id="result-count" aria-live="polite"></p>
+        <div id="offer-list" class="offer-list"></div>
+      </div>
+      <aside class="planner" aria-label="Minha grade">
+        <div class="planner-head"><h2>Minha grade</h2><button class="link-btn" id="clear-grade" type="button">Limpar</button></div>
+        <div id="planner"></div>
+      </aside>
+    </div>
+  </section>`;
+  const form = $('#filters');
+  const pickedOfferings = () => offerings.filter((o) => picked.has(o.key));
+  const conflicts = (o, list) => list.filter((p) => p.key !== o.key && p.schedule.some((a) => o.schedule.some((x) => x.day === a.day && toMin(x.start) < toMin(a.end) && toMin(a.start) < toMin(x.end))));
+
+  const drawPlanner = () => {
+    const list = pickedOfferings();
+    const box = $('#planner');
+    if (!list.length) { box.innerHTML = '<p class="muted small">Clique em “+ grade” nas turmas para montar seu horário. A grade fica salva só neste navegador.</p>'; return; }
+    const days = [1, 2, 3, 4, 5, ...(list.some((o) => o.schedule.some((s) => s.day === 6)) ? [6] : [])];
+    const starts = [...new Set([...SLOTS, ...list.flatMap((o) => o.schedule.map((s) => s.start))])].sort();
+    const used = starts.filter((t) => list.some((o) => o.schedule.some((s) => s.start <= t && t < s.end)));
+    const rows = used.length ? used : SLOTS;
+    const hasConflict = list.some((o) => conflicts(o, list).length);
+    const hue = new Map([...new Set(list.map((o) => o.course))].map((c, i) => [c, Math.round((i * 137.5 + 95) % 360)]));
+    box.innerHTML = `<div class="week" style="--cols:${days.length}">
+      <div></div>${days.map((d) => `<div class="week-day">${DAYS[d]}</div>`).join('')}
+      ${rows.map((t) => `<div class="week-time">${t}</div>${days.map((d) => {
+        const here = list.filter((o) => o.schedule.some((s) => s.day === d && s.start <= t && t < s.end));
+        return `<div class="week-cell ${here.length > 1 ? 'clash' : ''}">${here.map((o) => `<span class="week-item" style="--h:${hue.get(o.course)}" title="${esc(state.course.get(o.course)?.name || '')}">${esc(shortCourse(o))}</span>`).join('')}</div>`;
+      }).join('')}`).join('')}
+    </div>
+    ${hasConflict ? '<p class="warn small">⚠ Há turmas com horários sobrepostos (em vermelho).</p>' : ''}
+    <ul class="planner-list">${list.map((o) => { const c = state.course.get(o.course); return `<li><span class="dot" style="--h:${hue.get(o.course)}"></span><a href="#/disciplina/${encodeURIComponent(o.course)}">${esc(c?.name || o.course)}</a> <span class="muted small">${esc(o.professors.map((s) => firstNameLast(state.prof.get(s)?.name || s)).join(', '))}</span><button class="link-btn unpick" data-unpick="${esc(o.key)}" aria-label="Remover">✕</button></li>`; }).join('')}</ul>
+    <p class="small muted">${plural(list.length, 'disciplina', 'disciplinas')} · ${list.reduce((a, o) => a + o.schedule.reduce((x, s) => x + (toMin(s.end) - toMin(s.start)), 0), 0) / 60 | 0}h/semana em sala</p>`;
+  };
+
+  const draw = () => {
+    const fd = new FormData(form);
+    if (fd.get('term') !== term) { const qs = new URLSearchParams({ term: fd.get('term') }); setQuery(qs, { replace: false }); return; }
+    const q = fold(fd.get('q'));
+    const shift = fd.get('shift');
+    const day = Number(fd.get('day'));
+    const fits = fd.get('fits');
+    const chosen = pickedOfferings();
+    const list = offerings.filter((o) => {
+      const c = state.course.get(o.course);
+      const hay = fold(`${c?.name} ${o.codes.join(' ')} ${o.professors.map((s) => state.prof.get(s)?.name).join(' ')}`);
+      if (q && !q.split(/\s+/).every((w) => hay.includes(w))) return false;
+      if (shift && !o.schedule.some((s) => shiftOf(s.start) === shift)) return false;
+      if (day && !o.schedule.some((s) => s.day === day)) return false;
+      if (fits && !picked.has(o.key) && conflicts(o, chosen).length) return false;
+      return true;
+    });
+    const groups = new Map();
+    list.forEach((o) => groups.set(o.course, [...(groups.get(o.course) || []), o]));
+    const sorted = [...groups].sort(([a], [b2]) => {
+      const ca = state.course.get(a); const cb = state.course.get(b2);
+      return (ca.kind === cb.kind ? 0 : ca.kind === 'regular' ? -1 : 1) || (ca.kind === 'regular' ? a.localeCompare(b2) : ca.name.localeCompare(cb.name));
+    });
+    $('#result-count').textContent = `${plural(list.length, 'turma', 'turmas')} em ${plural(groups.size, 'disciplina', 'disciplinas')}`;
+    $('#offer-list').innerHTML = sorted.map(([cid, items]) => {
+      const c = state.course.get(cid);
+      return `<article class="offer-course">
+        <header><a href="#/disciplina/${encodeURIComponent(cid)}"><span class="code">${esc(courseCode(c))}</span><h3>${esc(c.name)}</h3></a>${c.stats ? `<span class="small muted">disciplina: ${pill(c.stats.overall)} (${c.stats.count})</span>` : ''}</header>
+        <ul>${items.map((o) => {
+          const clash = conflicts(o, chosen);
+          const on = picked.has(o.key);
+          return `<li class="offer-row ${on ? 'on' : ''} ${clash.length && !on ? 'has-clash' : ''}">
+            <div class="offer-profs">${o.professors.length ? o.professors.map((s) => { const p = state.prof.get(s); const st = o.stats[s]; return p ? `<a href="#/professor/${s}" class="prof-inline">${avatar(p, 'sm')}<span>${esc(firstNameLast(p.name))}</span></a>${pill(st?.overall, { title: st ? `${st.count} avaliação(ões) de ${p.name} nesta disciplina` : 'Ainda sem avaliações nesta disciplina' })}` : ''; }).join(' ') : unidentified(o, '<span class="muted small" title="A página oficial de oferta não traz o docente desta turma">docente não informado pelo DCC</span>')}</div>
+            <div class="offer-time">${fmtSchedule(o.schedule)}${o.class ? ` <span class="muted small">${esc(o.class)}</span>` : ''}</div>
+            <div class="offer-actions">${o.plan ? `<a class="small" href="${esc(o.plan)}" target="_blank" rel="noreferrer" title="Plano de ensino">plano ↗</a>` : ''}
+              <button type="button" class="btn btn-sm ${on ? '' : 'btn-ghost'}" data-pick="${esc(o.key)}" aria-pressed="${on}" ${!o.schedule.length && !on ? 'title="Sem horário informado"' : ''}>${on ? '✓ na grade' : '+ grade'}</button></div>
+            ${clash.length && !on ? `<p class="clash-note small">Conflita com ${esc(clash.map((x) => shortCourse(x)).join(', '))}</p>` : ''}
+          </li>`;
+        }).join('')}</ul></article>`;
+    }).join('') || '<div class="empty-state"><p>Nenhuma turma com esses filtros.</p></div>';
+    drawPlanner();
+  };
+  const save = () => store.set(key, [...picked]);
+  if (offerClick) main.removeEventListener('click', offerClick);
+  offerClick = (e) => {
+    if (!$('#offer-list')) return;
+    const pick = e.target.closest('[data-pick]');
+    const unpick = e.target.closest('[data-unpick]');
+    if (pick) { const k = pick.dataset.pick; if (picked.has(k)) picked.delete(k); else picked.add(k); save(); draw(); }
+    if (unpick) { picked.delete(unpick.dataset.unpick); save(); draw(); }
+    if (e.target.id === 'clear-grade' && picked.size && confirm('Limpar a grade deste semestre?')) { picked = new Set(); save(); draw(); }
+  };
+  main.addEventListener('click', offerClick);
+  form.addEventListener('input', draw);
+  form.addEventListener('submit', (e) => e.preventDefault());
+  draw();
+}
+function shortCourse(o) {
+  const c = state.course.get(o.course);
+  if (!c) return o.course;
+  if (c.kind === 'topico') return c.name.length > 18 ? `${c.name.slice(0, 16)}…` : c.name;
+  return c.codes[0];
+}
+
+// ---- formulário de avaliação
+async function viewReviewForm({ params, isCurrent }) {
+  const b = state.boot;
+  const editId = params.get('edit');
+  let existing = null;
+  if (editId) {
+    const me = await loadMe(true);
+    existing = me.reviews.find((r) => String(r.id) === editId);
+    if (!existing) throw Object.assign(new Error('Essa avaliação não pertence a este navegador. Se você a escreveu em outro lugar, use o código de recuperação em “Minhas avaliações”.'), { status: 404 });
+  }
+  if (!isCurrent()) return;
+  setTitle(existing ? 'Editar avaliação' : 'Avaliar');
+  const draftKey = 'avalie-draft';
+  const draft = existing ? null : store.get(draftKey, null);
+  const init = existing || {
+    professor: params.get('professor') || draft?.professor || '',
+    course: params.get('course') || draft?.course || '',
+    term: draft?.term || '', ratings: draft?.ratings || {}, wouldRetake: draft?.wouldRetake ?? null,
+    grade: draft?.grade || '', tags: draft?.tags || [], comment: draft?.comment || '',
+  };
+  if ((params.get('professor') && draft?.professor && params.get('professor') !== draft.professor) || (params.get('course') && draft?.course && params.get('course') !== draft.course)) {
+    Object.assign(init, { term: '', ratings: {}, wouldRetake: null, grade: '', tags: [], comment: '' });
+  }
+  const profs = b.professors.slice().sort((x, y) => (['ativo', 'voluntario'].includes(y.status) - ['ativo', 'voluntario'].includes(x.status)) || x.name.localeCompare(y.name));
+  const termsAll = (() => {
+    const out = [];
+    let [y, s] = b.currentTerm.split('.').map(Number);
+    while (y > 2014) { out.push(`${y}.${s}`); if (s === 2) s = 1; else { s = 2; y -= 1; } }
+    return out;
+  })();
+  main.innerHTML = `<section class="page narrow">
+    <div class="page-head"><p class="eyebrow">${existing ? 'Editar' : 'Sua vez'}</p><h1>${existing ? 'Editar avaliação' : 'Como foi a turma?'}</h1>
+      <p class="lead-sm">Sem login e sem dados pessoais. Fale sobre a disciplina e as práticas de ensino — não sobre a vida pessoal de ninguém.</p></div>
+    <form id="review-form" class="review-form" novalidate>
+      <fieldset class="form-step"><legend><span>1</span> Turma</legend>
+        <label class="field">Docente
+          <input list="prof-list" id="f-prof" autocomplete="off" placeholder="Digite para buscar…" required value="${esc(state.prof.get(init.professor)?.name || '')}">
+          <datalist id="prof-list">${profs.map((p) => `<option value="${esc(p.name)}">${p.status !== 'ativo' ? STATUS_LABEL[p.status] : ''}</option>`).join('')}</datalist>
+          <small class="err" data-err="professor"></small>
+        </label>
+        <div class="two">
+          <label class="field">Disciplina<select id="f-course" required></select><small class="hint" id="course-hint"></small><small class="err" data-err="course"></small></label>
+          <label class="field">Semestre cursado<select id="f-term" required></select><small class="err" data-err="term"></small></label>
+        </div>
+      </fieldset>
+
+      <fieldset class="form-step"><legend><span>2</span> Notas</legend>
+        ${b.criteria.map((c) => `<div class="rating-field" role="radiogroup" aria-labelledby="lbl-${c.key}">
+          <div class="rating-label"><b id="lbl-${c.key}">${esc(c.label)}</b><small>${esc(c.hint)}</small></div>
+          <div class="rating-scale ${c.neutral ? 'neutral' : ''}">
+            ${[1, 2, 3, 4, 5].map((n) => `<label><input type="radio" name="${c.key}" value="${n}" ${init.ratings?.[c.key] === n ? 'checked' : ''}><span>${n}</span></label>`).join('')}
+          </div>
+          <div class="rating-ends"><small>${esc(c.low)}</small><small>${esc(c.high)}</small></div>
+          <small class="err" data-err="${c.key}"></small>
+        </div>`).join('')}
+      </fieldset>
+
+      <fieldset class="form-step"><legend><span>3</span> Detalhes <small>(opcionais, mas ajudam muito)</small></legend>
+        <div class="two">
+          <div class="field"><span>Faria de novo com este docente?</span>
+            <div class="segmented" role="radiogroup">
+              <label><input type="radio" name="retake" value="true" ${init.wouldRetake === true ? 'checked' : ''}><span>Sim</span></label>
+              <label><input type="radio" name="retake" value="false" ${init.wouldRetake === false ? 'checked' : ''}><span>Não</span></label>
+              <label><input type="radio" name="retake" value="" ${init.wouldRetake == null ? 'checked' : ''}><span>Prefiro não dizer</span></label>
+            </div></div>
+          <label class="field">Conceito obtido<select id="f-grade"><option value="">Prefiro não dizer</option>${b.grades.filter((g) => g !== 'Prefiro não dizer').map((g) => `<option ${init.grade === g ? 'selected' : ''}>${esc(g)}</option>`).join('')}</select></label>
+        </div>
+        <div class="field"><span>Marcadores <small class="muted">(até ${b.maxTags})</small></span>
+          ${Object.entries(b.tags).map(([tone, list]) => `<div class="chips tag-picker">${list.map((t) => `<label class="chip ${tone === 'positivo' ? 'pos' : tone === 'negativo' ? 'neg' : 'neu'}"><input type="checkbox" name="tags" value="${esc(t)}" ${init.tags?.includes(t) ? 'checked' : ''}><span>${esc(t)}</span></label>`).join('')}</div>`).join('')}
+          <small class="err" data-err="tags"></small>
+        </div>
+      </fieldset>
+
+      <fieldset class="form-step"><legend><span>4</span> Comentário</legend>
+        <label class="field"><span class="sr-only">Comentário</span>
+          <textarea id="f-comment" rows="7" maxlength="${b.comment.max}" placeholder="Como eram as aulas? E as provas e trabalhos? O que você gostaria de ter sabido antes de se matricular? Alguma dica para quem vai cursar?">${esc(init.comment)}</textarea>
+          <div class="mod-hints" id="mod-hints" aria-live="polite" hidden></div>
+          <div class="field-foot"><small class="err" data-err="comment"></small><small class="muted"><span id="count">0</span>/${b.comment.max} · mínimo ${b.comment.min}</small></div>
+        </label>
+        <ul class="tips small muted"><li>Seja específico: exemplos concretos ajudam mais que adjetivos.</li><li>Critique práticas, não pessoas. Ofensas, comentários sobre aparência ou vida pessoal e dados pessoais impedem a publicação — o formulário avisa enquanto você escreve.</li><li>Você poderá editar ou apagar depois, neste navegador.</li></ul>
+      </fieldset>
+      <input id="f-website" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" class="hp">
+      <div class="form-actions">
+        <button class="btn btn-lg" type="submit">${existing ? 'Salvar alterações' : 'Publicar avaliação'} <span aria-hidden="true">→</span></button>
+        ${existing ? `<a class="btn btn-ghost" href="#/minhas">Cancelar</a>` : '<button type="button" class="link-btn muted" id="clear-draft">Limpar formulário</button>'}
+      </div>
+      <p id="form-message" class="form-message" role="status"></p>
+    </form>
+  </section>`;
+
+  const profInput = $('#f-prof');
+  const courseSel = $('#f-course');
+  const termSel = $('#f-term');
+  const byName = new Map(b.professors.map((p) => [fold(p.name), p.slug]));
+  const currentProf = () => byName.get(fold(profInput.value.trim())) || '';
+  const fillCourses = (keep) => {
+    const slug = currentProf();
+    const prof = state.prof.get(slug);
+    const usable = (c) => c && (c.active || c.id === keep || c.id === init.course); // fora de oferta: só ao editar uma avaliação antiga
+    const taught = prof ? [...new Set(prof.courses.map((id) => state.course.get(id)))].filter(usable) : [];
+    const taughtIds = new Set(taught.map((c) => c.id));
+    const others = b.courses.filter((c) => !taughtIds.has(c.id) && usable(c)).sort((x, y) => (x.kind === y.kind ? x.name.localeCompare(y.name) : x.kind === 'regular' ? -1 : 1));
+    const opt = (c) => `<option value="${esc(c.id)}" ${keep === c.id ? 'selected' : ''}>${esc(c.name)} — ${esc(c.codes.join('/'))}</option>`;
+    courseSel.innerHTML = `<option value="">Selecione…</option>
+      ${taught.length ? `<optgroup label="Lecionadas por ${esc(firstName(prof.name))} (oferta oficial)">${taught.map(opt).join('')}</optgroup>` : ''}
+      <optgroup label="${taught.length ? 'Outras disciplinas' : 'Todas as disciplinas'}">${others.map(opt).join('')}</optgroup>`;
+    $('#course-hint').textContent = prof && !taught.length ? 'Não encontramos turmas deste docente na oferta publicada — escolha na lista completa.' : '';
+    fillTerms(termSel.value || init.term);
+  };
+  const fillTerms = (keep) => {
+    const slug = currentProf();
+    const cid = courseSel.value;
+    const pairTerms = new Set(slug && cid ? [] : []);
+    if (slug && cid) {
+      // termos em que esse docente deu essa disciplina (busca leve no catálogo de oferta via perfil)
+      (state.pairCache?.[`${slug}|${cid}`] || []).forEach((t) => pairTerms.add(t));
+    }
+    const confirmed = termsAll.filter((t) => pairTerms.has(t));
+    const rest = termsAll.filter((t) => !pairTerms.has(t));
+    termSel.innerHTML = `<option value="">Selecione…</option>${confirmed.length ? `<optgroup label="Turmas confirmadas na oferta">${confirmed.map((t) => `<option ${keep === t ? 'selected' : ''}>${t}</option>`).join('')}</optgroup>` : ''}<optgroup label="${confirmed.length ? 'Outros semestres' : 'Semestre'}">${rest.map((t) => `<option ${keep === t ? 'selected' : ''}>${t}</option>`).join('')}</optgroup>`;
+  };
+  // carrega termos confirmados (pares docente×disciplina) sob demanda
+  state.pairCache = state.pairCache || {};
+  const loadPairs = async () => {
+    const slug = currentProf();
+    if (!slug || state.pairCache[`${slug}|*`]) return;
+    try {
+      const d = await api(`/api/professors/${slug}`);
+      d.courses.forEach((c) => { state.pairCache[`${slug}|${c.id}`] = c.terms; });
+      state.pairCache[`${slug}|*`] = true;
+      fillTerms(termSel.value);
+    } catch (_) { /* segue sem sugestões */ }
+  };
+  init.course = state.course.get(init.course)?.id || init.course; // rascunho/link com código antigo
+  fillCourses(init.course);
+  loadPairs();
+  profInput.addEventListener('change', () => { fillCourses(courseSel.value); loadPairs(); });
+  profInput.addEventListener('input', () => { if (currentProf()) { fillCourses(courseSel.value); loadPairs(); } });
+  // Sem docente escolhido: quem lecionou a disciplina selecionada aparece primeiro nas sugestões.
+  const fillProfs = () => {
+    const course = state.course.get(courseSel.value);
+    const first = new Set(course ? course.professors : []);
+    const ordered = [...profs.filter((p) => first.has(p.slug)), ...profs.filter((p) => !first.has(p.slug))];
+    $('#prof-list').innerHTML = ordered.map((p) => `<option value="${esc(p.name)}">${first.has(p.slug) ? `Lecionou ${esc(course.name)}` : p.status !== 'ativo' ? STATUS_LABEL[p.status] : ''}</option>`).join('');
+  };
+  fillProfs();
+  courseSel.addEventListener('change', () => { fillTerms(termSel.value); if (!currentProf()) fillProfs(); });
+
+  const form = $('#review-form');
+  const comment = $('#f-comment');
+  const count = () => { $('#count').textContent = comment.value.trim().length; };
+  comment.addEventListener('input', count);
+  // Checagem enquanto digita (moderation.py no servidor): mostra o que impediria a publicação antes de enviar
+  let modTimer;
+  let modSeq = 0;
+  const showHints = (issues) => {
+    const box = $('#mod-hints');
+    if (!issues.length) { box.hidden = true; box.innerHTML = ''; return; }
+    const reject = issues.filter((i) => i.action === 'reject');
+    const hold = issues.filter((i) => i.action === 'hold');
+    box.hidden = false;
+    box.className = `mod-hints ${reject.length ? 'is-reject' : 'is-hold'}`;
+    box.innerHTML = `<b>${reject.length ? 'Ajuste antes de enviar:' : 'Vai passar por uma pessoa antes de publicar:'}</b><ul>${[...reject, ...hold]
+      .map((i) => `<li>${esc(i.message)}${i.evidence ? ` <span class="mod-evidence">trecho: “${esc(i.evidence)}”</span>` : ''}</li>`).join('')}</ul>`;
+  };
+  const checkComment = async () => {
+    const text = comment.value.trim();
+    const seq = ++modSeq;
+    if (text.length < 15) { showHints([]); return; }
+    try {
+      const res = await api('/api/moderation/check', { method: 'POST', body: { comment: text, professor: currentProf() } });
+      if (seq === modSeq) showHints(res.issues);
+    } catch (_) { /* a validação do envio continua valendo */ }
+  };
+  comment.addEventListener('input', () => { clearTimeout(modTimer); modTimer = setTimeout(checkComment, 600); });
+  if (comment.value.trim()) checkComment();
+  count();
+  form.addEventListener('change', (e) => {
+    if (e.target.name === 'tags') {
+      const checked = $$('input[name="tags"]:checked', form);
+      if (checked.length > b.maxTags) { e.target.checked = false; toast(`Escolha no máximo ${b.maxTags} marcadores.`, 'error'); }
+    }
+  });
+  const collect = () => {
+    const fd = new FormData(form);
+    const ratings = {};
+    b.criteria.forEach((c) => { if (fd.get(c.key)) ratings[c.key] = Number(fd.get(c.key)); });
+    const retake = fd.get('retake');
+    return {
+      professor: currentProf(), course: courseSel.value, term: termSel.value, ratings,
+      wouldRetake: retake === 'true' ? true : retake === 'false' ? false : null,
+      grade: $('#f-grade').value || null, tags: fd.getAll('tags'), comment: comment.value, website: $('#f-website').value,
+    };
+  };
+  if (!existing) {
+    form.addEventListener('input', () => store.set(draftKey, collect()));
+    $('#clear-draft')?.addEventListener('click', () => { store.del(draftKey); location.hash = '#/avaliar'; router(); });
+  }
+  const showErrors = (fields = {}) => {
+    $$('[data-err]', form).forEach((el) => { el.textContent = fields[el.dataset.err] || ''; });
+    const first = Object.keys(fields)[0];
+    if (first) $(`[data-err="${first}"]`, form)?.closest('.field, .rating-field')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  };
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const payload = collect();
+    const errors = {};
+    if (!payload.professor) errors.professor = 'Escolha um docente da lista.';
+    if (!payload.course) errors.course = 'Escolha a disciplina.';
+    if (!payload.term) errors.term = 'Escolha o semestre.';
+    b.criteria.forEach((c) => { if (!payload.ratings[c.key]) errors[c.key] = 'Escolha uma nota.'; });
+    if (payload.comment.trim().length < b.comment.min) errors.comment = `Escreva pelo menos ${b.comment.min} caracteres.`;
+    showErrors(errors);
+    if (Object.keys(errors).length) { $('#form-message').textContent = 'Revise os campos destacados.'; return; }
+    const btn = $('button[type="submit"]', form);
+    btn.disabled = true;
+    $('#form-message').textContent = 'Enviando…';
+    try {
+      const res = await api(existing ? `/api/reviews/${existing.id}` : '/api/reviews', { method: existing ? 'PUT' : 'POST', body: payload });
+      store.del(draftKey);
+      state.me = null;
+      await loadBoot(true);
+      toast(res.message, res.held ? 'warn' : 'ok');
+      location.hash = res.held ? '#/minhas' : `#/professor/${payload.professor}`;
+    } catch (err) {
+      btn.disabled = false;
+      $('#form-message').textContent = err.message;
+      if (err.data?.fields) showErrors(err.data.fields);
+      if (err.status === 409 && err.data?.reviewId) {
+        $('#form-message').innerHTML = `${esc(err.message)} <a href="#/avaliar?edit=${err.data.reviewId}">Editar a avaliação existente →</a>`;
+      }
+    }
+  });
+}
+
+// ---- minhas avaliações
+async function viewMine() {
+  setTitle('Minhas avaliações');
+  const me = await loadMe(true);
+  main.innerHTML = `<section class="page narrow">
+    <div class="page-head"><p class="eyebrow">Neste navegador</p><h1>Minhas avaliações</h1>
+      <p class="lead-sm">Suas avaliações ficam ligadas a um identificador anônimo guardado neste navegador. Ninguém — nem nós — consegue saber quem as escreveu.</p></div>
+    ${me.reviews.length ? `<div class="review-list">${me.reviews.map((r) => reviewCard(r, { show: 'both' })).join('')}</div>`
+      : `<div class="empty-state callout"><h3>Nenhuma avaliação por aqui</h3><p>Se você avaliou em outro navegador ou celular, use o código de recuperação abaixo.</p><a class="btn" href="#/avaliar">Escrever uma avaliação</a></div>`}
+    <section class="block recovery" id="recuperacao">
+      <h2>Código de recuperação</h2>
+      <p class="muted">Use para continuar editando suas avaliações em outro navegador. <b>Guarde em segredo</b>: quem tiver o código pode editar e apagar suas avaliações.</p>
+      <div class="row-gap">
+        ${me.hasIdentity ? '<button class="btn btn-ghost" id="show-code" type="button">Mostrar meu código</button>' : '<span class="muted small">Este navegador ainda não tem um código (ele é criado na primeira avaliação).</span>'}
+        <code id="code-box" class="code-box" hidden></code>
+        <button class="btn btn-ghost btn-sm" id="copy-code" type="button" hidden>Copiar</button>
+      </div>
+      <form class="row-gap" id="restore-form">
+        <label class="field grow"><span>Tenho um código</span><input name="code" autocomplete="off" spellcheck="false" placeholder="Cole aqui o código de 43 caracteres"></label>
+        <button class="btn" type="submit">Recuperar</button>
+      </form>
+    </section>
+  </section>`;
+  $('#show-code')?.addEventListener('click', async () => {
+    try {
+      const { code } = await api('/api/me/code');
+      $('#code-box').textContent = code;
+      $('#code-box').hidden = false;
+      $('#copy-code').hidden = false;
+    } catch (err) { toast(err.message, 'error'); }
+  });
+  $('#copy-code')?.addEventListener('click', async () => {
+    try { await navigator.clipboard.writeText($('#code-box').textContent); toast('Código copiado.'); } catch (_) { toast('Selecione e copie manualmente.', 'warn'); }
+  });
+  $('#restore-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const code = new FormData(e.target).get('code').trim();
+    if (me.hasIdentity && me.reviews.length && !confirm('Este navegador já tem avaliações. Ao recuperar outro código, elas deixam de aparecer aqui (a não ser que você guarde o código atual). Continuar?')) return;
+    try {
+      const res = await api('/api/me/restore', { method: 'POST', body: { code } });
+      toast(res.message);
+      state.me = null;
+      router();
+    } catch (err) { toast(err.message, 'error'); }
+  });
+}
+
+// ---- sobre
+async function viewAbout() {
+  setTitle('Como funciona');
+  const b = state.boot;
+  main.innerHTML = `<section class="page narrow prose">
+    <div class="page-head"><p class="eyebrow">Sobre</p><h1>Como funciona</h1>
+      <p class="lead-sm">O DCCHub reúne o que estudantes do DCC precisam para escolher e cursar disciplinas: avaliações anônimas, a oferta do semestre, provas antigas e oportunidades de pesquisa — com transparência sobre os dados e respeito a quem ensina.</p></div>
+
+    <p class="notice notice-old" role="note"><span><b>Projeto independente de estudantes.</b> O DCCHub não tem vínculo com o DCC nem com a UFMG e não fala em nome deles. É feito pela e para a comunidade estudantil; os dados de oferta, docentes, materiais e oportunidades vêm de fontes públicas ou da própria comunidade.</span></p>
+
+    <h2 id="avaliar">O que você avalia</h2>
+    <ul>${b.criteria.map((c) => `<li><b>${esc(c.label)}</b> — ${esc(c.hint)} (1 = ${esc(c.low.toLowerCase())}, 5 = ${esc(c.high.toLowerCase())}).</li>`).join('')}</ul>
+    <p>Também dá para dizer se faria a disciplina de novo com o mesmo docente, o conceito obtido e marcadores como “Listas de exercícios” ou “Provas difíceis”. Cada pessoa avalia uma vez cada combinação de docente e disciplina, e pode editar quando quiser.</p>
+
+    <h2 id="notas">Como as notas são calculadas</h2>
+    <p>As notas exibidas são médias simples. Para <b>ordenar rankings</b> usamos uma média bayesiana, que puxa para a média geral quem tem poucas avaliações — assim uma única nota 5 não coloca ninguém no topo.</p>
+    <p>A nota mostrada ao lado de cada docente em uma disciplina considera apenas avaliações <em>daquela disciplina</em>: o mesmo docente pode ser ótimo em uma optativa e exigente em uma obrigatória.</p>
+
+    <h2 id="privacidade">Privacidade</h2>
+    <ul>
+      <li>Sem cadastro: não pedimos nome, e-mail ou matrícula.</li>
+      <li>Seu navegador recebe um identificador aleatório (cookie <code>HttpOnly</code>). O banco guarda apenas um <abbr title="HMAC-SHA256 com chave secreta do servidor">hash</abbr> dele — usado só para impedir avaliações repetidas e permitir edição.</li>
+      <li>O servidor não registra endereços IP em logs. O IP é usado apenas em memória, por alguns minutos, para limitar abusos.</li>
+      <li>Sem Google Fonts, analytics ou qualquer recurso de terceiros: fotos e dados são servidos pelo próprio site.</li>
+    </ul>
+
+    <h2 id="regras">Regras da comunidade</h2>
+    <ul>
+      <li>Fale da disciplina e das práticas de ensino. Nada de aparência, vida pessoal ou boatos.</li>
+      <li>Críticas são bem-vindas; ofensas não. Um filtro automático confere cada comentário enquanto você escreve e não deixa publicar palavrões, xingamentos, comentários sobre aparência, idade ou vida pessoal, ameaças, boatos, discriminação e dados pessoais — ele mostra o trecho e você reescreve na hora.</li>
+      <li>Denúncias graves (assédio, abuso, crimes) não são publicadas aqui: o lugar certo é a Ouvidoria da UFMG ou o DCE, que têm canais sigilosos.</li>
+      <li>Acusações de discriminação (machismo, racismo…) são lidas por uma pessoa da moderação antes de publicar.</li>
+      <li>Qualquer pessoa pode denunciar uma avaliação. Com ${3} denúncias ela sai do ar até ser revisada.</li>
+      <li>Docentes que se sentirem expostos de forma injusta podem usar o botão “Denunciar”.</li>
+    </ul>
+
+    <h2 id="dados">De onde vêm os dados</h2>
+    <p>A lista de docentes (com áreas de pesquisa e contatos) vem de <a href="${esc(b.sources.professors || 'https://dcc.ufmg.br/professores/')}" target="_blank" rel="noreferrer">dcc.ufmg.br/professores</a>. Disciplinas, turmas, horários e planos de ensino vêm das páginas públicas de <b>oferta de disciplinas</b> do DCC (${esc(b.terms[0])} a ${esc(b.latestTerm)}).</p>
+    <p id="versoes">Quando o currículo muda, a disciplina ganha um código novo e o antigo continua sendo ofertado por um tempo para quem está na versão anterior (ex.: <b>Estruturas de Dados</b> DCC205 → DCC221, <b>PDS II</b> DCC204 → DCC219, <b>Redes</b> DCC023 → DCC095). Aqui as versões aparecem como <b>uma só disciplina</b>, com todas as turmas e avaliações juntas. Disciplinas <b>extintas</b> — de currículos antigos, como Algoritmos e Estruturas de Dados I e II, ou que não aparecem em nenhuma oferta dos últimos dois anos (${esc(b.activeTerms?.[0] || '')}–${esc(b.latestTerm)}) — não aparecem no site. Quando há uma sucessora (ex.: Introdução à Ciência da Computação DCC050 e Fundamentos de SI DCC044 → Introdução à Computação DCC096, do tronco comum), links antigos levam a ela.</p>
+    <h3 id="atual">E o semestre atual?</h3>
+    <p>O site só mostra como oferta oficial o que o DCC publica. ${b.offerPublished ? `A oferta de ${esc(b.latestTerm)} já está publicada.` : `<b>A oferta de ${esc(b.currentTerm)} ainda não foi publicada</b>, então as turmas “atuais” exibidas são as de ${esc(b.latestTerm)}.`} Enquanto a oferta não sai, estudantes podem <b>informar quem está dando cada disciplina</b> na página do docente ou da disciplina. Esses relatos aparecem separados, com o número de pessoas que confirmaram, e somem quando a oferta oficial é publicada.</p>
+    <p id="materiais">A seção <a href="#/materiais">Materiais</a> aponta para o <b>newCompleaks</b>, acervo público de provas e materiais mantido pelos estudantes no Google Drive. O site só guarda os links e a contagem de arquivos de cada pasta (<code>scripts/sync_provas.py</code>); o conteúdo continua no Drive, e nada é carregado de lá ao navegar aqui.</p>
+    <p>Disciplinas de <b>tópicos especiais</b> (DCC030, DCC049, DCC831…) mudam de tema a cada semestre, então cada tema aparece como uma disciplina própria. Algumas ofertas antigas listam só o primeiro nome do docente; quando não foi possível identificar com segurança, a turma aparece como “docente não informado”.</p>
+    <p class="muted small">Última sincronização: ${b.generatedAt ? new Date(b.generatedAt).toLocaleString('pt-BR') : '—'}. ${b.sources.offerings ? `${b.sources.offerings.length} páginas de oferta lidas.` : ''}</p>
+
+    <h2 id="faq">Perguntas frequentes</h2>
+    <details><summary>Perdi minhas avaliações ao trocar de navegador.</summary><p>Elas continuam publicadas. Para voltar a editá-las, use o código de recuperação em <a href="#/minhas">Minhas avaliações</a> no navegador antigo e cole no novo.</p></details>
+    <details><summary>Não encontro um docente ou disciplina.</summary><p>Mostramos quem está no site do DCC e quem aparece na oferta desde 2020. Substitutos são identificados pela página oficial de professores substitutos do DCC; docentes de outros departamentos aparecem como “externo”. Quando a oferta traz só um apelido que não dá para identificar com segurança, a turma mostra esse nome com “(não identificado)”. Se faltar alguém, avise o centro acadêmico.</p></details>
+    <details><summary>O que significa “turma confirmada”?</summary><p>Que a oferta oficial do DCC lista aquele docente naquela disciplina no semestre informado. Não confirma que quem avaliou cursou a turma — isso é impossível sem identificar a pessoa.</p></details>
+    <details><summary>Posso avaliar uma disciplina de outro departamento?</summary><p>Por enquanto só disciplinas ofertadas pelo DCC.</p></details>
+  </section>`;
+}
+
+// ---- materiais (acervo newCompleaks no Google Drive: só links, nada é carregado do Drive)
+const filesLabel = (n) => (n ? plural(n, 'arquivo', 'arquivos') : 'pasta vazia');
+
+async function viewProvas({ params, isCurrent }) {
+  setTitle('Materiais');
+  main.innerHTML = '<div class="loading-screen"><span class="spinner"></span></div>';
+  const data = await api('/api/provas');
+  if (!isCurrent()) return;
+  const total = data.sections.reduce((n, s) => n + s.courses.reduce((m, c) => m + c.files, 0), 0);
+  const guide = data.extras.find((e) => /bem vindo/i.test(e.title));
+  const extras = data.extras.filter((e) => e !== guide);
+  main.innerHTML = `<section class="page">
+    <div class="page-head"><p class="eyebrow">Acervo dos estudantes</p><h1>Materiais</h1>
+      <p class="lead-sm">Provas, listas e materiais de semestres anteriores reunidos pelos estudantes no <b>${esc(data.name)}</b>, uma pasta pública no Google Drive organizada por período. São ${total.toLocaleString('pt-BR')} arquivos; os links abrem o Drive em outra aba.</p></div>
+    <div class="exam-intro">
+      <a class="btn" href="${esc(data.url)}" target="_blank" rel="noreferrer">Abrir o acervo completo ↗</a>
+      ${guide ? `<a class="btn btn-ghost" href="${esc(guide.url)}" target="_blank" rel="noreferrer">Como contribuir ↗</a>` : ''}
+      ${extras.length ? `<span class="small muted">Também no acervo: ${extras.map((e) => `<a href="${esc(e.url)}" target="_blank" rel="noreferrer">${esc(e.title)}</a>`).join(' · ')}</span>` : ''}
+    </div>
+    <form class="filters" id="filters" role="search">
+      <label class="field grow"><span class="sr-only">Buscar</span><input type="search" name="q" placeholder="Disciplina ou código (DCC205)…" value="${esc(params.get('q') || '')}"></label>
+      <label class="check"><input type="checkbox" name="all" value="1" ${params.get('all') ? 'checked' : ''}> Mostrar pastas vazias</label>
+    </form>
+    <div id="exam-list"></div>
+  </section>`;
+  const form = $('#filters');
+  const draw = () => {
+    const fd = new FormData(form);
+    const q = fold(fd.get('q') || '');
+    const all = fd.get('all');
+    const match = (c) => (all || c.files) && (!q || q.split(/\s+/).every((w) => fold(`${c.code} ${c.title} ${state.course.get(c.course)?.name || ''} ${(state.course.get(c.course)?.codes || []).join(' ')}`).includes(w)));
+    const html = data.sections.map((sec) => {
+      const rows = sec.courses.filter(match);
+      const folders = (q ? [] : sec.folders).filter((f) => all || f.files);
+      if (!rows.length && !folders.length) return '';
+      return `<section class="exam-section"><div class="section-head"><h2>${esc(sec.title)}</h2><a class="small" href="${esc(sec.url)}" target="_blank" rel="noreferrer">Pasta no Drive ↗</a></div>
+        <ul class="exam-list">${rows.map((c) => {
+          const course = state.course.get(c.course);
+          return `<li class="${c.files ? '' : 'empty'}">
+            <div class="exam-main"><span class="code">${esc(c.code)}</span>
+              ${course ? `<a href="#/disciplina/${encodeURIComponent(course.id)}"><b>${esc(course.name)}</b></a>${fold(course.name) !== fold(c.title) ? ` <span class="small muted">(no acervo: ${esc(c.title)})</span>` : ''}` : `<b>${esc(c.title)}</b>`}</div>
+            <span class="small muted exam-count">${filesLabel(c.files)}${c.note ? ` · ${esc(c.note)}` : ''}</span>
+            <a class="btn btn-sm btn-ghost" href="${esc(c.url)}" target="_blank" rel="noreferrer">Abrir ↗</a></li>`;
+        }).join('')}${folders.map((f) => `<li><div class="exam-main"><b>${esc(f.title)}</b></div><span class="small muted exam-count">${filesLabel(f.files)}</span><a class="btn btn-sm btn-ghost" href="${esc(f.url)}" target="_blank" rel="noreferrer">Abrir ↗</a></li>`).join('')}</ul></section>`;
+    }).join('');
+    $('#exam-list').innerHTML = html || '<div class="empty-state"><p>Nenhuma pasta encontrada. O acervo pode ter a disciplina com outro nome: <a href="' + esc(data.url) + '" target="_blank" rel="noreferrer">abra o acervo completo ↗</a>.</p></div>';
+    const qs = new URLSearchParams();
+    for (const [k, v] of fd) if (v) qs.set(k, v);
+    setQuery(qs);
+  };
+  form.addEventListener('input', draw);
+  form.addEventListener('submit', (e) => e.preventDefault());
+  draw();
+}
+
+// Bloco na página da disciplina: pastas do acervo para ela (inclui versões antigas, ex.: DCC205 em Estruturas de Dados)
+function examsBlock(exams) {
+  if (!exams?.items?.length) return '';
+  const withFiles = exams.items.filter((e) => e.files);
+  return `<section class="block exams" id="materiais">
+    <div class="section-head"><h2>Materiais</h2><a class="small" href="#/materiais">Todo o acervo →</a></div>
+    <ul class="exam-list">${exams.items.map((e) => `<li class="${e.files ? '' : 'empty'}">
+      <div class="exam-main"><span class="code">${esc(e.code)}</span> <b>${esc(e.title)}</b> <span class="small muted">· ${esc(e.section)}</span></div>
+      <span class="small muted exam-count">${filesLabel(e.files)}</span>
+      <a class="btn btn-sm ${e.files ? '' : 'btn-ghost'}" href="${esc(e.url)}" target="_blank" rel="noreferrer">${e.files ? 'Abrir pasta ↗' : 'Contribuir ↗'}</a></li>`).join('')}</ul>
+    <p class="small muted">Material reunido por estudantes no ${esc(exams.name)} (Google Drive)${withFiles.length ? '' : '. A pasta desta disciplina ainda está vazia: se você tem provas ou listas antigas, considere contribuir'}.</p>
+  </section>`;
+}
+
+// ---- oportunidades (bolsas de IC/pesquisa, estágios, pós-doc… publicadas em dcc.ufmg.br/oportunidades)
+const fmtDate = (iso) => (iso ? new Date(`${iso}T12:00:00`).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' }) : '');
+const isHttp = (u) => /^(https?:|mailto:)/.test(u || '');
+
+function stipendText(list) {
+  if (!list?.length) return '';
+  return list.map((x) => (x.who ? `${esc(x.who)}: <b>${esc(x.value)}</b>` : `<b>${esc(x.value)}</b>`)).join(' · ');
+}
+
+function oppCard(o) {
+  const profs = (o.professors || []).map((s) => state.prof.get(s)).filter(Boolean);
+  const facts = [
+    o.stipends?.length && `<div><dt>Bolsa</dt><dd>${stipendText(o.stipends)}</dd></div>`,
+    o.hours?.length && `<div><dt>Dedicação</dt><dd>${o.hours.map((h) => `${h}h`).join(' ou ')} semanais</dd></div>`,
+    o.deadline && `<div><dt>Inscrições</dt><dd>${esc(o.deadline)}</dd></div>`,
+  ].filter(Boolean);
+  return `<article class="opp-card${o.open ? '' : ' closed'}">
+    <div class="opp-tags">${o.types.map((t) => `<span class="badge badge-type">${esc(t)}</span>`).join('')}${o.audiences.filter((a) => !o.types.includes(a)).map((a) => `<span class="badge">${esc(a)}</span>`).join('')}${o.open ? '' : '<span class="badge">Encerrada</span>'}</div>
+    <h3><a href="${esc(o.url)}" target="_blank" rel="noreferrer">${esc(o.title)}</a></h3>
+    ${o.summary ? `<p class="opp-summary">${esc(o.summary)}</p>` : ''}
+    ${facts.length ? `<dl class="opp-facts">${facts.join('')}</dl>` : ''}
+    ${profs.length ? `<div class="opp-profs"><span class="small muted">Docentes:</span> ${profs.map((p) => `<a class="prof-inline" href="#/professor/${p.slug}">${avatar(p, 'sm')} <span>${esc(firstNameLast(p.name))}</span></a>`).join('')}</div>` : ''}
+    <div class="opp-foot">
+      <span class="small muted">${[...o.areas, ...o.groups].map(esc).join(' · ')}${o.published ? `${o.areas.length || o.groups.length ? ' · ' : ''}publicada em ${fmtDate(o.published)}` : ''}</span>
+      <span class="row-gap">${o.open && isHttp(o.apply) ? `<a class="btn btn-sm" href="${esc(o.apply)}" target="_blank" rel="noreferrer">Candidatar-se ↗</a>` : ''}<a class="btn btn-sm btn-ghost" href="${esc(o.url)}" target="_blank" rel="noreferrer">Ver chamada ↗</a></span>
+    </div>
+  </article>`;
+}
+
+async function viewOportunidades({ params, isCurrent }) {
+  setTitle('Oportunidades');
+  main.innerHTML = '<div class="loading-screen"><span class="spinner"></span></div>';
+  const data = await api('/api/oportunidades');
+  if (!isCurrent()) return;
+  const items = data.items;
+  const types = [...new Set(items.flatMap((o) => o.types))].sort((a, b) => a.localeCompare(b));
+  const auds = ['Graduação', 'Mestrado', 'Doutorado', 'Pós-doutorado', 'Profissionais'].filter((a) => items.some((o) => o.audiences.includes(a)));
+  const nOpen = items.filter((o) => o.open).length;
+  const sel = (name, v) => (params.get(name) === v ? 'selected' : '');
+  main.innerHTML = `<section class="page">
+    <div class="page-head"><p class="eyebrow">Pesquisa e projetos</p><h1>Oportunidades</h1>
+      <p class="lead-sm">Bolsas de iniciação científica e de pesquisa, estágios e vagas em laboratórios e projetos do DCC, reunidas da página <a href="${esc(data.source)}" target="_blank" rel="noreferrer">Oportunidades do DCC ↗</a>. ${plural(nOpen, 'chamada aberta', 'chamadas abertas')}. Confira sempre os detalhes e o prazo na chamada original.</p></div>
+    <form class="filters" id="filters" role="search">
+      <label class="field grow"><span class="sr-only">Buscar</span><input type="search" name="q" placeholder="Tema, laboratório, docente…" value="${esc(params.get('q') || '')}"></label>
+      <label class="field"><span class="sr-only">Situação</span><select name="status">
+        <option value="">Abertas</option><option value="fechadas" ${sel('status', 'fechadas')}>Encerradas</option><option value="todas" ${sel('status', 'todas')}>Todas</option></select></label>
+      <label class="field"><span class="sr-only">Tipo</span><select name="type"><option value="">Qualquer tipo</option>${types.map((t) => `<option ${sel('type', t)}>${esc(t)}</option>`).join('')}</select></label>
+      <label class="field"><span class="sr-only">Para quem</span><select name="aud"><option value="">Qualquer nível</option>${auds.map((a) => `<option ${sel('aud', a)}>${esc(a)}</option>`).join('')}</select></label>
+    </form>
+    <p class="result-count muted" id="result-count" aria-live="polite"></p>
+    <div class="opp-grid" id="opp-list"></div>
+    <p class="small muted">Atualizado em ${data.generatedAt ? new Date(data.generatedAt).toLocaleDateString('pt-BR') : '—'} a partir do site do DCC. Resumos e valores são extraídos automaticamente; a chamada original é a referência.</p>
+  </section>`;
+  const form = $('#filters');
+  const draw = () => {
+    const fd = new FormData(form);
+    const q = fold(fd.get('q') || '');
+    const status = fd.get('status');
+    const type = fd.get('type');
+    const aud = fd.get('aud');
+    const list = items.filter((o) => (status === 'todas' || (status === 'fechadas' ? !o.open : o.open))
+      && (!type || o.types.includes(type)) && (!aud || o.audiences.includes(aud))
+      && (!q || q.split(/\s+/).every((w) => fold(`${o.title} ${o.summary} ${o.areas.join(' ')} ${o.groups.join(' ')} ${(o.professors || []).map((s) => state.prof.get(s)?.name || '').join(' ')}`).includes(w))));
+    $('#result-count').textContent = plural(list.length, 'oportunidade', 'oportunidades');
+    $('#opp-list').innerHTML = list.map(oppCard).join('') || '<div class="empty-state"><p>Nenhuma oportunidade com esses filtros.</p></div>';
+    const qs = new URLSearchParams();
+    for (const [k, v] of fd) if (v) qs.set(k, v);
+    setQuery(qs);
+  };
+  form.addEventListener('input', draw);
+  form.addEventListener('submit', (e) => e.preventDefault());
+  draw();
+}
+
+function profOpportunities(list, name) {
+  if (!list?.length) return '';
+  return `<section class="block" id="oportunidades">
+    <div class="section-head"><h2>Oportunidades abertas</h2><a class="small" href="#/oportunidades">Todas as oportunidades →</a></div>
+    <ul class="exam-list">${list.map((o) => `<li><div class="exam-main"><a href="${esc(o.url)}" target="_blank" rel="noreferrer"><b>${esc(o.title)}</b></a></div>
+      <span class="small muted">${[o.types.join(', '), o.audiences.join(', ')].filter(Boolean).map(esc).join(' · ')}</span>
+      <a class="btn btn-sm btn-ghost" href="${esc(o.url)}" target="_blank" rel="noreferrer">Ver chamada ↗</a></li>`).join('')}</ul>
+    <p class="small muted">Chamadas publicadas pelo DCC que citam ${esc(name)}.</p>
+  </section>`;
+}
+
+// ---- moderação
+async function viewModeration() {
+  setTitle('Moderação');
+  let token = '';
+  try { token = sessionStorage.getItem('avalie-admin') || ''; } catch (_) { /* sem armazenamento */ }
+  main.innerHTML = `<section class="page narrow">
+    <div class="page-head"><p class="eyebrow">Equipe</p><h1>Moderação</h1></div>
+    ${state.boot.moderation ? '' : '<p class="warn">A moderação está desativada neste servidor (defina DCCHUB_ADMIN_TOKEN).</p>'}
+    <form class="row-gap" id="admin-form"><label class="field grow"><span>Token</span><input type="password" name="token" value="${esc(token)}" autocomplete="off"></label><button class="btn">Entrar</button></form>
+    <div id="queue"></div>
+  </section>`;
+  const load = async () => {
+    try {
+      const { queue } = await api('/api/admin/queue', { headers: { Authorization: `Bearer ${token}` } });
+      try { sessionStorage.setItem('avalie-admin', token); } catch (_) { /* idem */ }
+      $('#queue').innerHTML = `<h2>${plural(queue.length, 'item', 'itens')} na fila</h2>${queue.map((r) => `<div class="mod-item">
+        ${reviewCard(r, { show: 'both' })}
+        <p class="small"><b>Status:</b> ${esc(r.status)} ${r.heldReason ? `· <b>Motivo:</b> ${esc(r.heldReason)}` : ''} ${r.reports.length ? `· <b>Denúncias:</b> ${r.reports.map((x) => esc(x.reason + (x.detail ? ` (“${x.detail}”)` : ''))).join('; ')}` : ''}</p>
+        <div class="row-gap"><button class="btn btn-sm" data-mod="publish" data-id="${r.id}">Publicar</button><button class="btn btn-sm btn-ghost" data-mod="hold" data-id="${r.id}">Manter retida</button><button class="btn btn-sm btn-danger" data-mod="remove" data-id="${r.id}">Remover</button></div>
+      </div>`).join('') || '<p class="muted">Fila vazia.</p>'}`;
+      const { items } = await api('/api/admin/class-reports', { headers: { Authorization: `Bearer ${token}` } });
+      $('#queue').insertAdjacentHTML('beforeend', `<h2>Turmas informadas por estudantes</h2>${items.length ? `<ul class="community-list">${items.map((it) => `<li><b>${esc(it.term)}</b> ${esc(state.prof.get(it.professor)?.name || it.professor)} — ${esc(state.course.get(it.course)?.name || it.course)} <span class="small muted">${plural(it.count, 'relato', 'relatos')}</span>
+        <button class="btn btn-sm btn-danger" data-cdel data-term="${esc(it.term)}" data-prof="${esc(it.professor)}" data-course="${esc(it.course)}">Remover</button></li>`).join('')}</ul>` : '<p class="muted">Nenhum relato.</p>'}`);
+    } catch (err) { $('#queue').innerHTML = `<p class="warn">${esc(err.message)}</p>`; }
+  };
+  $('#admin-form').addEventListener('submit', (e) => { e.preventDefault(); token = new FormData(e.target).get('token'); load(); });
+  $('#queue').addEventListener('click', async (e) => {
+    const del = e.target.closest('[data-cdel]');
+    if (del) {
+      try {
+        const res = await api('/api/admin/class-reports/delete', { method: 'POST', body: { term: del.dataset.term, professor: del.dataset.prof, course: del.dataset.course }, headers: { Authorization: `Bearer ${token}` } });
+        toast(res.message);
+        load();
+      } catch (err) { toast(err.message, 'error'); }
+      return;
+    }
+    const btn = e.target.closest('[data-mod]');
+    if (!btn) return;
+    try {
+      await api(`/api/admin/reviews/${btn.dataset.id}`, { method: 'POST', body: { action: btn.dataset.mod }, headers: { Authorization: `Bearer ${token}` } });
+      toast('Feito.');
+      load();
+    } catch (err) { toast(err.message, 'error'); }
+  });
+  if (token) load();
+}
+
+// ---------------------------------------------------------------- inicialização
+function setupChrome() {
+  $('#theme-toggle').addEventListener('click', () => {
+    const root = document.documentElement;
+    const dark = root.dataset.theme ? root.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+    root.dataset.theme = dark ? 'light' : 'dark';
+    try { localStorage.setItem('avalie-theme', root.dataset.theme); } catch (_) { /* idem */ }
+  });
+  setupGlobalSearch();
+  document.addEventListener('click', (e) => { if (!e.target.closest('.hero-search')) { const box = $('#hero-results'); if (box) box.hidden = true; } });
+}
+
+setupChrome();
+window.addEventListener('hashchange', router);
+router();

@@ -1,0 +1,6674 @@
+{
+ "generatedAt": "2026-11-05T12:03:02+00:00",
+ "note": "Disciplinas extintas (currículo antigo ou sem oferta nos últimos 2 anos). Não aparecem no site.",
+ "courses": [
+  {
+   "id": "DCC003",
+   "codes": [
+    "DCC003"
+   ],
+   "name": "Algoritmos e Estruturas de Dados I",
+   "kind": "regular",
+   "terms": [
+    "2020.1"
+   ],
+   "retired": true,
+   "successor": "DCC221"
+  },
+  {
+   "id": "DCC007",
+   "codes": [
+    "DCC007",
+    "DCC819"
+   ],
+   "name": "Organização de Computadores II / Arq. Computadores",
+   "kind": "regular",
+   "terms": [
+    "2020.1",
+    "2021.1",
+    "2022.1"
+   ],
+   "retired": true
+  },
+  {
+   "id": "DCC044",
+   "codes": [
+    "DCC044"
+   ],
+   "name": "Fundamentos de Sistemas de Informação",
+   "kind": "regular",
+   "terms": [
+    "2020.2",
+    "2021.1",
+    "2021.2",
+    "2022.1",
+    "2022.2",
+    "2023.1",
+    "2023.2",
+    "2024.1",
+    "2024.2",
+    "2025.1"
+   ],
+   "retired": true,
+   "successor": "DCC096"
+  },
+  {
+   "id": "DCC050",
+   "codes": [
+    "DCC050"
+   ],
+   "name": "Introdução à Ciência da Computação",
+   "kind": "regular",
+   "terms": [
+    "2020.2",
+    "2021.1",
+    "2021.2",
+    "2022.1",
+    "2022.2",
+    "2023.1",
+    "2023.2",
+    "2024.1",
+    "2024.2",
+    "2025.1"
+   ],
+   "retired": true,
+   "successor": "DCC096"
+  },
+  {
+   "id": "DCC189",
+   "codes": [
+    "DCC189"
+   ],
+   "name": "Armazém de Dados",
+   "kind": "regular",
+   "terms": [
+    "2021.1",
+    "2022.1",
+    "2023.1"
+   ],
+   "aliases": [
+    "TOP-armazem-de-dados"
+   ],
+   "retired": true
+  },
+  {
+   "id": "DCC198",
+   "codes": [
+    "DCC198"
+   ],
+   "name": "Redes Complexas em Computação: Modelagem, Algoritmos e Aplicações",
+   "kind": "regular",
+   "terms": [
+    "2020.2",
+    "2021.1"
+   ],
+   "retired": true
+  },
+  {
+   "id": "DCC606",
+   "codes": [
+    "DCC606"
+   ],
+   "name": "Computadores e Sociedade",
+   "kind": "regular",
+   "terms": [
+    "2020.2"
+   ],
+   "retired": true,
+   "successor": "DCC637"
+  },
+  {
+   "id": "DCC808",
+   "codes": [
+    "DCC808"
+   ],
+   "name": "Programação Não Linear",
+   "kind": "regular",
+   "terms": [
+    "2023.1"
+   ],
+   "retired": true
+  },
+  {
+   "id": "TOP-advanced-topics-in-algebraic-combinatorics",
+   "codes": [
+    "DCC831"
+   ],
+   "name": "Advanced topics in algebraic combinatorics",
+   "kind": "topico",
+   "terms": [
+    "2024.2"
+   ],
+   "retired": true
+  },
+  {
+   "id": "TOP-algoritmos-avancados",
+   "codes": [
+    "DCC030",
+    "DCC049"
+   ],
+   "name": "Algoritmos avançados",
+   "kind": "topico",
+   "terms": [
+    "2022.2"
+   ],
+   "retired": true
+  },
+  {
+   "id": "TOP-algoritmos-de-aprendizado-profundo",
+   "codes": [
+    "DCC831"
+   ],
+   "name": "Algoritmos de Aprendizado Profundo",
+   "kind": "topico",
+   "terms": [
+    "2021.2",
+    "2024.2"
+   ],
+   "retired": true
+  },
+  {
+   "id": "TOP-algoritmos-exatos-exponenciais-e-complexidade-parametrizada",
+   "codes": [
+    "DCC030",
+    "DCC049",
+    "DCC831"
+   ],
+   "name": "Algoritmos exatos exponenciais e complexidade parametrizada",
+   "kind": "topico",
+   "terms": [
+    "2021.2"
+   ],
+   "retired": true
+  },
+  {
+   "id": "TOP-analise-e-mineracao-de-midias-sociais",
+   "codes": [
+    "DCC030",
+    "DCC831",
+    "DCC049"
+   ],
+   "name": "Análise e Mineração de Mídias Sociais",
+   "kind": "topico",
+   "terms": [
+    "2023.2"
+   ],
+   "retired": true
+  },
+  {
+   "id": "TOP-analise-estatica",
+   "codes": [
+    "DCC030"
+   ],
+   "name": "Análise Estática",
+   "kind": "topico",
+   "terms": [
+    "2020.1"
+   ],
+   "retired": true
+  },
+  {
+   "id": "TOP-aprendizado-de-maquina",
+   "codes": [
+    "DCC030",
+    "DCC049",
+    "DCC831"
+   ],
+   "name": "Aprendizado de Máquina",
+   "kind": "topico",
+   "terms": [
+    "2021.1",
+    "2022.1",
+    "2023.1",
+    "2024.1"
+   ],
+   "retired": true
+  },
+  {
+   "id": "TOP-aprendizado-de-maquina-para-saude",
+   "codes": [
+    "DCC030",
+    "DCC049",
+    "DCC831"
+   ],
+   "name": "Aprendizado de Máquina para Saúde",
+   "kind": "topico",
+   "terms": [
+    "2023.1"
+   ],
+   "retired": true
+  },
+  {
+   "id": "TOP-aprendizado-profundo-para-processamento-de-linguagem-natural",
+   "codes": [
+    "DCC030",
+    "DCC049",
+    "DCC831"
+   ],
+   "name": "Aprendizado Profundo para Processamento de Linguagem Natural",
+   "kind": "topico",
+   "terms": [
+    "2020.2",
+    "2021.2",
+    "2023.2"
+   ],
+   "retired": true
+  },
+  {
+   "id": "TOP-arquitetura-da-internet",
+   "codes": [
+    "DCC030",
+    "DCC049",
+    "DCC831"
+   ],
+   "name": "Arquitetura da Internet",
+   "kind": "topico",
+   "terms": [
+    "2023.1"
+   ],
+   "retired": true
+  },
+  {
+   "id": "TOP-bancos-de-dados-geograficos",
+   "codes": [
+    "DCC030",
+    "DCC049",
+    "DCC831"
+   ],
+   "name": "Bancos de Dados Geográficos",
+   "kind": "topico",
+   "terms": [
+    "2020.2",
+    "2021.2",
+    "2022.2",
+    "2023.2",
+    "2024.2"
+   ],
+   "aliases": [
+    "TOP-banco-de-dados-geograficos"
+   ],
+   "retired": true
+  },
+  {
+   "id": "TOP-bioinformatica",
+   "codes": [
+    "DCC030",
+    "DCC049",
+    "DCC831"
+   ],
+   "name": "Bioinformática",
+   "kind": "topico",
+   "terms": [
+    "2020.2",
+    "2021.2",
+    "2022.2",
+    "2023.2"
+   ],
+   "retired": true
+  },
+  {
+   "id": "TOP-blockchain-e-criptomoedas-conceitos-basicos-e-avancados",
+   "codes": [
+    "DCC030",
+    "DCC831",
+    "DCC049"
+   ],
+   "name": "Blockchain e Criptomoedas: Conceitos Básicos e Avançados",
+   "kind": "topico",
+   "terms": [
+    "2024.2"
+   ],
+   "retired": true
+  },
+  {
+   "id": "TOP-causalidade-em-aprendizado-de-maquina",
+   "codes": [
+    "DCC030",
+    "DCC049"
+   ],
+   "name": "Causalidade em Aprendizado de Máquina",
+   "kind": "topico",
+   "terms": [
+    "2022.2"
+   ],
+   "retired": true
+  },
+  {
+   "id": "TOP-classes-de-grafos",
+   "codes": [
+    "DCC030",
+    "DCC049",
+    "DCC831"
+   ],
+   "name": "Classes de Grafos",
+   "kind": "topico",
+   "terms": [
+    "2020.2",
+    "2023.2"
+   ],
+   "retired": true
+  },
+  {
+   "id": "TOP-cloud-computing",
+   "codes": [
+    "DCC030",
+    "DCC049"
+   ],
+   "name": "Cloud Computing",
+   "kind": "topico",
+   "terms": [
+    "2022.1"
+   ],
+   "retired": true
+  },
+  {
+   "id": "TOP-combinatoria-poliedrica",
+   "codes": [
+    "DCC030",
+    "DCC831",
+    "DCC049"
+   ],
+   "name": "Combinatória Poliédrica",
+   "kind": "topico",
+   "terms": [
+    "2024.2"
+   ],
+   "retired": true
+  },
+  {
+   "id": "TOP-complexidade-computacional",
+   "codes": [
+    "DCC030",
+    "DCC049"
+   ],
+   "name": "Complexidade Computacional",
+   "kind": "topico",
+   "terms": [
+    "2022.2"
+   ],
+   "retired": true
+  },
+  {
+   "id": "TOP-complexidade-parametrizada",
+   "codes": [
+    "DCC030",
+    "DCC831",
+    "DCC049"
+   ],
+   "name": "Complexidade Parametrizada",
+   "kind": "topico",
+   "terms": [
+    "2024.1"
+   ],
+   "retired": true
+  },
+  {
+   "id": "TOP-computacao-social-conceitos-algoritimos-e-aplicacoes",
+   "codes": [
+    "DCC030",
+    "DCC049"
+   ],
+   "name": "Computação Social: Conceitos, Algoritimos e Aplicações",
+   "kind": "topico",
+   "terms": [
+    "2024.1"
+   ],
+   "retired": true
+  },
+  {
+   "id": "TOP-computacao-ubiqua",
+   "codes": [
+    "DCC030",
+    "DCC049"
+   ],
+   "name": "Computação Ubíqua",
+   "kind": "topico",
+   "terms": [
+    "2021.1",
+    "2022.1"
+   ],
+   "retired": true
+  },
+  {
+   "id": "TOP-criptografia",
+   "codes": [
+    "DCC030",
+    "DCC049"
+   ],
+   "name": "Criptografia",
+   "kind": "topico",
+   "terms": [
+    "2021.1",
+    "2022.1"
+   ],
+   "retired": true
+  },
+  {
+   "id": "TOP-criptografia-blockchain-criptomoedas",
+   "codes": [
+    "DCC030",
+    "DCC049"
+   ],
+   "name": "Criptografia, blockchain, criptomoedas",
+   "kind": "topico",
+   "terms": [
+    "2023.1"
+   ],
+   "retired": true
+  },
+  {
+   "id": "TOP-criptografia-teorica",
+   "codes": [
+    "DCC030"
+   ],
+   "name": "Criptografia Teórica",
+   "kind": "topico",
+   "terms": [
+    "2020.1"
+   ],
+   "retired": true
+  },
+  {
+   "id": "TOP-cybersecurity-data-science",
+   "codes": [
+    "DCC030",
+    "DCC049",
+    "DCC831"
+   ],
+   "name": "Cybersecurity Data Science",
+   "kind": "topico",
+   "terms": [
+    "2021.1",
+    "2021.2"
+   ],
+   "aliases": [
+    "TOP-cyberscurity-data-science"
+   ],
+   "retired": true
+  },
+  {
+   "id": "TOP-divulgacao-de-resultados-de-pesquisa",
+   "codes": [
+    "DCC831"
+   ],
+   "name": "Divulgação de Resultados de Pesquisa",
+   "kind": "topico",
+   "terms": [
+    "2022.1"
+   ],
+   "retired": true
+  },
+  {
+   "id": "TOP-engenharia-de-software-experimental",
+   "codes": [
+    "DCC890",
+    "DCC831"
+   ],
+   "name": "Engenharia de Software Experimental",
+   "kind": "topico",
+   "terms": [
+    "2021.1",
+    "2022.1",
+    "2024.2"
+   ],
+   "retired": true
+  },
+  {
+   "id": "TOP-financas-quantitativas-e-gerenciamento-de-risco",
+   "codes": [
+    "DCC030",
+    "DCC049",
+    "DCC831"
+   ],
+   "name": "Finanças quantitativas e gerenciamento de risco",
+   "kind": "topico",
+   "terms": [
+    "2020.2",
+    "2021.2"
+   ],
+   "retired": true
+  },
+  {
+   "id": "TOP-fundamentos-de-engenharia-semiotica",
+   "codes": [
+    "DCC851"
+   ],
+   "name": "Fundamentos de Engenharia Semiótica",
+   "kind": "topico",
+   "terms": [
+    "2021.1",
+    "2021.2"
+   ],
+   "aliases": [
+    "TOP-fundamentos-da-engenharia-semiotica"
+   ],
+   "retired": true
+  },
+  {
+   "id": "TOP-fundamentos-do-processamento-de-sinais",
+   "codes": [
+    "DCC030"
+   ],
+   "name": "Fundamentos do Processamento de Sinais",
+   "kind": "topico",
+   "terms": [
+    "2023.2"
+   ],
+   "retired": true
+  },
+  {
+   "id": "TOP-fundamentos-estatisiticos-de-ciencia-dos-dados",
+   "codes": [
+    "DCC030",
+    "DCC049",
+    "DCC831"
+   ],
+   "name": "Fundamentos Estátísiticos de Ciência dos Dados",
+   "kind": "topico",
+   "terms": [
+    "2021.1"
+   ],
+   "retired": true
+  },
+  {
+   "id": "TOP-geometria-afim-e-projetiva-com-aplicacoes-em-computacao-graf",
+   "codes": [
+    "DCC030",
+    "DCC049"
+   ],
+   "name": "Geometria afim e projetiva com aplicações em computação gráfica",
+   "kind": "topico",
+   "terms": [
+    "2022.2"
+   ],
+   "retired": true
+  },
+  {
+   "id": "TOP-gerenciamento-das-redes-de-computadores-e-dos-servicos",
+   "codes": [
+    "DCC030",
+    "DCC049",
+    "DCC831"
+   ],
+   "name": "Gerenciamento das Redes de Computadores e dos Serviços",
+   "kind": "topico",
+   "terms": [
+    "2022.2",
+    "2023.2",
+    "2024.2"
+   ],
+   "aliases": [
+    "TOP-gerenciamento-das-redes-de-computadores-e-servicos"
+   ],
+   "retired": true
+  },
+  {
+   "id": "TOP-information-theory",
+   "codes": [
+    "DCC030",
+    "DCC049",
+    "DCC831"
+   ],
+   "name": "Information Theory",
+   "kind": "topico",
+   "terms": [
+    "2022.1",
+    "2024.1"
+   ],
+   "aliases": [
+    "TOP-information-theroy"
+   ],
+   "retired": true
+  },
+  {
+   "id": "TOP-interacao-humano-computador-em-computacao-ubiqua-e-internet-",
+   "codes": [
+    "DCC069"
+   ],
+   "name": "Interação Humano-Computador em Computação Ubíqua e Internet das Coisas",
+   "kind": "topico",
+   "terms": [
+    "2021.1"
+   ],
+   "retired": true
+  },
+  {
+   "id": "TOP-internet-das-coisas-aspectos-computacionais-e-juridicos",
+   "codes": [
+    "DCC030",
+    "DCC049",
+    "DCC831"
+   ],
+   "name": "Internet das Coisas – Aspectos Computacionais e Jurídicos",
+   "kind": "topico",
+   "terms": [
+    "2022.1"
+   ],
+   "retired": true
+  },
+  {
+   "id": "TOP-introducao-a-combinatoria-extremal-e-probabilistica",
+   "codes": [
+    "DCC030",
+    "DCC831",
+    "DCC049"
+   ],
+   "name": "Introdução à Combinatória Extremal e Probabilística",
+   "kind": "topico",
+   "terms": [
+    "2024.2"
+   ],
+   "retired": true
+  },
+  {
+   "id": "TOP-introducao-a-integracao-humano-computador-como-uma-extensao-",
+   "codes": [
+    "DCC030",
+    "DCC049"
+   ],
+   "name": "Introdução a Integração Humano-Computador como uma extensão da Interação",
+   "kind": "topico",
+   "terms": [
+    "2023.2"
+   ],
+   "retired": true
+  },
+  {
+   "id": "TOP-introducao-a-prototipagem-rapida",
+   "codes": [
+    "DCC030",
+    "DCC049"
+   ],
+   "name": "Introdução à Prototipagem Rápida",
+   "kind": "topico",
+   "terms": [
+    "2021.2"
+   ],
+   "retired": true
+  },
+  {
+   "id": "TOP-introduction-to-approximation-algorithms",
+   "codes": [
+    "DCC030",
+    "DCC049",
+    "DCC831"
+   ],
+   "name": "Introduction to Approximation Algorithms",
+   "kind": "topico",
+   "terms": [
+    "2020.1",
+    "2020.2"
+   ],
+   "retired": true
+  },
+  {
+   "id": "TOP-leitura-e-discussao-de-artigos-em-engenharia-de-software",
+   "codes": [
+    "DCC851"
+   ],
+   "name": "Leitura e Discussão de Artigos em Engenharia de Software",
+   "kind": "topico",
+   "terms": [
+    "2023.2"
+   ],
+   "retired": true
+  },
+  {
+   "id": "TOP-linguistica-computacional",
+   "codes": [
+    "DCC030",
+    "DCC049"
+   ],
+   "name": "Linguistica Computacional",
+   "kind": "topico",
+   "terms": [
+    "2021.1"
+   ],
+   "retired": true
+  },
+  {
+   "id": "TOP-medicao-e-qualidade-de-software",
+   "codes": [
+    "DCC030",
+    "DCC049",
+    "DCC890"
+   ],
+   "name": "Medição e Qualidade de Software",
+   "kind": "topico",
+   "terms": [
+    "2020.2",
+    "2022.2",
+    "2024.1"
+   ],
+   "retired": true
+  },
+  {
+   "id": "TOP-metodos-quantitativos-de-pesquisa-experimental-em-ciencia-da",
+   "codes": [
+    "DCC831"
+   ],
+   "name": "Métodos Quantitativos de Pesquisa Experimental em Ciência da Computação",
+   "kind": "topico",
+   "terms": [
+    "2021.1",
+    "2022.1"
+   ],
+   "retired": true
+  },
+  {
+   "id": "TOP-metodos-quantitativos-em-ciencia-da-computacao-experimental",
+   "codes": [
+    "DCC831"
+   ],
+   "name": "Métodos Quantitativos em Ciência da Computação Experimental",
+   "kind": "topico",
+   "terms": [
+    "2023.1"
+   ],
+   "retired": true
+  },
+  {
+   "id": "TOP-metodos-quantitativos-em-ciencia-experimental",
+   "codes": [
+    "DCC831"
+   ],
+   "name": "Métodos Quantitativos em Ciência Experimental",
+   "kind": "topico",
+   "terms": [
+    "2024.2"
+   ],
+   "retired": true
+  },
+  {
+   "id": "TOP-mobility-analytics",
+   "codes": [
+    "DCC831"
+   ],
+   "name": "Mobility Analytics",
+   "kind": "topico",
+   "terms": [
+    "2023.2"
+   ],
+   "retired": true
+  },
+  {
+   "id": "TOP-modelagem-e-resolucao-de-problemas-de-otimizacao-combinatori",
+   "codes": [
+    "DCC030",
+    "DCC049"
+   ],
+   "name": "Modelagem e Resolução de Problemas de Otimização Combinatória",
+   "kind": "topico",
+   "terms": [
+    "2024.1"
+   ],
+   "aliases": [
+    "TOP-modelagem-e-resolicao-de-problemas-de-otimizacao-combinatori"
+   ],
+   "retired": true
+  },
+  {
+   "id": "TOP-modularidade",
+   "codes": [
+    "DCC030",
+    "DCC049",
+    "DCC890",
+    "DCC831"
+   ],
+   "name": "Modularidade",
+   "kind": "topico",
+   "terms": [
+    "2021.1",
+    "2021.2"
+   ],
+   "retired": true
+  },
+  {
+   "id": "TOP-monitoria-de-graduacao-i",
+   "codes": [
+    "DCC069"
+   ],
+   "name": "Monitoria de Graduação I",
+   "kind": "topico",
+   "terms": [
+    "2024.1"
+   ],
+   "retired": true
+  },
+  {
+   "id": "TOP-music-information-retrieval",
+   "codes": [
+    "DCC030",
+    "DCC049",
+    "DCC831"
+   ],
+   "name": "Music Information Retrieval",
+   "kind": "topico",
+   "terms": [
+    "2020.2"
+   ],
+   "retired": true
+  },
+  {
+   "id": "TOP-otimizacao-de-codigo",
+   "codes": [
+    "DCC831"
+   ],
+   "name": "Otimização de Código",
+   "kind": "topico",
+   "terms": [
+    "2020.2"
+   ],
+   "retired": true
+  },
+  {
+   "id": "TOP-otimizacao-semidefinida-em-grafos",
+   "codes": [
+    "DCC030",
+    "DCC831",
+    "DCC049"
+   ],
+   "name": "Otimização Semidefinida em Grafos",
+   "kind": "topico",
+   "terms": [
+    "2024.1"
+   ],
+   "retired": true
+  },
+  {
+   "id": "TOP-pattern-recognition-for-earth-observation",
+   "codes": [
+    "DCC831"
+   ],
+   "name": "Pattern Recognition for Earth Observation",
+   "kind": "topico",
+   "terms": [
+    "2021.2"
+   ],
+   "retired": true
+  },
+  {
+   "id": "TOP-pratica-em-desenvolvimento-de-software",
+   "codes": [
+    "DCC030",
+    "DCC049"
+   ],
+   "name": "Prática em Desenvolvimento de Software",
+   "kind": "topico",
+   "terms": [
+    "2020.2",
+    "2021.1",
+    "2021.2",
+    "2022.1",
+    "2022.2",
+    "2023.1",
+    "2023.2",
+    "2024.1"
+   ],
+   "aliases": [
+    "TOP-pratica-de-desenvolvimento-de-software"
+   ],
+   "retired": true
+  },
+  {
+   "id": "TOP-processamento-de-dados-massivos",
+   "codes": [
+    "DCC030",
+    "DCC049",
+    "DCC831"
+   ],
+   "name": "Processamento de dados massivos",
+   "kind": "topico",
+   "terms": [
+    "2021.2"
+   ],
+   "retired": true
+  },
+  {
+   "id": "TOP-processamento-de-dados-massivos-em-nuvem",
+   "codes": [
+    "DCC030",
+    "DCC049"
+   ],
+   "name": "Processamento de Dados Massivos em Nuvem",
+   "kind": "topico",
+   "terms": [
+    "2020.2"
+   ],
+   "retired": true
+  },
+  {
+   "id": "TOP-processamento-de-linguagem-natural",
+   "codes": [
+    "DCC030",
+    "DCC831",
+    "DCC049"
+   ],
+   "name": "Processamento de Linguagem Natural",
+   "kind": "topico",
+   "terms": [
+    "2024.2"
+   ],
+   "retired": true
+  },
+  {
+   "id": "TOP-programacao-em-logica",
+   "codes": [
+    "DCC030",
+    "DCC049"
+   ],
+   "name": "Programação em Lógica",
+   "kind": "topico",
+   "terms": [
+    "2020.2",
+    "2021.1"
+   ],
+   "retired": true
+  },
+  {
+   "id": "TOP-programacao-estocastica-modelagem-aplicacoes-e-algoritmos",
+   "codes": [
+    "DCC831"
+   ],
+   "name": "Programação Estocástica: Modelagem, Aplicações e Algoritmos",
+   "kind": "topico",
+   "terms": [
+    "2021.2"
+   ],
+   "retired": true
+  },
+  {
+   "id": "TOP-programacao-inteira-e-tecnicas-de-aproximacao",
+   "codes": [
+    "DCC030",
+    "DCC049",
+    "DCC831"
+   ],
+   "name": "Programação Inteira e Técnicas de Aproximação",
+   "kind": "topico",
+   "terms": [
+    "2021.1",
+    "2022.1"
+   ],
+   "retired": true
+  },
+  {
+   "id": "TOP-programacao-nao-linear-inteira-mista",
+   "codes": [
+    "DCC831"
+   ],
+   "name": "Programação Não Linear Inteira Mista",
+   "kind": "topico",
+   "terms": [
+    "2022.1"
+   ],
+   "retired": true
+  },
+  {
+   "id": "TOP-programacao-paralela",
+   "codes": [
+    "DCC030",
+    "DCC049",
+    "DCC831"
+   ],
+   "name": "Programação Paralela",
+   "kind": "topico",
+   "terms": [
+    "2021.1",
+    "2021.2"
+   ],
+   "retired": true
+  },
+  {
+   "id": "TOP-quantum-information-theory",
+   "codes": [
+    "DCC030"
+   ],
+   "name": "Quantum Information Theory",
+   "kind": "topico",
+   "terms": [
+    "2020.1"
+   ],
+   "retired": true
+  },
+  {
+   "id": "TOP-reutilizacao-de-software",
+   "codes": [
+    "DCC030",
+    "DCC049",
+    "DCC831",
+    "DCC890"
+   ],
+   "name": "Reutilização de Software",
+   "kind": "topico",
+   "terms": [
+    "2021.2",
+    "2023.1"
+   ],
+   "retired": true
+  },
+  {
+   "id": "TOP-seguranca-em-sistemas-de-computacao",
+   "codes": [
+    "DCC030",
+    "DCC049",
+    "DCC831"
+   ],
+   "name": "Segurança em Sistemas de Computação",
+   "kind": "topico",
+   "terms": [
+    "2020.2"
+   ],
+   "retired": true
+  },
+  {
+   "id": "TOP-seminarios-avancados-em-arquitetura-de-sistemas-em-nuvem",
+   "codes": [
+    "DCC851"
+   ],
+   "name": "Seminários avançados em arquitetura de sistemas em nuvem",
+   "kind": "topico",
+   "terms": [
+    "2021.1"
+   ],
+   "retired": true
+  },
+  {
+   "id": "TOP-seminarios-avancados-em-aspectos-matematicos-de-aprendizado-",
+   "codes": [
+    "DCC831"
+   ],
+   "name": "Seminários Avançados em Aspectos Matemáticos de Aprendizado Profundo",
+   "kind": "topico",
+   "terms": [
+    "2023.2"
+   ],
+   "retired": true
+  },
+  {
+   "id": "TOP-seminarios-avancados-em-engenharia-de-software",
+   "codes": [
+    "DCC851"
+   ],
+   "name": "Seminários Avançados em Engenharia de Software",
+   "kind": "topico",
+   "terms": [
+    "2023.1"
+   ],
+   "retired": true
+  },
+  {
+   "id": "TOP-seminarios-avancados-em-grandes-modelos-de-linguagem",
+   "codes": [
+    "DCC851"
+   ],
+   "name": "Seminários Avançados em Grandes Modelos de Línguagem",
+   "kind": "topico",
+   "terms": [
+    "2024.1"
+   ],
+   "retired": true
+  },
+  {
+   "id": "TOP-seminarios-avancados-em-grandes-modelos-de-linguagem-eficien",
+   "codes": [
+    "DCC851"
+   ],
+   "name": "Seminários Avançados em Grandes Modelos de Linguagem — Eficiência",
+   "kind": "topico",
+   "terms": [
+    "2024.2"
+   ],
+   "retired": true
+  },
+  {
+   "id": "TOP-seminarios-avancados-em-recuperacao-de-informacao-e-computac",
+   "codes": [
+    "DCC831"
+   ],
+   "name": "Seminarios Avancados em Recuperação de Informaçao e Computação Social",
+   "kind": "topico",
+   "terms": [
+    "2021.2"
+   ],
+   "retired": true
+  },
+  {
+   "id": "TOP-seminarios-avancados-sobre-desinformacao-e-odio-nas-platafor",
+   "codes": [
+    "DCC831"
+   ],
+   "name": "Seminários Avançados sobre Desinformação e Ódio nas Plataformas Digitais",
+   "kind": "topico",
+   "terms": [
+    "2021.2"
+   ],
+   "retired": true
+  },
+  {
+   "id": "TOP-seminarios-em-governanca-e-auditoria-algoritmica",
+   "codes": [
+    "DCC831"
+   ],
+   "name": "Seminários em Governança e Auditoria Algorítmica",
+   "kind": "topico",
+   "terms": [
+    "2024.2"
+   ],
+   "retired": true
+  },
+  {
+   "id": "TOP-seminarios-sobre-interpretabilidade-em-mineracao-de-dados",
+   "codes": [
+    "DCC851"
+   ],
+   "name": "Seminários sobre Interpretabilidade em Mineração de Dados",
+   "kind": "topico",
+   "terms": [
+    "2021.1"
+   ],
+   "retired": true
+  },
+  {
+   "id": "TOP-sistemas-de-informacao-biomedicos",
+   "codes": [
+    "DCC030",
+    "DCC049",
+    "DCC831"
+   ],
+   "name": "Sistemas de Informação Biomédicos",
+   "kind": "topico",
+   "terms": [
+    "2020.2",
+    "2021.2",
+    "2022.2",
+    "2024.2"
+   ],
+   "retired": true
+  },
+  {
+   "id": "TOP-sistemas-de-recomendacao",
+   "codes": [
+    "DCC030",
+    "DCC049",
+    "DCC831"
+   ],
+   "name": "Sistemas de Recomendação",
+   "kind": "topico",
+   "terms": [
+    "2020.2",
+    "2021.1",
+    "2021.2",
+    "2022.2",
+    "2023.2",
+    "2024.2"
+   ],
+   "retired": true
+  },
+  {
+   "id": "TOP-sistemas-de-tempo-real",
+   "codes": [
+    "DCC030",
+    "DCC049",
+    "DCC831"
+   ],
+   "name": "Sistemas de Tempo Real",
+   "kind": "topico",
+   "terms": [
+    "2022.1"
+   ],
+   "retired": true
+  },
+  {
+   "id": "TOP-sistemas-em-redes",
+   "codes": [
+    "DCC030",
+    "DCC049",
+    "DCC831"
+   ],
+   "name": "Sistemas em Redes",
+   "kind": "topico",
+   "terms": [
+    "2021.1"
+   ],
+   "retired": true
+  },
+  {
+   "id": "TOP-sistemas-embarcados",
+   "codes": [
+    "DCC030",
+    "DCC049"
+   ],
+   "name": "Sistemas Embarcados",
+   "kind": "topico",
+   "terms": [
+    "2021.1"
+   ],
+   "retired": true
+  },
+  {
+   "id": "TOP-spectral-graph-theory",
+   "codes": [
+    "DCC030",
+    "DCC049",
+    "DCC831"
+   ],
+   "name": "Spectral Graph Theory",
+   "kind": "topico",
+   "terms": [
+    "2021.2"
+   ],
+   "retired": true
+  },
+  {
+   "id": "TOP-static-analysis",
+   "codes": [
+    "DCC030",
+    "DCC049",
+    "DCC831"
+   ],
+   "name": "Static Analysis",
+   "kind": "topico",
+   "terms": [
+    "2021.1"
+   ],
+   "retired": true
+  },
+  {
+   "id": "TOP-teoria-da-informacao",
+   "codes": [
+    "DCC030",
+    "DCC049"
+   ],
+   "name": "Teoria da Informação",
+   "kind": "topico",
+   "terms": [
+    "2020.2"
+   ],
+   "retired": true
+  },
+  {
+   "id": "TOP-topological-methods-in-graph-theory",
+   "codes": [
+    "DCC030",
+    "DCC049",
+    "DCC831"
+   ],
+   "name": "Topological Methods in Graph Theory",
+   "kind": "topico",
+   "terms": [
+    "2020.2"
+   ],
+   "retired": true
+  },
+  {
+   "id": "TOP-visualizacao-de-dados",
+   "codes": [
+    "DCC030",
+    "DCC049",
+    "DCC831",
+    "DCC829"
+   ],
+   "name": "Visualização de Dados",
+   "kind": "topico",
+   "terms": [
+    "2021.1",
+    "2022.1",
+    "2023.1",
+    "2024.1"
+   ],
+   "retired": true
+  }
+ ],
+ "offerings": [
+  {
+   "term": "2020.1",
+   "course": "DCC003",
+   "codes": [
+    "DCC003"
+   ],
+   "professors": [
+    "pedro-olmo-stancioli-vaz-de-melo"
+   ],
+   "schedule": [
+    {
+     "day": 5,
+     "start": "18:30",
+     "end": "22:00"
+    }
+   ],
+   "class": "TE"
+  },
+  {
+   "term": "2020.1",
+   "course": "DCC007",
+   "codes": [
+    "DCC007"
+   ],
+   "professors": [
+    "omar-paranaiba-vilela-neto"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "09:25",
+     "end": "11:05"
+    },
+    {
+     "day": 3,
+     "start": "09:25",
+     "end": "11:05"
+    }
+   ],
+   "class": "TB/TB1"
+  },
+  {
+   "term": "2020.1",
+   "course": "TOP-quantum-information-theory",
+   "codes": [
+    "DCC030"
+   ],
+   "professors": [
+    "gabriel-de-morais-coutinho"
+   ],
+   "schedule": [
+    {
+     "day": 2,
+     "start": "13:00",
+     "end": "14:40"
+    },
+    {
+     "day": 4,
+     "start": "13:00",
+     "end": "14:40"
+    }
+   ],
+   "class": "TA"
+  },
+  {
+   "term": "2020.1",
+   "course": "TOP-criptografia-teorica",
+   "codes": [
+    "DCC030"
+   ],
+   "professors": [
+    "jeroen-van-de-graaf"
+   ],
+   "schedule": [],
+   "class": "TB"
+  },
+  {
+   "term": "2020.1",
+   "course": "TOP-introduction-to-approximation-algorithms",
+   "codes": [
+    "DCC030"
+   ],
+   "professors": [
+    "olga-nikolaevna-goussevskaia"
+   ],
+   "schedule": [
+    {
+     "day": 2,
+     "start": "13:00",
+     "end": "14:40"
+    },
+    {
+     "day": 4,
+     "start": "13:00",
+     "end": "14:40"
+    }
+   ],
+   "class": "TC"
+  },
+  {
+   "term": "2020.1",
+   "course": "TOP-analise-estatica",
+   "codes": [
+    "DCC030"
+   ],
+   "professors": [],
+   "schedule": [],
+   "class": "TD"
+  },
+  {
+   "term": "2020.2",
+   "course": "DCC044",
+   "codes": [
+    "DCC044"
+   ],
+   "professors": [
+    "ana-paula-couto-da-silva"
+   ],
+   "schedule": [
+    {
+     "day": 3,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "class": "SI"
+  },
+  {
+   "term": "2020.2",
+   "course": "DCC606",
+   "codes": [
+    "DCC606"
+   ],
+   "professors": [
+    "fabricio-benevenuto-de-souza"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "14:55",
+     "end": "16:35"
+    },
+    {
+     "day": 3,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "class": "CC"
+  },
+  {
+   "term": "2020.2",
+   "course": "DCC606",
+   "codes": [
+    "DCC606"
+   ],
+   "professors": [
+    "jose-nagib-cotrim-arabe"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "19:00",
+     "end": "20:40"
+    },
+    {
+     "day": 3,
+     "start": "19:00",
+     "end": "20:40"
+    }
+   ],
+   "class": "SI"
+  },
+  {
+   "term": "2020.2",
+   "course": "DCC050",
+   "codes": [
+    "DCC050"
+   ],
+   "professors": [
+    "wagner-meira-junior"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "class": "CC"
+  },
+  {
+   "term": "2020.2",
+   "course": "TOP-otimizacao-de-codigo",
+   "codes": [
+    "DCC831"
+   ],
+   "professors": [
+    "mariza-andrade-da-silva-bigonha"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "09:25",
+     "end": "11:05"
+    },
+    {
+     "day": 3,
+     "start": "09:25",
+     "end": "11:05"
+    }
+   ],
+   "class": "PG"
+  },
+  {
+   "term": "2020.2",
+   "course": "TOP-aprendizado-profundo-para-processamento-de-linguagem-natural",
+   "codes": [
+    "DCC030",
+    "DCC049",
+    "DCC831"
+   ],
+   "professors": [
+    "adriano-alonso-veloso"
+   ],
+   "schedule": [
+    {
+     "day": 2,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 4,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "class": "CC/SI/MC/PG"
+  },
+  {
+   "term": "2020.2",
+   "course": "DCC198",
+   "codes": [
+    "DCC198",
+    "DCC030",
+    "DCC831"
+   ],
+   "professors": [
+    "ana-paula-couto-da-silva",
+    "fabricio-benevenuto-de-souza"
+   ],
+   "schedule": [
+    {
+     "day": 2,
+     "start": "14:55",
+     "end": "16:35"
+    },
+    {
+     "day": 4,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "class": "CC/SI/PG"
+  },
+  {
+   "term": "2020.2",
+   "course": "TOP-financas-quantitativas-e-gerenciamento-de-risco",
+   "codes": [
+    "DCC030",
+    "DCC049",
+    "DCC831"
+   ],
+   "professors": [
+    "cristiano-arbex-valle"
+   ],
+   "schedule": [
+    {
+     "day": 2,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 4,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "class": "CC/SI/MC/PG"
+  },
+  {
+   "term": "2020.2",
+   "course": "TOP-bancos-de-dados-geograficos",
+   "codes": [
+    "DCC030",
+    "DCC049",
+    "DCC831"
+   ],
+   "professors": [
+    "clodoveu-davis"
+   ],
+   "schedule": [
+    {
+     "day": 2,
+     "start": "14:55",
+     "end": "16:35"
+    },
+    {
+     "day": 4,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "class": "CC/SI/MC/PG"
+  },
+  {
+   "term": "2020.2",
+   "course": "TOP-medicao-e-qualidade-de-software",
+   "codes": [
+    "DCC030",
+    "DCC049",
+    "DCC890"
+   ],
+   "professors": [
+    "eduardo-figueiredo"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "14:55",
+     "end": "16:35"
+    },
+    {
+     "day": 3,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "class": "CC/SI/MC/PG"
+  },
+  {
+   "term": "2020.2",
+   "course": "TOP-music-information-retrieval",
+   "codes": [
+    "DCC030",
+    "DCC049",
+    "DCC831"
+   ],
+   "professors": [
+    "flavio-vinicius-diniz-de-figueiredo"
+   ],
+   "schedule": [
+    {
+     "day": 2,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 4,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "class": "CC/SI/MC/PG"
+  },
+  {
+   "term": "2020.2",
+   "course": "TOP-topological-methods-in-graph-theory",
+   "codes": [
+    "DCC030",
+    "DCC049",
+    "DCC831"
+   ],
+   "professors": [
+    "gabriel-de-morais-coutinho"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "09:25",
+     "end": "11:05"
+    },
+    {
+     "day": 3,
+     "start": "09:25",
+     "end": "11:05"
+    }
+   ],
+   "class": "CC/SI/MC/PG"
+  },
+  {
+   "term": "2020.2",
+   "course": "TOP-seguranca-em-sistemas-de-computacao",
+   "codes": [
+    "DCC030",
+    "DCC049",
+    "DCC831"
+   ],
+   "professors": [
+    "leonardo-barbosa-e-oliveira"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 3,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "class": "CC/SI/MC/PG"
+  },
+  {
+   "term": "2020.2",
+   "course": "TOP-introduction-to-approximation-algorithms",
+   "codes": [
+    "DCC030",
+    "DCC049",
+    "DCC831"
+   ],
+   "professors": [
+    "olga-nikolaevna-goussevskaia"
+   ],
+   "schedule": [
+    {
+     "day": 2,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 4,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "class": "CC/SI/MC/PG"
+  },
+  {
+   "term": "2020.2",
+   "course": "TOP-bioinformatica",
+   "codes": [
+    "DCC030",
+    "DCC049",
+    "DCC831"
+   ],
+   "professors": [
+    "raquel-cardoso-de-melo-minardi"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "11:10",
+     "end": "12:50"
+    },
+    {
+     "day": 3,
+     "start": "11:10",
+     "end": "12:50"
+    }
+   ],
+   "class": "CC/SI/MC/PG"
+  },
+  {
+   "term": "2020.2",
+   "course": "TOP-sistemas-de-recomendacao",
+   "codes": [
+    "DCC030",
+    "DCC049",
+    "DCC831"
+   ],
+   "professors": [
+    "rodrygo-luis-teodoro-santos"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "09:25",
+     "end": "11:05"
+    },
+    {
+     "day": 3,
+     "start": "09:25",
+     "end": "11:05"
+    }
+   ],
+   "class": "CC/SI/MC/PG"
+  },
+  {
+   "term": "2020.2",
+   "course": "TOP-sistemas-de-informacao-biomedicos",
+   "codes": [
+    "DCC030",
+    "DCC049",
+    "DCC831"
+   ],
+   "professors": [
+    "sergio-vale-aguiar-campos"
+   ],
+   "schedule": [
+    {
+     "day": 2,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 4,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "class": "CC/SI/MC/PG"
+  },
+  {
+   "term": "2020.2",
+   "course": "TOP-classes-de-grafos",
+   "codes": [
+    "DCC030",
+    "DCC049",
+    "DCC831"
+   ],
+   "professors": [
+    "vinicius-fernandes-dos-santos"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 3,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "class": "CC/SI/MC/PG"
+  },
+  {
+   "term": "2020.2",
+   "course": "TOP-processamento-de-dados-massivos-em-nuvem",
+   "codes": [
+    "DCC030",
+    "DCC049"
+   ],
+   "professors": [
+    "dorgival-olavo-guedes-neto"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "14:55",
+     "end": "16:35"
+    },
+    {
+     "day": 3,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "class": "CC/SI/MC/PG"
+  },
+  {
+   "term": "2020.2",
+   "course": "TOP-programacao-em-logica",
+   "codes": [
+    "DCC030",
+    "DCC049"
+   ],
+   "professors": [
+    "jose-lopes-de-siqueira-neto"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "09:25",
+     "end": "11:05"
+    },
+    {
+     "day": 3,
+     "start": "09:25",
+     "end": "11:05"
+    }
+   ],
+   "class": "CC/SI/MC"
+  },
+  {
+   "term": "2020.2",
+   "course": "TOP-teoria-da-informacao",
+   "codes": [
+    "DCC030",
+    "DCC049"
+   ],
+   "professors": [
+    "jeroen-van-de-graaf"
+   ],
+   "schedule": [
+    {
+     "day": 2,
+     "start": "11:10",
+     "end": "12:50"
+    },
+    {
+     "day": 4,
+     "start": "11:10",
+     "end": "12:50"
+    }
+   ],
+   "class": "CC/SI/MC"
+  },
+  {
+   "term": "2020.2",
+   "course": "TOP-pratica-em-desenvolvimento-de-software",
+   "codes": [
+    "DCC030",
+    "DCC049"
+   ],
+   "professors": [
+    "marco-tulio-de-oliveira-valente"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 3,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "class": "CC/SI"
+  },
+  {
+   "term": "2021.1",
+   "course": "DCC007",
+   "codes": [
+    "DCC007",
+    "DCC819"
+   ],
+   "professors": [
+    "omar-paranaiba-vilela-neto"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "09:25",
+     "end": "11:05"
+    },
+    {
+     "day": 3,
+     "start": "09:25",
+     "end": "11:05"
+    }
+   ],
+   "class": "CC/SI/POS"
+  },
+  {
+   "term": "2021.1",
+   "course": "TOP-programacao-em-logica",
+   "codes": [
+    "DCC030",
+    "DCC049"
+   ],
+   "professors": [
+    "jose-lopes-de-siqueira-neto"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "09:25",
+     "end": "11:05"
+    },
+    {
+     "day": 3,
+     "start": "09:25",
+     "end": "11:05"
+    }
+   ],
+   "class": "CC/SI/MC"
+  },
+  {
+   "term": "2021.1",
+   "course": "TOP-sistemas-embarcados",
+   "codes": [
+    "DCC030",
+    "DCC049"
+   ],
+   "professors": [
+    "daniel-fernandes-macedo"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 3,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "class": "CC/SI/MC"
+  },
+  {
+   "term": "2021.1",
+   "course": "TOP-pratica-em-desenvolvimento-de-software",
+   "codes": [
+    "DCC030",
+    "DCC049"
+   ],
+   "professors": [
+    "marco-tulio-de-oliveira-valente"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 3,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "class": "CC/SI"
+  },
+  {
+   "term": "2021.1",
+   "course": "TOP-computacao-ubiqua",
+   "codes": [
+    "DCC030",
+    "DCC049"
+   ],
+   "professors": [
+    "antonio-alfredo-ferreira-loureiro"
+   ],
+   "schedule": [
+    {
+     "day": 2,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 4,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "class": "CC/SI/MC"
+  },
+  {
+   "term": "2021.1",
+   "course": "TOP-linguistica-computacional",
+   "codes": [
+    "DCC030",
+    "DCC049"
+   ],
+   "professors": [
+    "thiago-ferreira-de-noronha"
+   ],
+   "schedule": [
+    {
+     "day": 2,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 4,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "class": "CC/SI/MC"
+  },
+  {
+   "term": "2021.1",
+   "course": "TOP-criptografia",
+   "codes": [
+    "DCC030",
+    "DCC049"
+   ],
+   "professors": [
+    "jeroen-van-de-graaf"
+   ],
+   "schedule": [
+    {
+     "day": 2,
+     "start": "19:00",
+     "end": "20:40"
+    },
+    {
+     "day": 4,
+     "start": "19:00",
+     "end": "20:40"
+    }
+   ],
+   "class": "CC/SI/MC"
+  },
+  {
+   "term": "2021.1",
+   "course": "TOP-programacao-inteira-e-tecnicas-de-aproximacao",
+   "codes": [
+    "DCC030",
+    "DCC049",
+    "DCC831"
+   ],
+   "professors": [],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "09:25",
+     "end": "11:05"
+    },
+    {
+     "day": 3,
+     "start": "09:25",
+     "end": "11:05"
+    }
+   ],
+   "unresolved": [
+    "Phablo"
+   ],
+   "class": "CC/SI/MC/PG"
+  },
+  {
+   "term": "2021.1",
+   "course": "TOP-sistemas-de-recomendacao",
+   "codes": [
+    "DCC030",
+    "DCC049",
+    "DCC831"
+   ],
+   "professors": [
+    "rodrygo-luis-teodoro-santos"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "09:25",
+     "end": "11:05"
+    },
+    {
+     "day": 3,
+     "start": "09:25",
+     "end": "11:05"
+    }
+   ],
+   "class": "CC/SI/MC/PG"
+  },
+  {
+   "term": "2021.1",
+   "course": "TOP-visualizacao-de-dados",
+   "codes": [
+    "DCC030",
+    "DCC049",
+    "DCC831"
+   ],
+   "professors": [
+    "raquel-cardoso-de-melo-minardi"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "13:00",
+     "end": "14:40"
+    },
+    {
+     "day": 3,
+     "start": "13:00",
+     "end": "14:40"
+    }
+   ],
+   "class": "CC/SI/MC/PG"
+  },
+  {
+   "term": "2021.1",
+   "course": "TOP-programacao-paralela",
+   "codes": [
+    "DCC030",
+    "DCC049",
+    "DCC831"
+   ],
+   "professors": [
+    "george-luiz-medeiros-teodoro"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 3,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "class": "CC/SI/MC/PG"
+  },
+  {
+   "term": "2021.1",
+   "course": "TOP-sistemas-em-redes",
+   "codes": [
+    "DCC030",
+    "DCC049",
+    "DCC831"
+   ],
+   "professors": [
+    "marcos-augusto-menezes-vieira"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "19:00",
+     "end": "20:40"
+    },
+    {
+     "day": 3,
+     "start": "19:00",
+     "end": "20:40"
+    }
+   ],
+   "class": "CC/SI/MC/PG"
+  },
+  {
+   "term": "2021.1",
+   "course": "TOP-fundamentos-estatisiticos-de-ciencia-dos-dados",
+   "codes": [
+    "DCC030",
+    "DCC049",
+    "DCC831"
+   ],
+   "professors": [
+    "renato-martins-assuncao"
+   ],
+   "schedule": [
+    {
+     "day": 2,
+     "start": "09:25",
+     "end": "11:05"
+    },
+    {
+     "day": 4,
+     "start": "09:25",
+     "end": "11:05"
+    }
+   ],
+   "class": "CC/SI/MC/PG"
+  },
+  {
+   "term": "2021.1",
+   "course": "TOP-aprendizado-de-maquina",
+   "codes": [
+    "DCC030",
+    "DCC049",
+    "DCC831"
+   ],
+   "professors": [
+    "adriano-alonso-veloso"
+   ],
+   "schedule": [
+    {
+     "day": 2,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 4,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "class": "CC/SI/MC/PG"
+  },
+  {
+   "term": "2021.1",
+   "course": "TOP-cybersecurity-data-science",
+   "codes": [
+    "DCC030",
+    "DCC049",
+    "DCC831"
+   ],
+   "professors": [],
+   "schedule": [
+    {
+     "day": 2,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 4,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "unresolved": [
+    "Michele"
+   ],
+   "class": "CC/SI/MC/PG"
+  },
+  {
+   "term": "2021.1",
+   "course": "TOP-static-analysis",
+   "codes": [
+    "DCC030",
+    "DCC049",
+    "DCC831"
+   ],
+   "professors": [
+    "fernando-magno-quintao-pereira"
+   ],
+   "schedule": [
+    {
+     "day": 2,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 4,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "class": "CC/SI/MC/PG"
+  },
+  {
+   "term": "2021.1",
+   "course": "TOP-modularidade",
+   "codes": [
+    "DCC030",
+    "DCC049",
+    "DCC890"
+   ],
+   "professors": [
+    "mariza-andrade-da-silva-bigonha"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "14:55",
+     "end": "16:35"
+    },
+    {
+     "day": 3,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "class": "CC/SI/MC/PG"
+  },
+  {
+   "term": "2021.1",
+   "course": "DCC044",
+   "codes": [
+    "DCC044"
+   ],
+   "professors": [
+    "ana-paula-couto-da-silva"
+   ],
+   "schedule": [
+    {
+     "day": 3,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "class": "SI"
+  },
+  {
+   "term": "2021.1",
+   "course": "DCC050",
+   "codes": [
+    "DCC050"
+   ],
+   "professors": [
+    "wagner-meira-junior"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "class": "CC"
+  },
+  {
+   "term": "2021.1",
+   "course": "TOP-interacao-humano-computador-em-computacao-ubiqua-e-internet-",
+   "codes": [
+    "DCC069"
+   ],
+   "professors": [],
+   "schedule": [
+    {
+     "day": 3,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "unresolved": [
+    "Bruno"
+   ],
+   "class": "CC/SI"
+  },
+  {
+   "term": "2021.1",
+   "course": "DCC189",
+   "codes": [
+    "DCC189",
+    "DCC049"
+   ],
+   "professors": [
+    "marcos-andre-goncalves"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 3,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "class": "CC/SI/MC"
+  },
+  {
+   "term": "2021.1",
+   "course": "DCC198",
+   "codes": [
+    "DCC198",
+    "DCC030",
+    "DCC049",
+    "DCC831"
+   ],
+   "professors": [
+    "ana-paula-couto-da-silva",
+    "fabricio-benevenuto-de-souza"
+   ],
+   "schedule": [
+    {
+     "day": 2,
+     "start": "19:00",
+     "end": "20:40"
+    },
+    {
+     "day": 4,
+     "start": "19:00",
+     "end": "20:40"
+    }
+   ],
+   "class": "CC/SI/MC/PG"
+  },
+  {
+   "term": "2021.1",
+   "course": "TOP-metodos-quantitativos-de-pesquisa-experimental-em-ciencia-da",
+   "codes": [
+    "DCC831"
+   ],
+   "professors": [
+    "jussara-marques-de-almeida"
+   ],
+   "schedule": [
+    {
+     "day": 2,
+     "start": "13:00",
+     "end": "14:40"
+    },
+    {
+     "day": 4,
+     "start": "13:00",
+     "end": "14:40"
+    }
+   ],
+   "class": "PG"
+  },
+  {
+   "term": "2021.1",
+   "course": "TOP-seminarios-avancados-em-arquitetura-de-sistemas-em-nuvem",
+   "codes": [
+    "DCC851"
+   ],
+   "professors": [
+    "dorgival-olavo-guedes-neto"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "class": "PG"
+  },
+  {
+   "term": "2021.1",
+   "course": "TOP-seminarios-sobre-interpretabilidade-em-mineracao-de-dados",
+   "codes": [
+    "DCC851"
+   ],
+   "professors": [
+    "wagner-meira-junior"
+   ],
+   "schedule": [],
+   "class": "PG"
+  },
+  {
+   "term": "2021.1",
+   "course": "TOP-fundamentos-de-engenharia-semiotica",
+   "codes": [
+    "DCC851"
+   ],
+   "professors": [
+    "raquel-oliveira-prates"
+   ],
+   "schedule": [],
+   "class": "PG"
+  },
+  {
+   "term": "2021.1",
+   "course": "TOP-engenharia-de-software-experimental",
+   "codes": [
+    "DCC890"
+   ],
+   "professors": [
+    "eduardo-figueiredo"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "14:55",
+     "end": "16:35"
+    },
+    {
+     "day": 3,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "class": "PG"
+  },
+  {
+   "term": "2021.2",
+   "course": "TOP-algoritmos-de-aprendizado-profundo",
+   "codes": [
+    "DCC831"
+   ],
+   "professors": [
+    "fabricio-murai"
+   ],
+   "schedule": [
+    {
+     "day": 2,
+     "start": "09:25",
+     "end": "11:05"
+    },
+    {
+     "day": 4,
+     "start": "09:25",
+     "end": "11:05"
+    }
+   ],
+   "class": "PG"
+  },
+  {
+   "term": "2021.2",
+   "course": "TOP-algoritmos-exatos-exponenciais-e-complexidade-parametrizada",
+   "codes": [
+    "DCC030",
+    "DCC049",
+    "DCC831"
+   ],
+   "professors": [
+    "vinicius-fernandes-dos-santos"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 3,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "class": "CC/SI/MC/PG"
+  },
+  {
+   "term": "2021.2",
+   "course": "TOP-aprendizado-profundo-para-processamento-de-linguagem-natural",
+   "codes": [
+    "DCC030",
+    "DCC049",
+    "DCC831"
+   ],
+   "professors": [
+    "adriano-alonso-veloso"
+   ],
+   "schedule": [
+    {
+     "day": 2,
+     "start": "19:00",
+     "end": "20:40"
+    },
+    {
+     "day": 4,
+     "start": "19:00",
+     "end": "20:40"
+    }
+   ],
+   "class": "CC/SI/MC/PG"
+  },
+  {
+   "term": "2021.2",
+   "course": "TOP-bancos-de-dados-geograficos",
+   "codes": [
+    "DCC030",
+    "DCC049",
+    "DCC831"
+   ],
+   "professors": [
+    "clodoveu-davis"
+   ],
+   "schedule": [
+    {
+     "day": 2,
+     "start": "14:55",
+     "end": "16:35"
+    },
+    {
+     "day": 4,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "class": "CC/SI/MC/PG"
+  },
+  {
+   "term": "2021.2",
+   "course": "TOP-bioinformatica",
+   "codes": [
+    "DCC030",
+    "DCC049",
+    "DCC831"
+   ],
+   "professors": [
+    "raquel-cardoso-de-melo-minardi"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "13:00",
+     "end": "14:40"
+    },
+    {
+     "day": 3,
+     "start": "13:00",
+     "end": "14:40"
+    }
+   ],
+   "class": "CC/SI/MC/PG"
+  },
+  {
+   "term": "2021.2",
+   "course": "TOP-cybersecurity-data-science",
+   "codes": [
+    "DCC030",
+    "DCC049",
+    "DCC831"
+   ],
+   "professors": [],
+   "schedule": [
+    {
+     "day": 2,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 4,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "unresolved": [
+    "Michele"
+   ],
+   "class": "CC/SI/MC/PG"
+  },
+  {
+   "term": "2021.2",
+   "course": "TOP-financas-quantitativas-e-gerenciamento-de-risco",
+   "codes": [
+    "DCC030",
+    "DCC049",
+    "DCC831"
+   ],
+   "professors": [
+    "cristiano-arbex-valle"
+   ],
+   "schedule": [
+    {
+     "day": 2,
+     "start": "19:00",
+     "end": "20:40"
+    },
+    {
+     "day": 4,
+     "start": "19:00",
+     "end": "20:40"
+    }
+   ],
+   "class": "CC/SI/MC/PG"
+  },
+  {
+   "term": "2021.2",
+   "course": "TOP-fundamentos-de-engenharia-semiotica",
+   "codes": [
+    "DCC851"
+   ],
+   "professors": [
+    "raquel-oliveira-prates"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "class": "PG"
+  },
+  {
+   "term": "2021.2",
+   "course": "DCC044",
+   "codes": [
+    "DCC044"
+   ],
+   "professors": [
+    "jussara-marques-de-almeida"
+   ],
+   "schedule": [
+    {
+     "day": 3,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "class": "SI"
+  },
+  {
+   "term": "2021.2",
+   "course": "DCC050",
+   "codes": [
+    "DCC050"
+   ],
+   "professors": [
+    "wagner-meira-junior"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "class": "CC"
+  },
+  {
+   "term": "2021.2",
+   "course": "TOP-introducao-a-prototipagem-rapida",
+   "codes": [
+    "DCC030",
+    "DCC049"
+   ],
+   "professors": [
+    "daniel-fernandes-macedo"
+   ],
+   "schedule": [
+    {
+     "day": 2,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 4,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "class": "CC/SI/MC"
+  },
+  {
+   "term": "2021.2",
+   "course": "TOP-modularidade",
+   "codes": [
+    "DCC030",
+    "DCC049",
+    "DCC831"
+   ],
+   "professors": [
+    "mariza-andrade-da-silva-bigonha"
+   ],
+   "schedule": [
+    {
+     "day": 2,
+     "start": "13:00",
+     "end": "14:40"
+    },
+    {
+     "day": 4,
+     "start": "13:00",
+     "end": "14:40"
+    }
+   ],
+   "class": "CC/SI/MC/PG"
+  },
+  {
+   "term": "2021.2",
+   "course": "TOP-pattern-recognition-for-earth-observation",
+   "codes": [
+    "DCC831"
+   ],
+   "professors": [
+    "jefersson-alex-dos-santos"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "09:25",
+     "end": "11:05"
+    },
+    {
+     "day": 3,
+     "start": "09:25",
+     "end": "11:05"
+    }
+   ],
+   "class": "PG"
+  },
+  {
+   "term": "2021.2",
+   "course": "TOP-pratica-em-desenvolvimento-de-software",
+   "codes": [
+    "DCC030",
+    "DCC049"
+   ],
+   "professors": [
+    "marco-tulio-de-oliveira-valente"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 3,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "class": "CC/SI"
+  },
+  {
+   "term": "2021.2",
+   "course": "TOP-processamento-de-dados-massivos",
+   "codes": [
+    "DCC030",
+    "DCC049",
+    "DCC831"
+   ],
+   "professors": [
+    "dorgival-olavo-guedes-neto"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "14:55",
+     "end": "16:35"
+    },
+    {
+     "day": 3,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "class": "CC/SI/MC/PG"
+  },
+  {
+   "term": "2021.2",
+   "course": "TOP-programacao-estocastica-modelagem-aplicacoes-e-algoritmos",
+   "codes": [
+    "DCC831"
+   ],
+   "professors": [
+    "alexandre-salles-da-cunha"
+   ],
+   "schedule": [
+    {
+     "day": 2,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 4,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "class": "PG"
+  },
+  {
+   "term": "2021.2",
+   "course": "TOP-programacao-paralela",
+   "codes": [
+    "DCC030",
+    "DCC049",
+    "DCC831"
+   ],
+   "professors": [
+    "george-luiz-medeiros-teodoro"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "11:10",
+     "end": "12:50"
+    },
+    {
+     "day": 3,
+     "start": "11:10",
+     "end": "12:50"
+    }
+   ],
+   "class": "CC/SI/MC/PG"
+  },
+  {
+   "term": "2021.2",
+   "course": "TOP-reutilizacao-de-software",
+   "codes": [
+    "DCC030",
+    "DCC049",
+    "DCC831"
+   ],
+   "professors": [
+    "eduardo-figueiredo"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "14:55",
+     "end": "16:35"
+    },
+    {
+     "day": 3,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "class": "CC/SI/MC/PG"
+  },
+  {
+   "term": "2021.2",
+   "course": "TOP-seminarios-avancados-em-recuperacao-de-informacao-e-computac",
+   "codes": [
+    "DCC831"
+   ],
+   "professors": [
+    "marcos-andre-goncalves"
+   ],
+   "schedule": [
+    {
+     "day": 2,
+     "start": "09:25",
+     "end": "11:05"
+    },
+    {
+     "day": 4,
+     "start": "09:25",
+     "end": "11:05"
+    }
+   ],
+   "class": "PG"
+  },
+  {
+   "term": "2021.2",
+   "course": "TOP-seminarios-avancados-sobre-desinformacao-e-odio-nas-platafor",
+   "codes": [
+    "DCC831"
+   ],
+   "professors": [
+    "fabricio-benevenuto-de-souza",
+    "fabricio-murai"
+   ],
+   "schedule": [
+    {
+     "day": 2,
+     "start": "13:00",
+     "end": "14:40"
+    },
+    {
+     "day": 4,
+     "start": "13:00",
+     "end": "14:40"
+    }
+   ],
+   "class": "PG"
+  },
+  {
+   "term": "2021.2",
+   "course": "TOP-sistemas-de-informacao-biomedicos",
+   "codes": [
+    "DCC030",
+    "DCC049",
+    "DCC831"
+   ],
+   "professors": [
+    "sergio-vale-aguiar-campos"
+   ],
+   "schedule": [
+    {
+     "day": 2,
+     "start": "14:55",
+     "end": "16:35"
+    },
+    {
+     "day": 4,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "class": "CC/SI/MC/PG"
+  },
+  {
+   "term": "2021.2",
+   "course": "TOP-sistemas-de-recomendacao",
+   "codes": [
+    "DCC030",
+    "DCC049",
+    "DCC831"
+   ],
+   "professors": [
+    "rodrygo-luis-teodoro-santos"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "09:25",
+     "end": "11:05"
+    },
+    {
+     "day": 3,
+     "start": "09:25",
+     "end": "11:05"
+    }
+   ],
+   "class": "CC/SI/MC/PG"
+  },
+  {
+   "term": "2021.2",
+   "course": "TOP-spectral-graph-theory",
+   "codes": [
+    "DCC030",
+    "DCC049",
+    "DCC831"
+   ],
+   "professors": [
+    "gabriel-de-morais-coutinho"
+   ],
+   "schedule": [
+    {
+     "day": 2,
+     "start": "13:00",
+     "end": "14:40"
+    },
+    {
+     "day": 4,
+     "start": "13:00",
+     "end": "14:40"
+    }
+   ],
+   "class": "CC/SI/MC/PG"
+  },
+  {
+   "term": "2022.1",
+   "course": "DCC044",
+   "codes": [
+    "DCC044"
+   ],
+   "professors": [],
+   "schedule": [
+    {
+     "day": 3,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "unresolved": [
+    "Michele"
+   ],
+   "class": "SI"
+  },
+  {
+   "term": "2022.1",
+   "course": "DCC050",
+   "codes": [
+    "DCC050"
+   ],
+   "professors": [
+    "luiz-filipe-menezes-vieira"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "class": "CC"
+  },
+  {
+   "term": "2022.1",
+   "course": "DCC007",
+   "codes": [
+    "DCC007"
+   ],
+   "professors": [
+    "omar-paranaiba-vilela-neto"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "09:25",
+     "end": "11:05"
+    },
+    {
+     "day": 3,
+     "start": "09:25",
+     "end": "11:05"
+    }
+   ]
+  },
+  {
+   "term": "2022.1",
+   "course": "TOP-metodos-quantitativos-de-pesquisa-experimental-em-ciencia-da",
+   "codes": [
+    "DCC831"
+   ],
+   "professors": [
+    "jussara-marques-de-almeida"
+   ],
+   "schedule": [
+    {
+     "day": 2,
+     "start": "14:55",
+     "end": "16:35"
+    },
+    {
+     "day": 4,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "class": "PG"
+  },
+  {
+   "term": "2022.1",
+   "course": "TOP-programacao-nao-linear-inteira-mista",
+   "codes": [
+    "DCC831"
+   ],
+   "professors": [
+    "alexandre-salles-da-cunha"
+   ],
+   "schedule": [
+    {
+     "day": 2,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 4,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "class": "PG"
+  },
+  {
+   "term": "2022.1",
+   "course": "TOP-divulgacao-de-resultados-de-pesquisa",
+   "codes": [
+    "DCC831"
+   ],
+   "professors": [
+    "jose-nelson-amaral",
+    "fernando-magno-quintao-pereira"
+   ],
+   "schedule": [],
+   "class": "PG"
+  },
+  {
+   "term": "2022.1",
+   "course": "TOP-engenharia-de-software-experimental",
+   "codes": [
+    "DCC890"
+   ],
+   "professors": [
+    "eduardo-figueiredo"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "14:55",
+     "end": "16:35"
+    },
+    {
+     "day": 3,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "class": "PG"
+  },
+  {
+   "term": "2022.1",
+   "course": "DCC007",
+   "codes": [
+    "DCC007",
+    "DCC819"
+   ],
+   "professors": [
+    "omar-paranaiba-vilela-neto"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "09:25",
+     "end": "11:05"
+    },
+    {
+     "day": 3,
+     "start": "09:25",
+     "end": "11:05"
+    }
+   ],
+   "class": "CC/SI/POS"
+  },
+  {
+   "term": "2022.1",
+   "course": "TOP-aprendizado-de-maquina",
+   "codes": [
+    "DCC030",
+    "DCC049",
+    "DCC831"
+   ],
+   "professors": [
+    "adriano-alonso-veloso"
+   ],
+   "schedule": [
+    {
+     "day": 2,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 4,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "class": "CC/SI/MC/PG"
+  },
+  {
+   "term": "2022.1",
+   "course": "TOP-information-theory",
+   "codes": [
+    "DCC030",
+    "DCC049",
+    "DCC831"
+   ],
+   "professors": [
+    "mario-sergio-alvim"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "14:55",
+     "end": "16:35"
+    },
+    {
+     "day": 3,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "class": "CC/SI/MC/PG"
+  },
+  {
+   "term": "2022.1",
+   "course": "TOP-internet-das-coisas-aspectos-computacionais-e-juridicos",
+   "codes": [
+    "DCC030",
+    "DCC049",
+    "DCC831"
+   ],
+   "professors": [],
+   "schedule": [
+    {
+     "day": 5,
+     "start": "13:00",
+     "end": "16:20"
+    }
+   ],
+   "unresolved": [
+    "Michele"
+   ],
+   "class": "CC/SI/MC/PG"
+  },
+  {
+   "term": "2022.1",
+   "course": "TOP-programacao-inteira-e-tecnicas-de-aproximacao",
+   "codes": [
+    "DCC030",
+    "DCC049",
+    "DCC831"
+   ],
+   "professors": [],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 3,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "unresolved": [
+    "Phablo"
+   ],
+   "class": "CC/SI/MC/PG"
+  },
+  {
+   "term": "2022.1",
+   "course": "TOP-sistemas-de-tempo-real",
+   "codes": [
+    "DCC030",
+    "DCC049",
+    "DCC831"
+   ],
+   "professors": [
+    "sergio-vale-aguiar-campos"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "14:55",
+     "end": "16:35"
+    },
+    {
+     "day": 3,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "class": "CC/SI/MC/PG"
+  },
+  {
+   "term": "2022.1",
+   "course": "TOP-visualizacao-de-dados",
+   "codes": [
+    "DCC030",
+    "DCC049",
+    "DCC829"
+   ],
+   "professors": [
+    "raquel-cardoso-de-melo-minardi"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "13:00",
+     "end": "14:40"
+    },
+    {
+     "day": 3,
+     "start": "13:00",
+     "end": "14:40"
+    }
+   ],
+   "class": "CC/SI/MC/PG"
+  },
+  {
+   "term": "2022.1",
+   "course": "DCC189",
+   "codes": [
+    "DCC189",
+    "DCC049"
+   ],
+   "professors": [
+    "marcos-andre-goncalves"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 3,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "class": "CC/SI/MC"
+  },
+  {
+   "term": "2022.1",
+   "course": "TOP-cloud-computing",
+   "codes": [
+    "DCC030",
+    "DCC049"
+   ],
+   "professors": [
+    "italo-fernando-scota-cunha"
+   ],
+   "schedule": [
+    {
+     "day": 2,
+     "start": "14:55",
+     "end": "16:35"
+    },
+    {
+     "day": 4,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "class": "CC/SI/MC"
+  },
+  {
+   "term": "2022.1",
+   "course": "TOP-computacao-ubiqua",
+   "codes": [
+    "DCC030",
+    "DCC049"
+   ],
+   "professors": [
+    "antonio-alfredo-ferreira-loureiro"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 3,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "class": "CC/SI/MC"
+  },
+  {
+   "term": "2022.1",
+   "course": "TOP-criptografia",
+   "codes": [
+    "DCC030",
+    "DCC049"
+   ],
+   "professors": [
+    "jeroen-van-de-graaf"
+   ],
+   "schedule": [
+    {
+     "day": 2,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 4,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "class": "CC/SI/MC"
+  },
+  {
+   "term": "2022.1",
+   "course": "TOP-pratica-em-desenvolvimento-de-software",
+   "codes": [
+    "DCC030",
+    "DCC049"
+   ],
+   "professors": [
+    "marco-tulio-de-oliveira-valente"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 3,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "class": "CC/SI"
+  },
+  {
+   "term": "2022.2",
+   "course": "TOP-sistemas-de-informacao-biomedicos",
+   "codes": [
+    "DCC030"
+   ],
+   "professors": [],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "14:55",
+     "end": "16:35"
+    },
+    {
+     "day": 3,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "class": "TN"
+  },
+  {
+   "term": "2022.2",
+   "course": "TOP-bioinformatica",
+   "codes": [
+    "DCC030"
+   ],
+   "professors": [],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "13:00",
+     "end": "14:40"
+    },
+    {
+     "day": 3,
+     "start": "13:00",
+     "end": "14:40"
+    }
+   ],
+   "class": "TA"
+  },
+  {
+   "term": "2022.2",
+   "course": "TOP-geometria-afim-e-projetiva-com-aplicacoes-em-computacao-graf",
+   "codes": [
+    "DCC030"
+   ],
+   "professors": [],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "14:55",
+     "end": "16:35"
+    },
+    {
+     "day": 3,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "class": "TM"
+  },
+  {
+   "term": "2022.2",
+   "course": "TOP-pratica-em-desenvolvimento-de-software",
+   "codes": [
+    "DCC030"
+   ],
+   "professors": [],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 3,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "class": "TO"
+  },
+  {
+   "term": "2022.2",
+   "course": "TOP-bancos-de-dados-geograficos",
+   "codes": [
+    "DCC030"
+   ],
+   "professors": [],
+   "schedule": [
+    {
+     "day": 2,
+     "start": "14:55",
+     "end": "16:35"
+    },
+    {
+     "day": 4,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "class": "TK"
+  },
+  {
+   "term": "2022.2",
+   "course": "TOP-algoritmos-avancados",
+   "codes": [
+    "DCC030"
+   ],
+   "professors": [],
+   "schedule": [
+    {
+     "day": 4,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 2,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "class": "TR"
+  },
+  {
+   "term": "2022.2",
+   "course": "TOP-complexidade-computacional",
+   "codes": [
+    "DCC030"
+   ],
+   "professors": [],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 3,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "class": "TF"
+  },
+  {
+   "term": "2022.2",
+   "course": "TOP-causalidade-em-aprendizado-de-maquina",
+   "codes": [
+    "DCC030"
+   ],
+   "professors": [],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "14:55",
+     "end": "16:35"
+    },
+    {
+     "day": 3,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "class": "TB"
+  },
+  {
+   "term": "2022.2",
+   "course": "TOP-medicao-e-qualidade-de-software",
+   "codes": [
+    "DCC030"
+   ],
+   "professors": [],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "14:55",
+     "end": "16:35"
+    },
+    {
+     "day": 3,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "class": "TC"
+  },
+  {
+   "term": "2022.2",
+   "course": "TOP-gerenciamento-das-redes-de-computadores-e-dos-servicos",
+   "codes": [
+    "DCC030"
+   ],
+   "professors": [],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 3,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "class": "TD"
+  },
+  {
+   "term": "2022.2",
+   "course": "TOP-sistemas-de-recomendacao",
+   "codes": [
+    "DCC030"
+   ],
+   "professors": [],
+   "schedule": [
+    {
+     "day": 2,
+     "start": "13:00",
+     "end": "14:40"
+    },
+    {
+     "day": 4,
+     "start": "13:00",
+     "end": "14:40"
+    }
+   ],
+   "class": "TJ"
+  },
+  {
+   "term": "2022.2",
+   "course": "DCC044",
+   "codes": [
+    "DCC044"
+   ],
+   "professors": [],
+   "schedule": [
+    {
+     "day": 3,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "class": "TZ"
+  },
+  {
+   "term": "2022.2",
+   "course": "TOP-causalidade-em-aprendizado-de-maquina",
+   "codes": [
+    "DCC049"
+   ],
+   "professors": [],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "14:55",
+     "end": "16:35"
+    },
+    {
+     "day": 3,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "class": "TE"
+  },
+  {
+   "term": "2022.2",
+   "course": "TOP-complexidade-computacional",
+   "codes": [
+    "DCC049"
+   ],
+   "professors": [],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 3,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "class": "TF"
+  },
+  {
+   "term": "2022.2",
+   "course": "TOP-sistemas-de-informacao-biomedicos",
+   "codes": [
+    "DCC049"
+   ],
+   "professors": [],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "14:55",
+     "end": "16:35"
+    },
+    {
+     "day": 3,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "class": "TP"
+  },
+  {
+   "term": "2022.2",
+   "course": "TOP-geometria-afim-e-projetiva-com-aplicacoes-em-computacao-graf",
+   "codes": [
+    "DCC049"
+   ],
+   "professors": [],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "14:55",
+     "end": "16:35"
+    },
+    {
+     "day": 3,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "class": "TMat"
+  },
+  {
+   "term": "2022.2",
+   "course": "TOP-algoritmos-avancados",
+   "codes": [
+    "DCC049"
+   ],
+   "professors": [],
+   "schedule": [
+    {
+     "day": 2,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 4,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "class": "TX"
+  },
+  {
+   "term": "2022.2",
+   "course": "TOP-medicao-e-qualidade-de-software",
+   "codes": [
+    "DCC049"
+   ],
+   "professors": [],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "14:55",
+     "end": "16:35"
+    },
+    {
+     "day": 3,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "class": "TD"
+  },
+  {
+   "term": "2022.2",
+   "course": "TOP-bioinformatica",
+   "codes": [
+    "DCC049"
+   ],
+   "professors": [],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "13:00",
+     "end": "14:40"
+    },
+    {
+     "day": 3,
+     "start": "13:00",
+     "end": "14:40"
+    }
+   ],
+   "class": "TB"
+  },
+  {
+   "term": "2022.2",
+   "course": "TOP-bancos-de-dados-geograficos",
+   "codes": [
+    "DCC049"
+   ],
+   "professors": [],
+   "schedule": [
+    {
+     "day": 4,
+     "start": "14:55",
+     "end": "16:35"
+    },
+    {
+     "day": 2,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "class": "TM"
+  },
+  {
+   "term": "2022.2",
+   "course": "TOP-sistemas-de-recomendacao",
+   "codes": [
+    "DCC049"
+   ],
+   "professors": [],
+   "schedule": [
+    {
+     "day": 2,
+     "start": "13:00",
+     "end": "14:40"
+    },
+    {
+     "day": 4,
+     "start": "13:00",
+     "end": "14:40"
+    }
+   ],
+   "class": "TL"
+  },
+  {
+   "term": "2022.2",
+   "course": "TOP-gerenciamento-das-redes-de-computadores-e-dos-servicos",
+   "codes": [
+    "DCC049"
+   ],
+   "professors": [],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 3,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "class": "TG"
+  },
+  {
+   "term": "2022.2",
+   "course": "TOP-pratica-em-desenvolvimento-de-software",
+   "codes": [
+    "DCC049"
+   ],
+   "professors": [],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 3,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "class": "TT"
+  },
+  {
+   "term": "2022.2",
+   "course": "DCC050",
+   "codes": [
+    "DCC050"
+   ],
+   "professors": [],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "class": "TN"
+  },
+  {
+   "term": "2023.1",
+   "course": "TOP-aprendizado-de-maquina",
+   "codes": [
+    "DCC030"
+   ],
+   "professors": [
+    "adriano-alonso-veloso"
+   ],
+   "schedule": [
+    {
+     "day": 2,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 4,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "class": "TU"
+  },
+  {
+   "term": "2023.1",
+   "course": "TOP-aprendizado-de-maquina-para-saude",
+   "codes": [
+    "DCC030"
+   ],
+   "professors": [
+    "anisio-mendes-lacerda",
+    "gisele-lobo-pappa"
+   ],
+   "schedule": [
+    {
+     "day": 2,
+     "start": "13:00",
+     "end": "14:40"
+    },
+    {
+     "day": 4,
+     "start": "13:00",
+     "end": "14:40"
+    }
+   ],
+   "class": "TN"
+  },
+  {
+   "term": "2023.1",
+   "course": "TOP-reutilizacao-de-software",
+   "codes": [
+    "DCC030"
+   ],
+   "professors": [
+    "eduardo-figueiredo"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "14:55",
+     "end": "16:35"
+    },
+    {
+     "day": 3,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "class": "TM"
+  },
+  {
+   "term": "2023.1",
+   "course": "TOP-arquitetura-da-internet",
+   "codes": [
+    "DCC030",
+    "DCC049"
+   ],
+   "professors": [
+    "italo-fernando-scota-cunha"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "14:55",
+     "end": "16:35"
+    },
+    {
+     "day": 3,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "class": "TT"
+  },
+  {
+   "term": "2023.1",
+   "course": "TOP-criptografia-blockchain-criptomoedas",
+   "codes": [
+    "DCC030"
+   ],
+   "professors": [
+    "jeroen-van-de-graaf"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 3,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "class": "TE"
+  },
+  {
+   "term": "2023.1",
+   "course": "TOP-pratica-em-desenvolvimento-de-software",
+   "codes": [
+    "DCC030"
+   ],
+   "professors": [
+    "marco-tulio-de-oliveira-valente"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 3,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "class": "TF"
+  },
+  {
+   "term": "2023.1",
+   "course": "DCC189",
+   "codes": [
+    "DCC030"
+   ],
+   "professors": [
+    "marcos-andre-goncalves"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 3,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "class": "TD"
+  },
+  {
+   "term": "2023.1",
+   "course": "TOP-visualizacao-de-dados",
+   "codes": [
+    "DCC030"
+   ],
+   "professors": [
+    "raquel-cardoso-de-melo-minardi"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "13:00",
+     "end": "14:40"
+    },
+    {
+     "day": 3,
+     "start": "13:00",
+     "end": "14:40"
+    }
+   ],
+   "class": "TI"
+  },
+  {
+   "term": "2023.1",
+   "course": "DCC044",
+   "codes": [
+    "DCC044"
+   ],
+   "professors": [
+    "douglas-guimaraes-macharet"
+   ],
+   "schedule": [
+    {
+     "day": 3,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "class": "TZ/TDESI"
+  },
+  {
+   "term": "2023.1",
+   "course": "TOP-aprendizado-de-maquina",
+   "codes": [
+    "DCC049"
+   ],
+   "professors": [
+    "adriano-alonso-veloso"
+   ],
+   "schedule": [
+    {
+     "day": 2,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 4,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "class": "TS"
+  },
+  {
+   "term": "2023.1",
+   "course": "TOP-aprendizado-de-maquina-para-saude",
+   "codes": [
+    "DCC049"
+   ],
+   "professors": [
+    "anisio-mendes-lacerda",
+    "gisele-lobo-pappa"
+   ],
+   "schedule": [
+    {
+     "day": 2,
+     "start": "13:00",
+     "end": "14:40"
+    },
+    {
+     "day": 4,
+     "start": "13:00",
+     "end": "14:40"
+    }
+   ],
+   "class": "TL"
+  },
+  {
+   "term": "2023.1",
+   "course": "TOP-reutilizacao-de-software",
+   "codes": [
+    "DCC049"
+   ],
+   "professors": [
+    "eduardo-figueiredo"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "14:55",
+     "end": "16:35"
+    },
+    {
+     "day": 3,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "class": "TK"
+  },
+  {
+   "term": "2023.1",
+   "course": "TOP-criptografia-blockchain-criptomoedas",
+   "codes": [
+    "DCC049"
+   ],
+   "professors": [
+    "jeroen-van-de-graaf"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 3,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "class": "TF"
+  },
+  {
+   "term": "2023.1",
+   "course": "TOP-pratica-em-desenvolvimento-de-software",
+   "codes": [
+    "DCC049"
+   ],
+   "professors": [
+    "marco-tulio-de-oliveira-valente"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 3,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "class": "TC"
+  },
+  {
+   "term": "2023.1",
+   "course": "DCC189",
+   "codes": [
+    "DCC049"
+   ],
+   "professors": [
+    "marcos-andre-goncalves"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 3,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "class": "TE"
+  },
+  {
+   "term": "2023.1",
+   "course": "TOP-visualizacao-de-dados",
+   "codes": [
+    "DCC049"
+   ],
+   "professors": [
+    "raquel-cardoso-de-melo-minardi"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "13:00",
+     "end": "14:40"
+    },
+    {
+     "day": 3,
+     "start": "13:00",
+     "end": "14:40"
+    }
+   ],
+   "class": "TG"
+  },
+  {
+   "term": "2023.1",
+   "course": "DCC050",
+   "codes": [
+    "DCC050"
+   ],
+   "professors": [
+    "luiz-filipe-menezes-vieira"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "class": "TN"
+  },
+  {
+   "term": "2023.1",
+   "course": "DCC808",
+   "codes": [
+    "DCC808"
+   ],
+   "professors": [
+    "alexandre-salles-da-cunha"
+   ],
+   "schedule": [
+    {
+     "day": 2,
+     "start": "13:00",
+     "end": "14:40"
+    },
+    {
+     "day": 4,
+     "start": "13:00",
+     "end": "14:40"
+    }
+   ],
+   "class": "PG"
+  },
+  {
+   "term": "2023.1",
+   "course": "TOP-aprendizado-de-maquina",
+   "codes": [
+    "DCC831"
+   ],
+   "professors": [
+    "adriano-alonso-veloso"
+   ],
+   "schedule": [
+    {
+     "day": 2,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 4,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "class": "PG9"
+  },
+  {
+   "term": "2023.1",
+   "course": "TOP-aprendizado-de-maquina-para-saude",
+   "codes": [
+    "DCC831"
+   ],
+   "professors": [
+    "anisio-mendes-lacerda",
+    "gisele-lobo-pappa"
+   ],
+   "schedule": [
+    {
+     "day": 2,
+     "start": "13:00",
+     "end": "14:40"
+    },
+    {
+     "day": 4,
+     "start": "13:00",
+     "end": "14:40"
+    }
+   ],
+   "class": "PG7"
+  },
+  {
+   "term": "2023.1",
+   "course": "TOP-arquitetura-da-internet",
+   "codes": [
+    "DCC831"
+   ],
+   "professors": [
+    "italo-fernando-scota-cunha"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "14:55",
+     "end": "16:35"
+    },
+    {
+     "day": 3,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "class": "PG4"
+  },
+  {
+   "term": "2023.1",
+   "course": "TOP-metodos-quantitativos-em-ciencia-da-computacao-experimental",
+   "codes": [
+    "DCC831"
+   ],
+   "professors": [
+    "jussara-marques-de-almeida"
+   ],
+   "schedule": [
+    {
+     "day": 2,
+     "start": "14:55",
+     "end": "16:35"
+    },
+    {
+     "day": 4,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "class": "PG1"
+  },
+  {
+   "term": "2023.1",
+   "course": "TOP-visualizacao-de-dados",
+   "codes": [
+    "DCC831"
+   ],
+   "professors": [
+    "raquel-cardoso-de-melo-minardi"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "13:00",
+     "end": "14:40"
+    },
+    {
+     "day": 3,
+     "start": "13:00",
+     "end": "14:40"
+    }
+   ],
+   "class": "PG3"
+  },
+  {
+   "term": "2023.1",
+   "course": "TOP-seminarios-avancados-em-engenharia-de-software",
+   "codes": [
+    "DCC851"
+   ],
+   "professors": [
+    "eduardo-figueiredo"
+   ],
+   "schedule": [],
+   "class": "PG"
+  },
+  {
+   "term": "2023.1",
+   "course": "TOP-reutilizacao-de-software",
+   "codes": [
+    "DCC890"
+   ],
+   "professors": [
+    "eduardo-figueiredo"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "14:55",
+     "end": "16:35"
+    },
+    {
+     "day": 3,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "class": "PG"
+  },
+  {
+   "term": "2023.2",
+   "course": "DCC044",
+   "codes": [
+    "DCC044"
+   ],
+   "professors": [
+    "douglas-guimaraes-macharet"
+   ],
+   "schedule": [
+    {
+     "day": 3,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "class": "TZ"
+  },
+  {
+   "term": "2023.2",
+   "course": "DCC050",
+   "codes": [
+    "DCC050"
+   ],
+   "professors": [
+    "luiz-filipe-menezes-vieira"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "class": "TN"
+  },
+  {
+   "term": "2023.2",
+   "course": "TOP-analise-e-mineracao-de-midias-sociais",
+   "codes": [
+    "DCC030"
+   ],
+   "professors": [
+    "fabricio-benevenuto-de-souza"
+   ],
+   "schedule": [
+    {
+     "day": 4,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 2,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "class": "TT"
+  },
+  {
+   "term": "2023.2",
+   "course": "TOP-aprendizado-profundo-para-processamento-de-linguagem-natural",
+   "codes": [
+    "DCC030"
+   ],
+   "professors": [
+    "adriano-alonso-veloso"
+   ],
+   "schedule": [
+    {
+     "day": 2,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 4,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "class": "TI"
+  },
+  {
+   "term": "2023.2",
+   "course": "TOP-bancos-de-dados-geograficos",
+   "codes": [
+    "DCC030"
+   ],
+   "professors": [
+    "clodoveu-davis"
+   ],
+   "schedule": [
+    {
+     "day": 4,
+     "start": "14:55",
+     "end": "16:35"
+    },
+    {
+     "day": 2,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "class": "TG"
+  },
+  {
+   "term": "2023.2",
+   "course": "TOP-bioinformatica",
+   "codes": [
+    "DCC030",
+    "DCC049"
+   ],
+   "professors": [
+    "raquel-cardoso-de-melo-minardi"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "13:00",
+     "end": "14:40"
+    },
+    {
+     "day": 3,
+     "start": "13:00",
+     "end": "14:40"
+    }
+   ],
+   "class": "TB"
+  },
+  {
+   "term": "2023.2",
+   "course": "TOP-classes-de-grafos",
+   "codes": [
+    "DCC030"
+   ],
+   "professors": [
+    "vinicius-fernandes-dos-santos"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 3,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "class": "TC"
+  },
+  {
+   "term": "2023.2",
+   "course": "TOP-fundamentos-do-processamento-de-sinais",
+   "codes": [
+    "DCC030"
+   ],
+   "professors": [
+    "ricardo-hiroshi-takahashi"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "14:55",
+     "end": "16:35"
+    },
+    {
+     "day": 3,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "class": "TU"
+  },
+  {
+   "term": "2023.2",
+   "course": "TOP-gerenciamento-das-redes-de-computadores-e-dos-servicos",
+   "codes": [
+    "DCC030"
+   ],
+   "professors": [
+    "aldri-luiz-dos-santos"
+   ],
+   "schedule": [
+    {
+     "day": 3,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 1,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "class": "TE"
+  },
+  {
+   "term": "2023.2",
+   "course": "TOP-introducao-a-integracao-humano-computador-como-uma-extensao-",
+   "codes": [
+    "DCC030"
+   ],
+   "professors": [
+    "raquel-oliveira-prates"
+   ],
+   "schedule": [
+    {
+     "day": 2,
+     "start": "14:55",
+     "end": "16:35"
+    },
+    {
+     "day": 4,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "class": "TM"
+  },
+  {
+   "term": "2023.2",
+   "course": "TOP-pratica-em-desenvolvimento-de-software",
+   "codes": [
+    "DCC030"
+   ],
+   "professors": [
+    "marco-tulio-de-oliveira-valente"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 3,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "class": "TK"
+  },
+  {
+   "term": "2023.2",
+   "course": "TOP-sistemas-de-recomendacao",
+   "codes": [
+    "DCC030"
+   ],
+   "professors": [
+    "rodrygo-luis-teodoro-santos"
+   ],
+   "schedule": [
+    {
+     "day": 3,
+     "start": "14:55",
+     "end": "16:35"
+    },
+    {
+     "day": 1,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "class": "TX"
+  },
+  {
+   "term": "2023.2",
+   "course": "TOP-analise-e-mineracao-de-midias-sociais",
+   "codes": [
+    "DCC831"
+   ],
+   "professors": [
+    "fabricio-benevenuto-de-souza"
+   ],
+   "schedule": [
+    {
+     "day": 2,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 4,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "class": "P17"
+  },
+  {
+   "term": "2023.2",
+   "course": "TOP-aprendizado-profundo-para-processamento-de-linguagem-natural",
+   "codes": [
+    "DCC831"
+   ],
+   "professors": [
+    "adriano-alonso-veloso"
+   ],
+   "schedule": [
+    {
+     "day": 2,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 4,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "class": "P13"
+  },
+  {
+   "term": "2023.2",
+   "course": "TOP-bancos-de-dados-geograficos",
+   "codes": [
+    "DCC831"
+   ],
+   "professors": [
+    "clodoveu-davis"
+   ],
+   "schedule": [
+    {
+     "day": 2,
+     "start": "14:55",
+     "end": "16:35"
+    },
+    {
+     "day": 4,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "class": "P11"
+  },
+  {
+   "term": "2023.2",
+   "course": "TOP-bioinformatica",
+   "codes": [
+    "DCC831"
+   ],
+   "professors": [
+    "raquel-cardoso-de-melo-minardi"
+   ],
+   "schedule": [
+    {
+     "day": 3,
+     "start": "13:00",
+     "end": "14:40"
+    },
+    {
+     "day": 1,
+     "start": "13:00",
+     "end": "14:40"
+    }
+   ],
+   "class": "PG6"
+  },
+  {
+   "term": "2023.2",
+   "course": "TOP-classes-de-grafos",
+   "codes": [
+    "DCC831"
+   ],
+   "professors": [
+    "vinicius-fernandes-dos-santos"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 3,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "class": "PG7"
+  },
+  {
+   "term": "2023.2",
+   "course": "TOP-gerenciamento-das-redes-de-computadores-e-dos-servicos",
+   "codes": [
+    "DCC831"
+   ],
+   "professors": [
+    "aldri-luiz-dos-santos"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 3,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "class": "PG9"
+  },
+  {
+   "term": "2023.2",
+   "course": "TOP-leitura-e-discussao-de-artigos-em-engenharia-de-software",
+   "codes": [
+    "DCC851"
+   ],
+   "professors": [
+    "eduardo-figueiredo"
+   ],
+   "schedule": [
+    {
+     "day": 5,
+     "start": "09:25",
+     "end": "11:05"
+    }
+   ],
+   "class": "PG"
+  },
+  {
+   "term": "2023.2",
+   "course": "TOP-mobility-analytics",
+   "codes": [
+    "DCC831"
+   ],
+   "professors": [
+    "antonio-alfredo-ferreira-loureiro"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 3,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "class": "PG3"
+  },
+  {
+   "term": "2023.2",
+   "course": "TOP-seminarios-avancados-em-aspectos-matematicos-de-aprendizado-",
+   "codes": [
+    "DCC831"
+   ],
+   "professors": [
+    "gabriel-de-morais-coutinho"
+   ],
+   "schedule": [
+    {
+     "day": 2,
+     "start": "11:20",
+     "end": "13:00"
+    },
+    {
+     "day": 4,
+     "start": "11:20",
+     "end": "13:00"
+    }
+   ],
+   "class": "PG4"
+  },
+  {
+   "term": "2023.2",
+   "course": "TOP-sistemas-de-recomendacao",
+   "codes": [
+    "DCC831"
+   ],
+   "professors": [
+    "rodrygo-luis-teodoro-santos"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "14:55",
+     "end": "16:35"
+    },
+    {
+     "day": 3,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "class": "P16"
+  },
+  {
+   "term": "2023.2",
+   "course": "TOP-analise-e-mineracao-de-midias-sociais",
+   "codes": [
+    "DCC049"
+   ],
+   "professors": [
+    "fabricio-benevenuto-de-souza"
+   ],
+   "schedule": [
+    {
+     "day": 2,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 4,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "class": "TV"
+  },
+  {
+   "term": "2023.2",
+   "course": "TOP-aprendizado-profundo-para-processamento-de-linguagem-natural",
+   "codes": [
+    "DCC049"
+   ],
+   "professors": [
+    "adriano-alonso-veloso"
+   ],
+   "schedule": [
+    {
+     "day": 2,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 4,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "class": "TH"
+  },
+  {
+   "term": "2023.2",
+   "course": "TOP-bancos-de-dados-geograficos",
+   "codes": [
+    "DCC049"
+   ],
+   "professors": [
+    "clodoveu-davis"
+   ],
+   "schedule": [
+    {
+     "day": 2,
+     "start": "14:55",
+     "end": "16:35"
+    },
+    {
+     "day": 4,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "class": "TG"
+  },
+  {
+   "term": "2023.2",
+   "course": "TOP-classes-de-grafos",
+   "codes": [
+    "DCC049"
+   ],
+   "professors": [
+    "vinicius-fernandes-dos-santos"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 3,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "class": "TE"
+  },
+  {
+   "term": "2023.2",
+   "course": "TOP-gerenciamento-das-redes-de-computadores-e-dos-servicos",
+   "codes": [
+    "DCC049"
+   ],
+   "professors": [
+    "aldri-luiz-dos-santos"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 3,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "class": "TF"
+  },
+  {
+   "term": "2023.2",
+   "course": "TOP-introducao-a-integracao-humano-computador-como-uma-extensao-",
+   "codes": [
+    "DCC049"
+   ],
+   "professors": [
+    "raquel-oliveira-prates"
+   ],
+   "schedule": [
+    {
+     "day": 2,
+     "start": "14:55",
+     "end": "16:35"
+    },
+    {
+     "day": 4,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "class": "TK"
+  },
+  {
+   "term": "2023.2",
+   "course": "TOP-pratica-em-desenvolvimento-de-software",
+   "codes": [
+    "DCC049"
+   ],
+   "professors": [
+    "marco-tulio-de-oliveira-valente"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 3,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "class": "TC"
+  },
+  {
+   "term": "2023.2",
+   "course": "TOP-sistemas-de-recomendacao",
+   "codes": [
+    "DCC049"
+   ],
+   "professors": [
+    "rodrygo-luis-teodoro-santos"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "14:55",
+     "end": "16:35"
+    },
+    {
+     "day": 3,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "class": "TTR"
+  },
+  {
+   "term": "2024.1",
+   "course": "DCC044",
+   "codes": [
+    "DCC044"
+   ],
+   "professors": [
+    "douglas-guimaraes-macharet"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "class": "TZ"
+  },
+  {
+   "term": "2024.1",
+   "course": "DCC050",
+   "codes": [
+    "DCC050"
+   ],
+   "professors": [
+    "thiago-ferreira-de-noronha"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "class": "TN"
+  },
+  {
+   "term": "2024.1",
+   "course": "TOP-aprendizado-de-maquina",
+   "codes": [
+    "DCC030"
+   ],
+   "professors": [
+    "adriano-alonso-veloso"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "19:00",
+     "end": "20:40"
+    },
+    {
+     "day": 3,
+     "start": "19:00",
+     "end": "20:40"
+    }
+   ],
+   "class": "TE"
+  },
+  {
+   "term": "2024.1",
+   "course": "TOP-complexidade-parametrizada",
+   "codes": [
+    "DCC030"
+   ],
+   "professors": [
+    "guilherme-de-castro-mendes-gomes"
+   ],
+   "schedule": [
+    {
+     "day": 2,
+     "start": "09:25",
+     "end": "11:05"
+    },
+    {
+     "day": 4,
+     "start": "09:25",
+     "end": "11:05"
+    }
+   ],
+   "class": "TI"
+  },
+  {
+   "term": "2024.1",
+   "course": "TOP-computacao-social-conceitos-algoritimos-e-aplicacoes",
+   "codes": [
+    "DCC030"
+   ],
+   "professors": [
+    "ana-paula-couto-da-silva"
+   ],
+   "schedule": [
+    {
+     "day": 2,
+     "start": "19:00",
+     "end": "20:40"
+    },
+    {
+     "day": 4,
+     "start": "19:00",
+     "end": "20:40"
+    }
+   ],
+   "class": "TA"
+  },
+  {
+   "term": "2024.1",
+   "course": "TOP-information-theory",
+   "codes": [
+    "DCC030"
+   ],
+   "professors": [
+    "mario-sergio-alvim"
+   ],
+   "schedule": [
+    {
+     "day": 2,
+     "start": "14:55",
+     "end": "16:35"
+    },
+    {
+     "day": 4,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "class": "TM"
+  },
+  {
+   "term": "2024.1",
+   "course": "TOP-medicao-e-qualidade-de-software",
+   "codes": [
+    "DCC030",
+    "DCC049"
+   ],
+   "professors": [
+    "eduardo-figueiredo"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "19:00",
+     "end": "20:40"
+    },
+    {
+     "day": 3,
+     "start": "19:00",
+     "end": "20:40"
+    }
+   ],
+   "class": "TZ"
+  },
+  {
+   "term": "2024.1",
+   "course": "TOP-modelagem-e-resolucao-de-problemas-de-otimizacao-combinatori",
+   "codes": [
+    "DCC030"
+   ],
+   "professors": [
+    "alexandre-salles-da-cunha"
+   ],
+   "schedule": [
+    {
+     "day": 2,
+     "start": "11:10",
+     "end": "12:50"
+    },
+    {
+     "day": 4,
+     "start": "11:10",
+     "end": "12:50"
+    }
+   ],
+   "class": "TT"
+  },
+  {
+   "term": "2024.1",
+   "course": "TOP-otimizacao-semidefinida-em-grafos",
+   "codes": [
+    "DCC030"
+   ],
+   "professors": [
+    "gabriel-de-morais-coutinho"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "09:25",
+     "end": "11:05"
+    },
+    {
+     "day": 3,
+     "start": "09:25",
+     "end": "11:05"
+    }
+   ],
+   "class": "TN"
+  },
+  {
+   "term": "2024.1",
+   "course": "TOP-pratica-em-desenvolvimento-de-software",
+   "codes": [
+    "DCC030"
+   ],
+   "professors": [
+    "marco-tulio-de-oliveira-valente"
+   ],
+   "schedule": [
+    {
+     "day": 3,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 1,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "class": "TU"
+  },
+  {
+   "term": "2024.1",
+   "course": "TOP-visualizacao-de-dados",
+   "codes": [
+    "DCC030"
+   ],
+   "professors": [
+    "raquel-cardoso-de-melo-minardi"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "13:00",
+     "end": "14:40"
+    },
+    {
+     "day": 3,
+     "start": "13:00",
+     "end": "14:40"
+    }
+   ],
+   "class": "TQ"
+  },
+  {
+   "term": "2024.1",
+   "course": "TOP-aprendizado-de-maquina",
+   "codes": [
+    "DCC831"
+   ],
+   "professors": [
+    "adriano-alonso-veloso"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "19:00",
+     "end": "20:40"
+    },
+    {
+     "day": 3,
+     "start": "19:00",
+     "end": "20:40"
+    }
+   ],
+   "class": "PG3"
+  },
+  {
+   "term": "2024.1",
+   "course": "TOP-complexidade-parametrizada",
+   "codes": [
+    "DCC831"
+   ],
+   "professors": [
+    "guilherme-de-castro-mendes-gomes"
+   ],
+   "schedule": [
+    {
+     "day": 2,
+     "start": "09:25",
+     "end": "11:05"
+    },
+    {
+     "day": 4,
+     "start": "09:25",
+     "end": "11:05"
+    }
+   ],
+   "class": "PG7"
+  },
+  {
+   "term": "2024.1",
+   "course": "TOP-information-theory",
+   "codes": [
+    "DCC831"
+   ],
+   "professors": [
+    "mario-sergio-alvim"
+   ],
+   "schedule": [
+    {
+     "day": 2,
+     "start": "14:55",
+     "end": "16:35"
+    },
+    {
+     "day": 4,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "class": "PG11"
+  },
+  {
+   "term": "2024.1",
+   "course": "TOP-otimizacao-semidefinida-em-grafos",
+   "codes": [
+    "DCC831"
+   ],
+   "professors": [
+    "gabriel-de-morais-coutinho"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "09:25",
+     "end": "11:05"
+    },
+    {
+     "day": 3,
+     "start": "09:25",
+     "end": "11:05"
+    }
+   ],
+   "class": "PG12"
+  },
+  {
+   "term": "2024.1",
+   "course": "TOP-seminarios-avancados-em-grandes-modelos-de-linguagem",
+   "codes": [
+    "DCC851"
+   ],
+   "professors": [
+    "rodrygo-luis-teodoro-santos"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "09:25",
+     "end": "11:05"
+    },
+    {
+     "day": 3,
+     "start": "09:25",
+     "end": "11:05"
+    }
+   ],
+   "class": "PG"
+  },
+  {
+   "term": "2024.1",
+   "course": "TOP-medicao-e-qualidade-de-software",
+   "codes": [
+    "DCC890"
+   ],
+   "professors": [
+    "eduardo-figueiredo"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "19:00",
+     "end": "20:40"
+    },
+    {
+     "day": 3,
+     "start": "19:00",
+     "end": "20:40"
+    }
+   ],
+   "class": "PG"
+  },
+  {
+   "term": "2024.1",
+   "course": "TOP-monitoria-de-graduacao-i",
+   "codes": [
+    "DCC069"
+   ],
+   "professors": [
+    "gisele-lobo-pappa"
+   ],
+   "schedule": [],
+   "class": "TA"
+  },
+  {
+   "term": "2024.1",
+   "course": "TOP-aprendizado-de-maquina",
+   "codes": [
+    "DCC049"
+   ],
+   "professors": [
+    "adriano-alonso-veloso"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "19:00",
+     "end": "20:40"
+    },
+    {
+     "day": 3,
+     "start": "19:00",
+     "end": "20:40"
+    }
+   ],
+   "class": "TD"
+  },
+  {
+   "term": "2024.1",
+   "course": "TOP-complexidade-parametrizada",
+   "codes": [
+    "DCC049"
+   ],
+   "professors": [
+    "guilherme-de-castro-mendes-gomes"
+   ],
+   "schedule": [
+    {
+     "day": 2,
+     "start": "09:25",
+     "end": "11:05"
+    },
+    {
+     "day": 4,
+     "start": "09:25",
+     "end": "11:05"
+    }
+   ],
+   "class": "TH"
+  },
+  {
+   "term": "2024.1",
+   "course": "TOP-computacao-social-conceitos-algoritimos-e-aplicacoes",
+   "codes": [
+    "DCC049"
+   ],
+   "professors": [
+    "ana-paula-couto-da-silva"
+   ],
+   "schedule": [
+    {
+     "day": 2,
+     "start": "19:00",
+     "end": "20:40"
+    },
+    {
+     "day": 4,
+     "start": "19:00",
+     "end": "20:40"
+    }
+   ],
+   "class": "TA2"
+  },
+  {
+   "term": "2024.1",
+   "course": "TOP-information-theory",
+   "codes": [
+    "DCC049"
+   ],
+   "professors": [
+    "mario-sergio-alvim"
+   ],
+   "schedule": [
+    {
+     "day": 2,
+     "start": "14:55",
+     "end": "16:35"
+    },
+    {
+     "day": 4,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "class": "TL"
+  },
+  {
+   "term": "2024.1",
+   "course": "TOP-modelagem-e-resolucao-de-problemas-de-otimizacao-combinatori",
+   "codes": [
+    "DCC049"
+   ],
+   "professors": [
+    "alexandre-salles-da-cunha"
+   ],
+   "schedule": [
+    {
+     "day": 2,
+     "start": "11:10",
+     "end": "12:50"
+    },
+    {
+     "day": 4,
+     "start": "11:10",
+     "end": "12:50"
+    }
+   ],
+   "class": "TR"
+  },
+  {
+   "term": "2024.1",
+   "course": "TOP-otimizacao-semidefinida-em-grafos",
+   "codes": [
+    "DCC049"
+   ],
+   "professors": [
+    "gabriel-de-morais-coutinho"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "09:25",
+     "end": "11:05"
+    },
+    {
+     "day": 3,
+     "start": "09:25",
+     "end": "11:05"
+    }
+   ],
+   "class": "TM"
+  },
+  {
+   "term": "2024.1",
+   "course": "TOP-pratica-em-desenvolvimento-de-software",
+   "codes": [
+    "DCC049"
+   ],
+   "professors": [
+    "marco-tulio-de-oliveira-valente"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 3,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "class": "TS"
+  },
+  {
+   "term": "2024.1",
+   "course": "TOP-visualizacao-de-dados",
+   "codes": [
+    "DCC049"
+   ],
+   "professors": [
+    "raquel-cardoso-de-melo-minardi"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "13:00",
+     "end": "14:40"
+    },
+    {
+     "day": 3,
+     "start": "13:00",
+     "end": "14:40"
+    }
+   ],
+   "class": "TX"
+  },
+  {
+   "term": "2024.1",
+   "course": "TOP-visualizacao-de-dados",
+   "codes": [
+    "DCC831"
+   ],
+   "professors": [
+    "raquel-cardoso-de-melo-minardi"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "13:00",
+     "end": "14:40"
+    },
+    {
+     "day": 3,
+     "start": "13:00",
+     "end": "14:40"
+    }
+   ],
+   "class": "PG1"
+  },
+  {
+   "term": "2024.2",
+   "course": "TOP-algoritmos-de-aprendizado-profundo",
+   "codes": [
+    "DCC831"
+   ],
+   "professors": [
+    "douglas-guimaraes-macharet"
+   ],
+   "schedule": [
+    {
+     "day": 2,
+     "start": "09:25",
+     "end": "11:05"
+    },
+    {
+     "day": 4,
+     "start": "09:25",
+     "end": "11:05"
+    }
+   ],
+   "class": "PG",
+   "plan": "/wp-content/uploads/2024-2-Aprendizado-Profundo.pdf"
+  },
+  {
+   "term": "2024.2",
+   "course": "DCC044",
+   "codes": [
+    "DCC044"
+   ],
+   "professors": [
+    "douglas-guimaraes-macharet"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "class": "SI"
+  },
+  {
+   "term": "2024.2",
+   "course": "DCC050",
+   "codes": [
+    "DCC050"
+   ],
+   "professors": [
+    "thiago-ferreira-de-noronha"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "class": "CC"
+  },
+  {
+   "term": "2024.2",
+   "course": "TOP-metodos-quantitativos-em-ciencia-experimental",
+   "codes": [
+    "DCC831"
+   ],
+   "professors": [
+    "jussara-marques-de-almeida"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "13:00",
+     "end": "14:40"
+    },
+    {
+     "day": 3,
+     "start": "13:00",
+     "end": "14:40"
+    }
+   ],
+   "class": "PG",
+   "plan": "/wp-content/uploads/2024-2-Metodos-quantiativos-em-Ciencia-Experimental.pdf"
+  },
+  {
+   "term": "2024.2",
+   "course": "TOP-seminarios-avancados-em-grandes-modelos-de-linguagem-eficien",
+   "codes": [
+    "DCC851"
+   ],
+   "professors": [
+    "rodrygo-luis-teodoro-santos"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "09:25",
+     "end": "11:05"
+    },
+    {
+     "day": 3,
+     "start": "09:25",
+     "end": "11:05"
+    }
+   ],
+   "class": "PG",
+   "plan": "/wp-content/uploads/2024-2-Seminarios-Avancados-em-Grandes-Modelos-de-Linguagem.pdf"
+  },
+  {
+   "term": "2024.2",
+   "course": "TOP-bancos-de-dados-geograficos",
+   "codes": [
+    "DCC030"
+   ],
+   "professors": [
+    "clodoveu-davis"
+   ],
+   "schedule": [
+    {
+     "day": 2,
+     "start": "14:55",
+     "end": "16:35"
+    },
+    {
+     "day": 4,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "class": "CC/MC",
+   "plan": "/wp-content/uploads/2024-2-Bancos-de-Dados-Geograficos.pdf"
+  },
+  {
+   "term": "2024.2",
+   "course": "TOP-blockchain-e-criptomoedas-conceitos-basicos-e-avancados",
+   "codes": [
+    "DCC030"
+   ],
+   "professors": [
+    "jeroen-van-de-graaf"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 3,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "class": "CC/MC",
+   "plan": "/wp-content/uploads/2024-2-Blockchain-pt_BR.pdf"
+  },
+  {
+   "term": "2024.2",
+   "course": "TOP-combinatoria-poliedrica",
+   "codes": [
+    "DCC030"
+   ],
+   "professors": [
+    "marcio-costa-santos"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "09:25",
+     "end": "11:05"
+    },
+    {
+     "day": 3,
+     "start": "09:25",
+     "end": "11:05"
+    }
+   ],
+   "class": "CC/MC",
+   "plan": "/wp-content/uploads/2024-2-Combinatoria-Poliedrica.pdf"
+  },
+  {
+   "term": "2024.2",
+   "course": "TOP-gerenciamento-das-redes-de-computadores-e-dos-servicos",
+   "codes": [
+    "DCC030"
+   ],
+   "professors": [
+    "aldri-luiz-dos-santos"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 3,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "class": "CC/MC",
+   "plan": "/wp-content/uploads/2024-2-Gerenciamento-das-Redes-de-Computadores-e-dos-Servicos.pdf"
+  },
+  {
+   "term": "2024.2",
+   "course": "TOP-introducao-a-combinatoria-extremal-e-probabilistica",
+   "codes": [
+    "DCC030"
+   ],
+   "professors": [
+    "vinicius-fernandes-dos-santos"
+   ],
+   "schedule": [
+    {
+     "day": 2,
+     "start": "14:55",
+     "end": "16:35"
+    },
+    {
+     "day": 4,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "class": "CC/MC",
+   "plan": "/wp-content/uploads/2024-2-Introducao-a-combinatoria-extremal-e-probabilistica_final-1.pdf"
+  },
+  {
+   "term": "2024.2",
+   "course": "TOP-processamento-de-linguagem-natural",
+   "codes": [
+    "DCC030"
+   ],
+   "professors": [
+    "adriano-alonso-veloso"
+   ],
+   "schedule": [
+    {
+     "day": 2,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 4,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "class": "CC/MC",
+   "plan": "/wp-content/uploads/2024-2-ProcessamentoLinguaNatural.pdf"
+  },
+  {
+   "term": "2024.2",
+   "course": "TOP-sistemas-de-informacao-biomedicos",
+   "codes": [
+    "DCC030"
+   ],
+   "professors": [
+    "sergio-vale-aguiar-campos"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "14:55",
+     "end": "16:35"
+    },
+    {
+     "day": 3,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "class": "CC/MC",
+   "plan": "/wp-content/uploads/2024-2-SistemasInformacaoBiomedicos.pdf"
+  },
+  {
+   "term": "2024.2",
+   "course": "TOP-sistemas-de-recomendacao",
+   "codes": [
+    "DCC030"
+   ],
+   "professors": [
+    "rodrygo-luis-teodoro-santos"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "14:55",
+     "end": "16:35"
+    },
+    {
+     "day": 3,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "class": "CC/MC",
+   "plan": "/wp-content/uploads/2024-2-Sistemas-de-Recomendacao.pdf"
+  },
+  {
+   "term": "2024.2",
+   "course": "TOP-advanced-topics-in-algebraic-combinatorics",
+   "codes": [
+    "DCC831"
+   ],
+   "professors": [
+    "gabriel-de-morais-coutinho"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "09:25",
+     "end": "11:05"
+    },
+    {
+     "day": 3,
+     "start": "09:25",
+     "end": "11:05"
+    }
+   ],
+   "class": "PG",
+   "plan": "/wp-content/uploads/2024-2-Advanced-topics-in-algebraic-combinatorics-1.pdf"
+  },
+  {
+   "term": "2024.2",
+   "course": "TOP-bancos-de-dados-geograficos",
+   "codes": [
+    "DCC831"
+   ],
+   "professors": [
+    "clodoveu-davis"
+   ],
+   "schedule": [
+    {
+     "day": 2,
+     "start": "14:55",
+     "end": "16:35"
+    },
+    {
+     "day": 4,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "class": "PG",
+   "plan": "/wp-content/uploads/2024-2-Bancos-de-Dados-Geograficos.pdf"
+  },
+  {
+   "term": "2024.2",
+   "course": "TOP-blockchain-e-criptomoedas-conceitos-basicos-e-avancados",
+   "codes": [
+    "DCC831"
+   ],
+   "professors": [
+    "jeroen-van-de-graaf"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 3,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "class": "PG",
+   "plan": "/wp-content/uploads/2024-2-Blockchain-pt_BR.pdf"
+  },
+  {
+   "term": "2024.2",
+   "course": "TOP-combinatoria-poliedrica",
+   "codes": [
+    "DCC831"
+   ],
+   "professors": [
+    "marcio-costa-santos"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "09:25",
+     "end": "11:05"
+    },
+    {
+     "day": 3,
+     "start": "09:25",
+     "end": "11:05"
+    }
+   ],
+   "class": "PG",
+   "plan": "/wp-content/uploads/2024-2-Combinatoria-Poliedrica.pdf"
+  },
+  {
+   "term": "2024.2",
+   "course": "TOP-engenharia-de-software-experimental",
+   "codes": [
+    "DCC831"
+   ],
+   "professors": [
+    "eduardo-figueiredo"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "14:55",
+     "end": "16:35"
+    },
+    {
+     "day": 3,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "class": "PG",
+   "plan": "/wp-content/uploads/2024-2-Engenharia-de-Software-Experimental.pdf"
+  },
+  {
+   "term": "2024.2",
+   "course": "TOP-gerenciamento-das-redes-de-computadores-e-dos-servicos",
+   "codes": [
+    "DCC831"
+   ],
+   "professors": [
+    "aldri-luiz-dos-santos"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 3,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "class": "PG",
+   "plan": "/wp-content/uploads/2024-2-Gerenciamento-das-Redes-de-Computadores-e-dos-Servicos.pdf"
+  },
+  {
+   "term": "2024.2",
+   "course": "TOP-introducao-a-combinatoria-extremal-e-probabilistica",
+   "codes": [
+    "DCC831"
+   ],
+   "professors": [
+    "vinicius-fernandes-dos-santos"
+   ],
+   "schedule": [
+    {
+     "day": 2,
+     "start": "14:55",
+     "end": "16:35"
+    },
+    {
+     "day": 4,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "class": "PG",
+   "plan": "/wp-content/uploads/2024-2-Introducao-a-combinatoria-extremal-e-probabilistica_final-1.pdf"
+  },
+  {
+   "term": "2024.2",
+   "course": "TOP-processamento-de-linguagem-natural",
+   "codes": [
+    "DCC831"
+   ],
+   "professors": [
+    "adriano-alonso-veloso"
+   ],
+   "schedule": [
+    {
+     "day": 2,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 4,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "class": "PG",
+   "plan": "/wp-content/uploads/2024-2-ProcessamentoLinguaNatural.pdf"
+  },
+  {
+   "term": "2024.2",
+   "course": "TOP-seminarios-em-governanca-e-auditoria-algoritmica",
+   "codes": [
+    "DCC831"
+   ],
+   "professors": [
+    "virgilio-augusto-fernandes-almeida",
+    "wagner-meira-junior"
+   ],
+   "schedule": [
+    {
+     "day": 2,
+     "start": "14:55",
+     "end": "16:35"
+    },
+    {
+     "day": 4,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "class": "PG",
+   "plan": "/wp-content/uploads/2024-2-Seminarios-em-Governanca-e-Auditotira-Algoritmica.pdf"
+  },
+  {
+   "term": "2024.2",
+   "course": "TOP-sistemas-de-informacao-biomedicos",
+   "codes": [
+    "DCC831"
+   ],
+   "professors": [
+    "sergio-vale-aguiar-campos"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "14:55",
+     "end": "16:35"
+    },
+    {
+     "day": 3,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "class": "PG",
+   "plan": "/wp-content/uploads/2024-2-SistemasInformacaoBiomedicos.pdf"
+  },
+  {
+   "term": "2024.2",
+   "course": "TOP-sistemas-de-recomendacao",
+   "codes": [
+    "DCC831"
+   ],
+   "professors": [
+    "rodrygo-luis-teodoro-santos"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "14:55",
+     "end": "16:35"
+    },
+    {
+     "day": 3,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "class": "PG",
+   "plan": "/wp-content/uploads/2024-2-Sistemas-de-Recomendacao.pdf"
+  },
+  {
+   "term": "2024.2",
+   "course": "TOP-bancos-de-dados-geograficos",
+   "codes": [
+    "DCC049"
+   ],
+   "professors": [
+    "clodoveu-davis"
+   ],
+   "schedule": [
+    {
+     "day": 2,
+     "start": "14:55",
+     "end": "16:35"
+    },
+    {
+     "day": 4,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "class": "SI",
+   "plan": "/wp-content/uploads/2024-2-Bancos-de-Dados-Geograficos.pdf"
+  },
+  {
+   "term": "2024.2",
+   "course": "TOP-blockchain-e-criptomoedas-conceitos-basicos-e-avancados",
+   "codes": [
+    "DCC049"
+   ],
+   "professors": [
+    "jeroen-van-de-graaf"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 3,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "class": "SI",
+   "plan": "/wp-content/uploads/2024-2-Blockchain-pt_BR.pdf"
+  },
+  {
+   "term": "2024.2",
+   "course": "TOP-combinatoria-poliedrica",
+   "codes": [
+    "DCC049"
+   ],
+   "professors": [
+    "marcio-costa-santos"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "09:25",
+     "end": "11:05"
+    },
+    {
+     "day": 3,
+     "start": "09:25",
+     "end": "11:05"
+    }
+   ],
+   "class": "SI",
+   "plan": "/wp-content/uploads/2024-2-Combinatoria-Poliedrica.pdf"
+  },
+  {
+   "term": "2024.2",
+   "course": "TOP-gerenciamento-das-redes-de-computadores-e-dos-servicos",
+   "codes": [
+    "DCC049"
+   ],
+   "professors": [
+    "aldri-luiz-dos-santos"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 3,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "class": "SI",
+   "plan": "/wp-content/uploads/2024-2-Gerenciamento-das-Redes-de-Computadores-e-dos-Servicos.pdf"
+  },
+  {
+   "term": "2024.2",
+   "course": "TOP-introducao-a-combinatoria-extremal-e-probabilistica",
+   "codes": [
+    "DCC049"
+   ],
+   "professors": [
+    "vinicius-fernandes-dos-santos"
+   ],
+   "schedule": [
+    {
+     "day": 2,
+     "start": "14:55",
+     "end": "16:35"
+    },
+    {
+     "day": 4,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "class": "SI",
+   "plan": "/wp-content/uploads/2024-2-Introducao-a-combinatoria-extremal-e-probabilistica_final-1.pdf"
+  },
+  {
+   "term": "2024.2",
+   "course": "TOP-processamento-de-linguagem-natural",
+   "codes": [
+    "DCC049"
+   ],
+   "professors": [
+    "adriano-alonso-veloso"
+   ],
+   "schedule": [
+    {
+     "day": 2,
+     "start": "17:00",
+     "end": "18:40"
+    },
+    {
+     "day": 4,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "class": "SI",
+   "plan": "/wp-content/uploads/2024-2-ProcessamentoLinguaNatural.pdf"
+  },
+  {
+   "term": "2024.2",
+   "course": "TOP-sistemas-de-informacao-biomedicos",
+   "codes": [
+    "DCC049"
+   ],
+   "professors": [
+    "sergio-vale-aguiar-campos"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "14:55",
+     "end": "16:35"
+    },
+    {
+     "day": 3,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "class": "SI",
+   "plan": "/wp-content/uploads/2024-2-SistemasInformacaoBiomedicos.pdf"
+  },
+  {
+   "term": "2024.2",
+   "course": "TOP-sistemas-de-recomendacao",
+   "codes": [
+    "DCC049"
+   ],
+   "professors": [
+    "rodrygo-luis-teodoro-santos"
+   ],
+   "schedule": [
+    {
+     "day": 1,
+     "start": "14:55",
+     "end": "16:35"
+    },
+    {
+     "day": 3,
+     "start": "14:55",
+     "end": "16:35"
+    }
+   ],
+   "class": "SI",
+   "plan": "/wp-content/uploads/2024-2-Sistemas-de-Recomendacao.pdf"
+  },
+  {
+   "term": "2025.1",
+   "course": "DCC044",
+   "codes": [
+    "DCC044"
+   ],
+   "professors": [
+    "douglas-guimaraes-macharet",
+    "thiago-ferreira-de-noronha"
+   ],
+   "schedule": [
+    {
+     "day": 5,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "class": "SI"
+  },
+  {
+   "term": "2025.1",
+   "course": "DCC050",
+   "codes": [
+    "DCC050"
+   ],
+   "professors": [
+    "mario-sergio-alvim"
+   ],
+   "schedule": [
+    {
+     "day": 5,
+     "start": "17:00",
+     "end": "18:40"
+    }
+   ],
+   "class": "CC"
+  }
+ ]
+}

@@ -1,0 +1,19 @@
+__pycache__/
+*.pyc
+
+# banco, chave e dados de produção — nunca versionar
+*.db
+*.db-wal
+*.db-shm
+data/secret.key
+secret.key
+var/
+deploy/.env
+deploy/backups/
+
+# relatórios do SIGAA (uso restrito, com nº de inscrição): nunca versionar/empacotar
+*.pdf
+
+.DS_Store
+.vscode/
+.idea/
