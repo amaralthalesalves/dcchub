@@ -292,7 +292,7 @@ function viewGate(methods = ['code']) {
       ${code ? `<details class="gate-alt"><summary>Tenho um código de acesso</summary>${codeForm}</details>` : ''}`
     : `${codeForm}
       <p class="small muted">O código é divulgado nos canais dos estudantes (centro acadêmico, grupos de turma). Ele não identifica você: o acesso continua anônimo.</p>`}
-      <p class="small muted">Projeto independente de estudantes, sem vínculo com o DCC ou com a UFMG.</p>
+      <p class="small muted">Projeto independente de estudantes, sem vínculo com o DCC ou com a UFMG. Pedidos de remoção de conteúdo: <a href="mailto:dcchubufmg@gmail.com">dcchubufmg@gmail.com</a>.</p>
     </div>
   </section>`;
   const enter = () => { document.body.classList.remove('gated'); state.boot = null; router(); };
@@ -1690,6 +1690,22 @@ async function viewAbout() {
       <li>Docentes que se sentirem expostos de forma injusta podem usar o botão “Denunciar”.</li>
     </ul>
     <p>Sugestões, erros ou ideias? Mande um <a href="#/feedback">feedback anônimo</a>.</p>
+
+    <h2 id="termos">Termos de uso</h2>
+    <ul>
+      <li><b>Quem escreve responde pelo que escreve.</b> Cada avaliação é a opinião de quem cursou a disciplina, publicada de forma anônima. Ao publicar, você declara que relata uma experiência própria e que segue as regras acima.</li>
+      <li><b>O DCCHub não endossa as avaliações</b> nem garante que estejam corretas. As notas são médias de opiniões, não uma medida oficial de nada.</li>
+      <li><b>Uso pessoal e acadêmico.</b> Não copie avaliações em massa para outros sites nem use o conteúdo para expor, perseguir ou retaliar quem quer que seja.</li>
+      <li><b>Moderação.</b> Podemos segurar para revisão ou remover conteúdo que viole as regras, a qualquer momento.</li>
+      <li><b>Anonimato também diante de pedidos.</b> Não sabemos quem escreveu cada avaliação: não há conta, e o site não guarda e-mail nem IP. Por isso, não temos como informar a autoria a ninguém.</li>
+    </ul>
+    <h3 id="remocao">Pedidos de remoção</h3>
+    <p>Qualquer pessoa — inclusive docentes — pode pedir a remoção de uma avaliação que viole as regras (ofensa, dado pessoal, informação falsa, exposição indevida):</p>
+    <ul>
+      <li>pelo botão <b>“Denunciar”</b> na própria avaliação, que leva o pedido direto à moderação; ou</li>
+      <li>por e-mail para <a href="mailto:dcchubufmg@gmail.com">dcchubufmg@gmail.com</a>, com o link da página, um trecho da avaliação e o motivo — o caminho para pedidos formais ou de quem não tem acesso ao site.</li>
+    </ul>
+    <p>Cada pedido é lido por uma pessoa. Enquanto isso, a avaliação pode ficar fora do ar. Avaliações que seguem as regras continuam publicadas, mesmo que sejam críticas.</p>
 
     <h2 id="dados">De onde vêm os dados</h2>
     <p>A lista de docentes (com áreas de pesquisa e contatos) vem de <a href="${safeHref(b.sources.professors || 'https://dcc.ufmg.br/professores/')}" target="_blank" rel="noreferrer">dcc.ufmg.br/professores</a>. Disciplinas, turmas, horários e planos de ensino vêm das páginas públicas de <b>oferta de disciplinas</b> do DCC (${esc(b.terms[0])} a ${esc(b.latestTerm)}).</p>

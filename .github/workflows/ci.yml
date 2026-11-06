@@ -57,3 +57,28 @@ jobs:
       - name: Log do servidor (se falhar)
         if: failure()
         run: cat "$RUNNER_TEMP/server.log" || true
+
+  docker:
+    name: Imagem Docker (sobe e responde)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Monta a imagem
+        run: docker build -t dcchub-ci .
+      # a imagem é o que vai para a VM: os testes acima rodam no repositório, não nela (um módulo fora do COPY já
+      # derrubou um deploy com todos os testes verdes)
+      - name: Sobe com a configuração de produção e consulta
+        run: |
+          docker run -d --name dcchub -p 8767:8000 -e DCCHUB_TRUST_PROXY=1 -e DCCHUB_EMAIL_LOGIN=1 \
+            -e DCCHUB_ADMIN_TOKEN=ci -e DCCHUB_MOD_EMAIL=mod@exemplo.org dcchub-ci
+          for i in $(seq 1 30); do curl -sf http://localhost:8767/api/health > /dev/null && break; sleep 1; done
+          test "$(curl -s http://localhost:8767/api/health)" = '{"ok":true}'
+          curl -sf http://localhost:8767/ | grep -q '<script src="app.js"'
+          curl -sf http://localhost:8767/app.js > /dev/null
+          test "$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8767/api/bootstrap)" = 401  # acesso restrito
+          docker exec dcchub python3 -c "import app, email_login, moderation, mod_notify"
+          if docker exec dcchub python3 scripts/send_backup.py x.enc; then echo "sem SMTP deveria recusar"; exit 1; fi
+      - name: Log do container (se falhar)
+        if: failure()
+        run: docker logs dcchub || true

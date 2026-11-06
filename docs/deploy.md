@@ -111,10 +111,41 @@ crontab -e        # cole as linhas de deploy/cron.example
 |---|---|
 | todo dia, 6h | oportunidades |
 | segunda, 6h30 | catálogo/oferta + materiais |
-| todo dia, 3h | backup do banco e da chave em `deploy/backups/` |
+| todo dia, 3h | backup do banco e da chave em `deploy/backups/` (14 dias) e, se configurado, cópia cifrada por e-mail |
 
-> [!WARNING]
-> Os backups ficam na própria VM. **Copie `deploy/backups/` para fora dela** de vez em quando (ex.: `rclone` para o Google Drive). Se a VM for perdida — ou o crédito acabar — sem cópia externa, as avaliações se perdem.
+### 7. Backup fora da VM
+
+Backup só na VM não protege contra perder a VM (ou o crédito da nuvem acabar). Com duas linhas no `.env`, o
+`backup.sh` diário também manda uma cópia **criptografada** (banco + chave secreta, `openssl` AES-256 com PBKDF2) por
+e-mail, pelo mesmo SMTP do acesso:
+
+```bash
+openssl rand -base64 32          # gere a senha; GUARDE-A TAMBÉM FORA DA VM (gerenciador de senhas)
+# no .env:
+DCCHUB_BACKUP_EMAIL=conta-do-projeto@gmail.com
+DCCHUB_BACKUP_PASSPHRASE=<a senha gerada, sem aspas>
+docker compose up -d             # o container passa a conhecer DCCHUB_BACKUP_EMAIL
+./backup.sh                      # teste: deve terminar com "backup externo enviado"
+```
+
+A caixa de e-mail só recebe um arquivo cifrado (`dcchub-AAAAMMDD-HHMM.tar.gz.enc`, alguns KB por dia); o
+`send_backup.py` recusa mandar qualquer coisa que não esteja cifrada. **Sem a senha, o backup não abre** — e a senha
+só existe no `.env` da VM e onde você a guardou. Se o envio falhar, o backup local continua valendo e o arquivo cifrado
+fica em `deploy/backups/` (o motivo vai para o log do cron).
+
+### 8. Aviso quando o site cai
+
+O workflow `.github/workflows/uptime.yml` consulta `https://SEU.DOMINIO/api/health` a cada 15 min (o endpoint só diz
+"ok": servidor no ar e banco abrindo, sem precisar de acesso). Fora do ar em 3 tentativas: abre a issue **"Site fora do
+ar"** e a execução falha (o GitHub manda e-mail); quando volta, a issue é fechada. Para ligar, cadastre a URL como
+secret — ela não fica no código, que é público:
+
+```bash
+gh secret set SITE_URL --body "https://seu.dominio"
+```
+
+O GitHub pausa agendamentos de repositórios públicos sem nenhum commit por 60 dias; se isso acontecer, reative em
+*Actions → Disponibilidade*.
 
 ## Atualizando o código
 
@@ -126,6 +157,15 @@ cd deploy && docker compose up -d --build
 O banco e a chave ficam no volume `dcchub-var` e sobrevivem a rebuilds. O catálogo vem na imagem; os crons atualizam a cópia dentro do container, e o próximo rebuild volta à versão do repositório até o cron seguinte — rode os syncs localmente e faça commit de `data/` para manter o repositório em dia.
 
 ## Restaurando um backup
+
+Da cópia por e-mail (baixe o anexo `.enc`; precisa da senha de backup):
+
+```bash
+openssl enc -d -aes-256-cbc -pbkdf2 -iter 600000 -pass file:senha.txt -in dcchub-AAAAMMDD-HHMM.tar.gz.enc | tar xz
+# extrai dcchub-AAAAMMDD-HHMM.db e secret.key; copie-os para deploy/backups/ da VM nova e siga abaixo
+```
+
+Do backup local:
 
 ```bash
 cd /opt/dcchub/deploy

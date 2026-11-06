@@ -1,0 +1,56 @@
+# Confere a cada 15 min se o site responde (GET /api/health: servidor no ar e banco abrindo).
+# Caiu: abre uma issue "Site fora do ar" (quem acompanha o repositório recebe e-mail) e a execução falha (o GitHub
+# avisa por e-mail quem configurou o agendamento). Voltou: comenta e fecha a issue.
+# A URL fica no secret SITE_URL (ex.: https://seu.dominio), não no código: o repositório é público.
+# Atenção: o GitHub pausa agendamentos de repositórios públicos sem atividade por 60 dias (reative em Actions).
+name: Disponibilidade
+
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+
+permissions:
+  issues: write
+
+concurrency:
+  group: uptime
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      SITE_URL: ${{ secrets.SITE_URL }}
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      TITLE: Site fora do ar
+    steps:
+      - name: Consulta o site (3 tentativas)
+        id: probe
+        run: |
+          if [ -z "$SITE_URL" ]; then echo "::notice::defina o secret SITE_URL para ligar o monitor"; echo "skip=1" >> "$GITHUB_OUTPUT"; exit 0; fi
+          for i in 1 2 3; do
+            code=$(curl -s -m 20 -o body.txt -w '%{http_code}' "$SITE_URL/api/health" || true)
+            if [ "$code" = 200 ] && grep -q '"ok":true' body.txt; then echo "up=1" >> "$GITHUB_OUTPUT"; exit 0; fi
+            echo "tentativa $i: HTTP $code"
+            [ "$i" = 3 ] || sleep 30
+          done
+          echo "code=$code" >> "$GITHUB_OUTPUT"
+      - name: Fora do ar — abre a issue (uma só) e falha
+        if: steps.probe.outputs.skip != '1' && steps.probe.outputs.up != '1'
+        run: |
+          open=$(gh issue list --state open --search "in:title \"$TITLE\"" --json number --jq '.[0].number')
+          when=$(TZ=America/Sao_Paulo date '+%d/%m %H:%M')
+          if [ -z "$open" ]; then
+            gh issue create --title "$TITLE" --body "O monitor não conseguiu acessar o site em $when (horário de Brasília): HTTP ${{ steps.probe.outputs.code }} em 3 tentativas. Veja \`docker compose ps\` e \`docker compose logs app\` na VM. Esta issue fecha sozinha quando o site voltar."
+          fi  # já aberta: não comenta a cada 15 min
+          exit 1
+      - name: No ar — fecha a issue aberta, se houver
+        if: steps.probe.outputs.up == '1'
+        run: |
+          open=$(gh issue list --state open --search "in:title \"$TITLE\"" --json number --jq '.[0].number')
+          if [ -n "$open" ]; then
+            gh issue close "$open" --comment "Voltou ao ar em $(TZ=America/Sao_Paulo date '+%d/%m %H:%M') (horário de Brasília)."
+          fi

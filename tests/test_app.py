@@ -600,6 +600,19 @@ class ServerTest(unittest.TestCase):
         self.client().post("/api/reviews", review(comment="Ele é machista: só chama os meninos para responder no quadro."))
         self.assertIsNone(app.notifier.timer)
 
+    def test_health_is_open_and_says_nothing(self):
+        """O monitor de disponibilidade consulta /api/health sem acesso da comunidade; a resposta é só "ok"."""
+        original = (app.ACCESS_CODES, app.EMAIL.enabled)
+        app.ACCESS_CODES, app.EMAIL.enabled = ["segredo"], True
+        try:
+            c = self.client()
+            self.assertEqual(c.get("/api/bootstrap")[0], 401)
+            status, data, res = c.get("/api/health")
+            self.assertEqual((status, data), (200, {"ok": True}))
+            self.assertIsNone(res.getheader("Set-Cookie"))
+        finally:
+            app.ACCESS_CODES, app.EMAIL.enabled = original
+
     def test_email_login_disabled_by_default(self):
         self.assertEqual(self.client().post("/api/access/email", {"email": "a@ufmg.br"})[0], 404)
         self.assertEqual(self.client().post("/api/access/email/verify", {"challenge": "x", "code": "123456"})[0], 404)

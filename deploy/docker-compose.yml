@@ -20,6 +20,8 @@ services:
       # avisos à moderação quando algo entra na fila (mesmo SMTP); o link do painel usa o domínio
       DCCHUB_MOD_EMAIL: ${DCCHUB_MOD_EMAIL:-}
       DCCHUB_PUBLIC_URL: https://${DOMAIN}
+      # cópia diária do backup, criptografada, por e-mail (deploy/backup.sh; a senha fica só no .env, fora do container)
+      DCCHUB_BACKUP_EMAIL: ${DCCHUB_BACKUP_EMAIL:-}
     volumes:
       - dcchub-var:/app/var              # banco SQLite + chave secreta: é ISTO que precisa de backup
   caddy:

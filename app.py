@@ -73,7 +73,7 @@ EMAIL = email_login.Config(env)
 # avisos à moderação quando algo entra na fila (ver mod_notify.py); usa o mesmo SMTP do acesso por e-mail
 MOD_EMAILS = [a.strip() for a in (env("MOD_EMAIL") or "").split(",") if a.strip()]
 PUBLIC_URL = (env("PUBLIC_URL") or "").rstrip("/")
-GATE_FREE = {"/api/access", "/api/access/email", "/api/access/email/verify"}
+GATE_FREE = {"/api/access", "/api/access/email", "/api/access/email/verify", "/api/health"}
 MAX_BODY = 16_384
 ACTIVE_TERMS = 4  # disciplina sem oferta nos últimos 4 semestres publicados (2 anos) = fora de oferta
 
@@ -792,6 +792,7 @@ class App(BaseHTTPRequestHandler):
         self.dispatch("DELETE")
 
     ROUTES = [
+        ("GET", r"/api/health", "get_health"),
         ("POST", r"/api/access", "post_access"),
         ("POST", r"/api/access/email", "post_access_email"),
         ("POST", r"/api/access/email/verify", "post_access_email_verify"),
@@ -945,6 +946,16 @@ class App(BaseHTTPRequestHandler):
         """Disciplinas extintas (currículo antigo, sem oferta recente) não aparecem no site,
         a menos que já tenham avaliações publicadas — essas nunca somem."""
         return cid in CATALOG.active or cid in reviewed
+
+    def get_health(self) -> None:
+        """Para o monitor de disponibilidade: o servidor responde e o banco abre. Livre do acesso da comunidade, e não
+        diz nada além de "ok" (nem versão, nem contagens)."""
+        try:
+            with connect() as conn:
+                conn.execute("SELECT 1 FROM reviews LIMIT 1").fetchall()
+        except sqlite3.Error:
+            raise ApiError(503, "Banco indisponível.") from None
+        self.send_json({"ok": True})
 
     def get_bootstrap(self) -> None:
         with connect() as conn:

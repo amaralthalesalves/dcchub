@@ -103,7 +103,7 @@ O servidor recarrega o catálogo sozinho quando os arquivos mudam. Detalhes de c
 
 ## Colocando no ar
 
-Uma VM mínima com Docker basta (o app usa ~30 MB de RAM). `deploy/` tem `docker-compose.yml` com HTTPS automático via Caddy, cron de atualização e backup. Passo a passo para **Azure for Students**, **Oracle Cloud** ou qualquer VPS em [Deploy](docs/deploy.md).
+Uma VM mínima com Docker basta (o app usa ~30 MB de RAM). `deploy/` tem `docker-compose.yml` com HTTPS automático via Caddy, cron de atualização, backup (com cópia cifrada fora da VM) e monitor de disponibilidade. Passo a passo para **Azure for Students**, **Oracle Cloud** ou qualquer VPS em [Deploy](docs/deploy.md).
 
 ```bash
 cd deploy && cp .env.example .env   # DOMAIN, DCCHUB_ADMIN_TOKEN, acesso por e-mail/código, SMTP
