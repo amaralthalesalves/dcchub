@@ -2,7 +2,7 @@ FROM python:3.13-slim
 WORKDIR /app
 # código + catálogo (data/: catálogo, disciplinas extintas, materiais, oportunidades). O banco e a chave
 # NÃO vão na imagem (.dockerignore): ficam no volume /app/var, que sobrevive a atualizações da imagem.
-COPY app.py moderation.py ./
+COPY app.py moderation.py email_login.py ./
 COPY scripts ./scripts
 COPY static ./static
 COPY data ./data

@@ -14,6 +14,10 @@ Variáveis de ambiente (todas opcionais):
     DCCHUB_TRUST_PROXY  "1" para usar X-Forwarded-For como IP (somente atrás de proxy confiável)
     DCCHUB_ACCESS_CODES códigos de acesso da comunidade, separados por vírgula; se definido, os dados só saem
                         para navegadores que digitaram um código válido (trocar o código revoga os acessos antigos)
+    DCCHUB_EMAIL_LOGIN  "1" para liberar o acesso por código enviado ao e-mail @ufmg.br (ver email_login.py); o e-mail
+                        não é guardado. Configuração do envio: DCCHUB_SMTP_HOST/PORT/USER/PASSWORD/FROM/TLS; sem SMTP,
+                        o código aparece no terminal (desenvolvimento). DCCHUB_EMAIL_EPOCH: trocar o valor revoga todos
+                        os acessos feitos por e-mail; DCCHUB_EMAIL_DAILY_LIMIT: teto de e-mails por dia (250)
   Os nomes antigos (AVALIA_DCC_*) continuam aceitos.
     HOST / PORT             endereço de escuta (padrão 0.0.0.0:8000)
 """
@@ -43,6 +47,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, unquote, urlparse
 
+import email_login
 import moderation
 
 ROOT = Path(__file__).resolve().parent
@@ -60,6 +65,8 @@ TRUST_PROXY = env("TRUST_PROXY") == "1"
 ADMIN_TOKEN = env("ADMIN_TOKEN", "") or ""
 ACCESS_COOKIE = "dcchub_access"
 ACCESS_CODES = [c.strip() for c in (env("ACCESS_CODES") or "").split(",") if c.strip()]
+EMAIL = email_login.Config(env)
+GATE_FREE = {"/api/access", "/api/access/email", "/api/access/email/verify"}
 MAX_BODY = 16_384
 ACTIVE_TERMS = 4  # disciplina sem oferta nos últimos 4 semestres publicados (2 anos) = fora de oferta
 
@@ -332,6 +339,11 @@ CREATE TABLE IF NOT EXISTS class_reports (
   created_at INTEGER NOT NULL,
   PRIMARY KEY (term, professor, course, reporter_hash)
 ) WITHOUT ROWID;
+-- códigos de acesso por e-mail já usados (nonce do desafio, até expirar): uso único. Nome antigo, de quando era link
+CREATE TABLE IF NOT EXISTS used_links (
+  nonce TEXT PRIMARY KEY,
+  expires_at INTEGER NOT NULL
+) WITHOUT ROWID;
 CREATE TABLE IF NOT EXISTS reports (
   review_id INTEGER NOT NULL REFERENCES reviews(id) ON DELETE CASCADE,
   reporter_hash TEXT NOT NULL,
@@ -342,9 +354,9 @@ CREATE TABLE IF NOT EXISTS reports (
   PRIMARY KEY (review_id, reporter_hash)
 ) WITHOUT ROWID;
 """
-# votos, denúncias e turmas informadas não têm rowid (WITHOUT ROWID): ficam guardados na ordem da chave,
+# votos, denúncias, turmas informadas e links usados não têm rowid (WITHOUT ROWID): ficam guardados na ordem da chave,
 # não na ordem de chegada — senão a posição no arquivo diria em que ordem cada hash agiu num mesmo dia.
-ROWLESS_TABLES = ("votes", "class_reports", "reports")
+ROWLESS_TABLES = ("votes", "class_reports", "used_links", "reports")
 
 
 @contextmanager
@@ -552,12 +564,15 @@ class RateLimiter:
             return True
 
 
-LIMITS = {"check": (120, 60), "access": (10, 600), "classreport": (20, 600), "review": (6, 600), "vote": (60, 60), "report": (10, 600), "restore": (10, 600), "admin": (30, 60),
-          # identidade anônima nova sai de graça (basta apagar o cookie), então os limites abaixo valem por rede (IP) —
-          # nunca guardados: só em memória, como os demais
+LIMITS = {"check": (120, 60), "access": (10, 600), "login": (5, 600), "classreport": (20, 600), "review": (6, 600), "vote": (60, 60), "report": (10, 600), "restore": (10, 600), "admin": (30, 60),
+          # identidade anônima nova sai de graça (basta apagar o cookie), então os limites abaixo valem por rede (IP) e,
+          # no acesso por e-mail, por login — nunca guardados: só em memória, como os demais
+          "login-day": (20, 86400),       # códigos pedidos por IP por dia (protege a cota diária do serviço de e-mail)
           "review-pair": (3, 86400),      # avaliações do MESMO docente+disciplina por IP por dia (3, não 1: Wi-Fi do campus é NAT)
+          "review-access": (1, 86400),    # idem, por login de e-mail
           "vote-pair": (3, 86400)}        # votos "útil" na MESMA avaliação por IP por dia
 limiter = RateLimiter()
+EMAIL_DAILY_LIMIT = int(env("EMAIL_DAILY_LIMIT") or 250)  # teto global de e-mails por dia (Gmail: ~500; Brevo grátis: 300)
 
 
 def ip_key(ip: str) -> str:
@@ -610,6 +625,10 @@ def gzip_cached(etag: str, data: bytes) -> bytes:
 
 CSP = ("default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self'; "
        "font-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'")
+
+
+def gate_methods() -> list[str]:
+    return (["email"] if EMAIL.enabled else []) + (["code"] if ACCESS_CODES else [])
 
 
 class App(BaseHTTPRequestHandler):
@@ -726,6 +745,14 @@ class App(BaseHTTPRequestHandler):
             return ""
         return cookies[name].value if name in cookies else ""
 
+    def email_login_key(self) -> str | None:
+        """Identificador do login por e-mail deste navegador (o nonce do cookie de acesso), para limites em memória.
+        Não diz quem é a pessoa nem vai para o banco: serve só para um mesmo login não avaliar a mesma turma em série."""
+        given = self.cookie(ACCESS_COOKIE)
+        if EMAIL.enabled and given.startswith("e1.") and email_login.check_access(SECRET, EMAIL.epoch, given):
+            return given.split(".")[2]
+        return None
+
     # ---- roteamento
     def do_HEAD(self) -> None:
         self.do_GET()
@@ -744,6 +771,8 @@ class App(BaseHTTPRequestHandler):
 
     ROUTES = [
         ("POST", r"/api/access", "post_access"),
+        ("POST", r"/api/access/email", "post_access_email"),
+        ("POST", r"/api/access/email/verify", "post_access_email_verify"),
         ("GET", r"/api/bootstrap", "get_bootstrap"),
         ("GET", r"/api/offerings", "get_offerings"),
         ("GET", r"/api/professors/([a-z0-9-]+)", "get_professor"),
@@ -789,9 +818,9 @@ class App(BaseHTTPRequestHandler):
             if method in ("GET", "HEAD"):
                 return self.serve_static(path)
             return self.send_json({"error": "Método não permitido."}, 405)
-        if ACCESS_CODES and path != "/api/access" and not self.has_access():
-            # nada de dados sem o código da comunidade; o front mostra a tela de acesso
-            return self.send_json({"error": "Acesso restrito à comunidade. Digite o código de acesso.", "gate": True}, 401)
+        if (ACCESS_CODES or EMAIL.enabled) and path not in GATE_FREE and not self.has_access():
+            # nada de dados sem o código da comunidade ou o e-mail @ufmg.br; o front mostra a tela de acesso
+            return self.send_json({"error": "Acesso restrito à comunidade.", "gate": True, "methods": gate_methods()}, 401)
         try:
             for route_method, pattern, handler in self.ROUTES:
                 m = re.fullmatch(pattern, path)
@@ -927,6 +956,7 @@ class App(BaseHTTPRequestHandler):
             "comment": {"min": COMMENT_MIN, "max": COMMENT_MAX},
             "totals": {"reviews": totals["n"], "reviewers": totals["people"], "pending": pending},
             "moderation": bool(ADMIN_TOKEN),
+            "emailAccess": EMAIL.enabled,
         })
 
     def get_offerings(self) -> None:
@@ -942,8 +972,8 @@ class App(BaseHTTPRequestHandler):
         self.send_json({"term": term, "offerings": out})
 
     def reviews_where(self, conn: sqlite3.Connection, where: str, args: list, sort: str = "helpful", limit: int = 500, offset: int = 0) -> list[dict]:
-        order = {"recent": "r.created_at DESC", "helpful": "helpful DESC, r.created_at DESC",
-                 "high": "r.overall DESC, r.created_at DESC", "low": "r.overall ASC, r.created_at DESC"}.get(sort, "helpful DESC, r.created_at DESC")
+        order = {"recent": "r.created_at DESC, r.id DESC", "helpful": "helpful DESC, r.created_at DESC, r.id DESC",
+                 "high": "r.overall DESC, r.created_at DESC, r.id DESC", "low": "r.overall ASC, r.created_at DESC, r.id DESC"}.get(sort, "helpful DESC, r.created_at DESC, r.id DESC")
         rows = conn.execute(f"""SELECT r.*, (SELECT COUNT(*) FROM votes v WHERE v.review_id=r.id) helpful
                                 FROM reviews r WHERE r.status='published' AND {where} ORDER BY {order} LIMIT ? OFFSET ?""",
                             [*args, limit, offset]).fetchall()
@@ -1141,9 +1171,12 @@ class App(BaseHTTPRequestHandler):
 
     def limit_same_class(self, professor: str, course: str) -> None:
         """Contra avaliações em série da mesma turma: cada cookie anônimo novo poderia avaliar de novo o mesmo docente.
-        Limita por rede (IP), só em memória — nada disso liga a avaliação a quem a escreveu."""
+        Limita por rede (IP) e por login de e-mail, só em memória — nada disso liga a avaliação a quem a escreveu."""
         msg = "Já recebemos avaliações desta turma a partir desta conexão hoje. Se você ainda não avaliou, tente amanhã."
         self.limit("review-pair", f"{self.client_ip()}|{professor}|{course}", msg)
+        login = self.email_login_key()
+        if login:
+            self.limit("review-access", f"{login}|{professor}|{course}", msg)
 
     def post_moderation_check(self) -> None:
         """Checagem enquanto a pessoa digita: diz o que seria barrado/segurado, sem guardar nada."""
@@ -1232,7 +1265,7 @@ class App(BaseHTTPRequestHandler):
         if not viewer:
             return self.send_json({"reviews": [], "hasIdentity": False})
         with connect() as conn:
-            rows = conn.execute("SELECT * FROM reviews WHERE reviewer_hash=? AND status!='removed' ORDER BY created_at DESC", (viewer,)).fetchall()
+            rows = conn.execute("SELECT * FROM reviews WHERE reviewer_hash=? AND status!='removed' ORDER BY created_at DESC, id DESC", (viewer,)).fetchall()
             helpful = helpful_counts(conn, [r["id"] for r in rows])
         self.send_json({"reviews": [review_out(r, viewer, set(), helpful) for r in rows], "hasIdentity": True})
 
@@ -1335,19 +1368,93 @@ class App(BaseHTTPRequestHandler):
 
     def has_access(self) -> bool:
         given = self.cookie(ACCESS_COOKIE)
-        # o cookie guarda um HMAC do código: remover/trocar o código em DCCHUB_ACCESS_CODES revoga quem entrou com ele
-        return bool(given) and any(hmac.compare_digest(given, self.access_token(c)) for c in ACCESS_CODES)
+        if not given:
+            return False
+        # entrada por e-mail: token assinado e com validade, sem nada do e-mail (DCCHUB_EMAIL_EPOCH revoga todos)
+        if EMAIL.enabled and given.startswith("e1."):
+            return email_login.check_access(SECRET, EMAIL.epoch, given)
+        # entrada por código: o cookie guarda um HMAC do código; trocar DCCHUB_ACCESS_CODES revoga quem entrou com ele
+        return any(hmac.compare_digest(given, self.access_token(c)) for c in ACCESS_CODES)
+
+    def set_access_cookie(self, value: str, max_age: int) -> None:
+        secure = "; Secure" if self.secure_request() else ""
+        self.access_cookie = f"{ACCESS_COOKIE}={value}; Path=/; Max-Age={max_age}; HttpOnly; SameSite=Strict{secure}"
 
     def post_access(self) -> None:
         if not ACCESS_CODES:
+            if EMAIL.enabled:
+                raise ApiError(403, "O acesso é pelo e-mail @ufmg.br.")
             return self.send_json({"ok": True})
         self.limit("access")
         code = clean_line(self.read_json().get("code"), 120)
         match = next((c for c in ACCESS_CODES if hmac.compare_digest(code.lower().encode(), c.lower().encode())), None)
         if not match:
             raise ApiError(403, "Código inválido. Peça o código atual nos canais dos estudantes.")
-        secure = "; Secure" if self.secure_request() else ""
-        self.access_cookie = f"{ACCESS_COOKIE}={self.access_token(match)}; Path=/; Max-Age=15552000; HttpOnly; SameSite=Strict{secure}"
+        self.set_access_cookie(self.access_token(match), 15552000)
+        self.send_json({"ok": True})
+
+    def post_access_email(self) -> None:
+        """Envia o código de acesso e devolve o desafio. O e-mail só passa pela memória: não vai para banco nem log."""
+        if not EMAIL.enabled:
+            raise ApiError(404, "Acesso por e-mail desativado.")
+        self.limit("login")
+        address = email_login.normalize(self.read_json().get("email"))
+        if not address:
+            raise ApiError(400, "Digite um e-mail válido.", fields={"email": ["Digite um e-mail válido."]})
+        if not email_login.allowed(address, EMAIL.domain):
+            msg = f"Use seu e-mail @{EMAIL.domain}."
+            raise ApiError(400, msg, fields={"email": [msg]})
+        self.limit("login-day", message="Muitos pedidos de código a partir desta conexão hoje. Tente amanhã.")
+        code, challenge = email_login.new_code(SECRET)
+        # no máximo 3 e-mails por endereço por hora (chave HMAC só em memória). Acima disso a resposta é a mesma, com
+        # um desafio de verdade, mas nada é enviado: ninguém usa o site para encher a caixa de outra pessoa.
+        if limiter.hit("login-addr", email_login.address_key(SECRET, address), 3, 3600):
+            # teto global por dia: sem ele, poucas conexões gastariam a cota do serviço de envio e ninguém mais entraria
+            if not limiter.hit("login-global", "*", EMAIL_DAILY_LIMIT, 86400):
+                raise ApiError(503, "O limite diário de envios de e-mail foi atingido. Tente de novo amanhã"
+                               + (" ou entre com o código da comunidade." if ACCESS_CODES else "."))
+            email_login.send_async(EMAIL, address, code)
+        self.send_json({"ok": True, "challenge": challenge, "expiresIn": email_login.CODE_TTL,
+                        "message": f"Enviamos um código de 6 dígitos para {address}. Ele vale por "
+                                   f"{email_login.CODE_TTL // 60} minutos."})
+
+    def post_access_email_verify(self) -> None:
+        if not EMAIL.enabled:
+            raise ApiError(404, "Acesso por e-mail desativado.")
+        self.limit("access")
+        body = self.read_json()
+        # os últimos desafios pedidos neste navegador (e-mail lento: vale o código de qualquer um deles)
+        given = body.get("challenges")
+        given = given if isinstance(given, list) else [body.get("challenge")]
+        challenges = [(c, n) for c in dict.fromkeys(x for x in given[:email_login.CODE_PENDING] if isinstance(x, str))
+                      if (n := email_login.challenge_nonce(c))]
+        if not challenges:
+            raise ApiError(400, "Código expirado. Peça um novo.")
+        code = body.get("code")
+        if not email_login.clean_code(code):
+            raise ApiError(400, "Digite os 6 dígitos do código.", fields={"code": ["Digite os 6 dígitos do código."]})
+        # tentativas por desafio, só em memória: 5 chutes em 1.000.000 por e-mail enviado
+        nonce, tried = None, False
+        for challenge, candidate in challenges:
+            if not limiter.hit("login-try", candidate, email_login.CODE_TRIES, email_login.CODE_TTL):
+                continue
+            tried = True
+            if email_login.check_code(SECRET, challenge, code):
+                nonce = candidate
+                break
+        if not tried:
+            raise ApiError(429, "Tentativas demais com este código. Peça um novo.")
+        if not nonce:
+            raise ApiError(400, "Código incorreto ou expirado. Confira os e-mails recebidos.",
+                           fields={"code": ["Código incorreto ou expirado."]})
+        now = int(time.time())
+        with connect() as conn:
+            conn.execute("DELETE FROM used_links WHERE expires_at < ?", (now,))
+            try:  # uso único
+                conn.execute("INSERT INTO used_links (nonce, expires_at) VALUES (?, ?)", (nonce, now + email_login.CODE_TTL))
+            except sqlite3.IntegrityError:
+                raise ApiError(400, "Este código já foi usado. Peça um novo.") from None
+        self.set_access_cookie(email_login.access_token(SECRET, EMAIL.epoch), email_login.ACCESS_TTL)
         self.send_json({"ok": True})
 
     def require_admin(self) -> None:
@@ -1362,7 +1469,7 @@ class App(BaseHTTPRequestHandler):
             rows = conn.execute("""SELECT r.*, (SELECT COUNT(*) FROM reports p WHERE p.review_id=r.id AND p.resolved=0) nreports
                                    FROM reviews r WHERE r.status='held'
                                       OR EXISTS (SELECT 1 FROM reports p WHERE p.review_id=r.id AND p.resolved=0)
-                                   ORDER BY r.created_at DESC LIMIT 200""").fetchall()
+                                   ORDER BY r.created_at DESC, r.id DESC LIMIT 200""").fetchall()
             reasons = defaultdict(list)
             for rep in conn.execute("SELECT review_id, reason, detail FROM reports WHERE resolved=0"):
                 reasons[rep["review_id"]].append({"reason": rep["reason"], "detail": rep["detail"]})
@@ -1416,6 +1523,10 @@ if __name__ == "__main__":
     print(f"DCCHub em http://localhost:{port}  ({len(CATALOG.professors)} docentes, {len(CATALOG.courses)} disciplinas)")
     if not ADMIN_TOKEN:
         print("Moderação desativada: defina DCCHUB_ADMIN_TOKEN para habilitar o painel /#/moderacao.")
+    if EMAIL.enabled:
+        print(f"Acesso por e-mail @{EMAIL.domain} ativo." + ("" if EMAIL.smtp_host else
+              " SMTP não configurado: os códigos aparecem aqui no terminal (só para desenvolvimento)."))
+
     def stop(*_: object) -> None:
         raise KeyboardInterrupt
 

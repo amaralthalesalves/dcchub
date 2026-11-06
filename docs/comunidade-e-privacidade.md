@@ -8,9 +8,40 @@ O DCCHub é um projeto **independente** de estudantes, sem vínculo com o DCC ou
 
 | Medida | Como |
 |---|---|
-| **Código de acesso** | Com `DCCHUB_ACCESS_CODES` definido, a API não entrega nenhum dado sem um código válido; o site mostra só a tela de acesso. |
+| **E-mail @ufmg.br** | Com `DCCHUB_EMAIL_LOGIN=1`, entra quem recebe um código de 6 dígitos no e-mail institucional. Sem conta, e o e-mail não é guardado. |
+| **Código de acesso** | Com `DCCHUB_ACCESS_CODES` definido, também entra quem digita um código válido. Sem nenhum dos dois, a API não entrega dados; o site mostra só a tela de acesso. |
 | **Fora de buscadores** | `robots.txt` bloqueia tudo; toda resposta leva `X-Robots-Tag: noindex` e a página tem `<meta name="robots" content="noindex">`. O nome de um docente numa busca não leva ao site. |
 | **Sem marca institucional** | Nome, logo e textos não imitam DCC/UFMG e deixam claro que é um projeto independente. |
+
+### Acesso pelo e-mail @ufmg.br
+
+```mermaid
+sequenceDiagram
+  participant P as Pessoa
+  participant S as DCCHub
+  participant E as Serviço de e-mail
+  P->>S: aluna@ufmg.br
+  Note over S: aceita só @ufmg.br exato<br>(recusa @dcc.ufmg.br)
+  S->>E: código de 6 dígitos (30 min)
+  S-->>P: "enviamos um código" + desafio assinado
+  E->>P: e-mail com o código
+  P->>S: desafio + código digitado
+  Note over S: confere assinatura, validade,<br>tentativas (até 5) e uso único
+  S-->>P: cookie de acesso (180 dias)
+```
+
+- **Só `@ufmg.br` exato.** Todo aluno tem um. `@dcc.ufmg.br` — o domínio que os docentes do DCC divulgam — e outros subdomínios são recusados, então digitar o endereço público de um docente **não dispara e-mail nenhum** para ele.
+- **O e-mail não é guardado.** Só passa pela memória durante o envio: não vai para o banco nem para logs — erros de envio registram só o tipo e o código SMTP, porque o texto dessas exceções costuma trazer o endereço. O limite de 3 e-mails por endereço por hora usa um HMAC do endereço que fica só em memória e some ao fim da janela.
+- **O código** tem 6 dígitos, vale 30 minutos e é de **uso único**. São 30 minutos, e não 10, porque o correio da UFMG — e o redirecionamento para outras caixas — chega a levar vários minutos; o prazo não muda a chance de chute, que depende só das tentativas. Junto com o envio, o navegador recebe um *desafio*: um token assinado com a chave do servidor que amarra o código sem contê-lo e não traz nada do e-mail. Sem a chave, não dá para testar códigos fora do ar; online, são **no máximo 5 tentativas por código** — 5 chances em 1.000.000 por e-mail enviado, que já é limitado por endereço, por rede e por dia.
+- **E-mail lento:** o navegador guarda os desafios dos últimos 3 códigos pedidos, e qualquer um deles serve — quem cansa de esperar e pede outro pode usar o primeiro que chegar. Pedir de novo só é liberado 60 segundos depois do último envio.
+- **Funciona entre aparelhos:** dá para ler o e-mail no celular e digitar o código no computador. E, como o e-mail não tem link, antivírus que "visitam" links não atrapalham, e ninguém se acostuma a clicar em link de login vindo por e-mail.
+- **O cookie de acesso** também não contém nada do e-mail e é **independente da identidade anônima** de quem avalia (`avalia_dcc`). Saber quem pediu um código não diz nada sobre quem escreveu cada avaliação.
+- **Revogar:** trocar `DCCHUB_EMAIL_EPOCH` desconecta todo mundo que entrou por e-mail. Não dá para revogar uma pessoa só: o cookie não diz de quem é (é o preço de não guardar o e-mail).
+- **Cota de envio:** no máximo 20 códigos por conexão por dia e `DCCHUB_EMAIL_DAILY_LIMIT` (padrão 250) no total, para que ninguém esgote a cota do serviço de e-mail e trave o acesso de todo mundo.
+- **O e-mail é neutro:** "123456 é seu código de acesso ao DCCHub", sem falar em avaliações, docentes ou disciplinas. O código vai no assunto para aparecer direto na notificação do celular.
+
+> [!NOTE]
+> O serviço de envio (Gmail, Brevo…) registra para quem enviou cada e-mail e quando — isso fica fora do DCCHub. Como o acesso não tem ligação com as avaliações, esse registro mostra quem *entrou* no site, não o que cada pessoa escreveu. Para dificultar o cruzamento por horário ("código às 14:02, avaliação às 14:05"), o banco guarda a data das avaliações **só com precisão de dia**. Num dia com pouquíssimo movimento, o cruzamento por dia ainda seria possível para quem tivesse o log do serviço *e* o banco — por isso, os dois ficam só com quem mantém o site.
 
 ### O código de acesso
 - Divulgue **só nos canais dos estudantes** (grupos de turma, DA, Discord…).
@@ -29,7 +60,7 @@ O DCCHub é um projeto **independente** de estudantes, sem vínculo com o DCC ou
 - **Sem ordem de chegada.** As avaliações têm ids aleatórios, e votos, denúncias e turmas informadas ficam em tabelas sem `rowid` (guardadas na ordem da chave). Com ids sequenciais, daria para saber quem avaliou ou votou antes de quem num mesmo dia, o que anularia a data só com o dia.
 - **Apagar é apagar.** O banco roda com `secure_delete`: avaliações apagadas e horários antigos são zerados no arquivo, não ficam em páginas livres.
 - **Nenhum log de acesso com IP.** O IP só é usado em memória para limitar abusos (ex.: 6 avaliações a cada 10 min; no máximo 3 avaliações da mesma turma e 3 votos na mesma avaliação por rede por dia; denúncias contadas por rede) e é descartado.
-- **Contra contas falsas sem criar contas.** Como um cookie anônimo novo sai de graça, os limites acima valem por rede — sempre só em memória, sem ligar a avaliação a quem a escreveu.
+- **Contra contas falsas sem criar contas.** Como um cookie anônimo novo sai de graça, os limites acima valem por rede e, para quem entrou por e-mail, por login (1 avaliação por turma por dia) — sempre só em memória, sem ligar a avaliação a quem a escreveu.
 - Quem escreveu pode **editar e apagar** as próprias avaliações. O **código de recuperação** leva a identidade anônima para outro navegador.
 
 ### O que o banco guarda
@@ -40,6 +71,7 @@ O DCCHub é um projeto **independente** de estudantes, sem vínculo com o DCC ou
 | `votes` | Voto "útil": avaliação + hash de quem votou |
 | `reports` | Denúncias: avaliação + hash de quem denunciou + motivo |
 | `class_reports` | Relatos "docente X dá a disciplina Y neste semestre" + hash de quem relatou |
+| `used_links` | Identificador aleatório de cada código de acesso já usado, até ele expirar (para o uso único). Sem e-mail nem o código. O nome vem da versão anterior, que mandava um link. |
 
 Comentários recusados pela moderação **não são guardados**.
 

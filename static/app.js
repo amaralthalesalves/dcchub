@@ -247,7 +247,7 @@ async function router() {
       else if (!history.state?.keepScroll) window.scrollTo(0, 0);
     } catch (err) {
       if (token !== renderToken) return;
-      if (err.data?.gate) { viewGate(); return; }
+      if (err.data?.gate) { viewGate(err.data.methods); return; }
       main.innerHTML = errorBlock(err);
     }
     return;
@@ -255,39 +255,135 @@ async function router() {
   main.innerHTML = `<section class="page narrow empty-state"><h1>Página não encontrada</h1><p>O endereço não existe ou mudou.</p><a class="btn" href="#/">Voltar ao início</a></section>`;
 }
 
-// Tela de acesso: o servidor só entrega dados a quem digitou o código da comunidade (DCCHUB_ACCESS_CODES)
-function viewGate() {
+// Tela de acesso: o servidor só entrega dados a quem entrou com o e-mail @ufmg.br (código de 6 dígitos, sem conta) ou com
+// o código da comunidade. methods vem do servidor: ['email'], ['code'] ou os dois.
+function viewGate(methods = ['code']) {
   setTitle('Acesso da comunidade');
   document.body.classList.add('gated');
+  const email = methods.includes('email'), code = methods.includes('code');
+  const codeForm = `<form id="gate-code" class="gate-form">
+        <label class="field">Código de acesso<input name="code" autocomplete="off" autocapitalize="off" spellcheck="false" required placeholder="Digite o código"></label>
+        <button class="btn ${email ? 'btn-ghost' : 'btn-lg'}" type="submit">Entrar com código</button>
+        <p class="err" role="alert"></p>
+      </form>`;
   main.innerHTML = `<section class="page narrow gate">
     <div class="gate-card">
       <span class="brand-logo" aria-hidden="true">D</span>
       <h1>DCC<span>Hub</span></h1>
       <p>Espaço da comunidade estudantil do DCC/UFMG: avaliações anônimas de turmas, oferta do semestre, materiais e oportunidades.</p>
-      <form id="gate-form" class="gate-form">
-        <label class="field">Código de acesso<input name="code" autocomplete="off" autocapitalize="off" spellcheck="false" required placeholder="Digite o código"></label>
-        <button class="btn btn-lg" type="submit">Entrar</button>
-        <p class="err" id="gate-err" role="alert"></p>
+      ${email ? `<form id="gate-email" class="gate-form" novalidate>
+        <label class="field">E-mail da UFMG<input name="email" type="email" autocomplete="email" autocapitalize="off" spellcheck="false" required placeholder="voce@ufmg.br"></label>
+        <button class="btn btn-lg" type="submit">Receber código de acesso</button>
+        <p class="err" role="alert"></p>
       </form>
-      <p class="small muted">O código é divulgado nos canais dos estudantes (centro acadêmico, grupos de turma). Ele não identifica você: o acesso continua anônimo.</p>
+      <div class="gate-sent" id="gate-sent" hidden>
+        <span class="gate-sent-icon" aria-hidden="true"><svg class="ico"><use href="#i-mail"/></svg></span>
+        <p class="gate-sent-msg" role="status"></p>
+        <form id="gate-otp" class="gate-form" novalidate>
+          <label class="field">Código de 6 dígitos<input name="code" class="otp-input" inputmode="numeric" autocomplete="one-time-code" maxlength="7" pattern="[0-9 ]*" required placeholder="000000"></label>
+          <button class="btn btn-lg" type="submit">Entrar</button>
+          <p class="err" role="alert"></p>
+        </form>
+        <p class="small muted">O e-mail da UFMG pode levar <b>alguns minutos</b> para chegar (mais ainda se ele é redirecionado para outra caixa). Pode abrir no celular e digitar o código aqui.</p>
+        <p class="small muted">Não chegou? Confira o spam ou <button class="link-btn" type="button" id="gate-retry">peça outro código</button><span id="gate-wait"></span>. Os códigos anteriores continuam valendo.</p>
+      </div>
+      <p class="small muted">Sem conta e sem senha: o e-mail só é usado para enviar o código e <b>não fica guardado</b>. Seu acesso não tem ligação com as avaliações que você escreve, que continuam anônimas.</p>
+      ${code ? `<details class="gate-alt"><summary>Tenho um código de acesso</summary>${codeForm}</details>` : ''}`
+    : `${codeForm}
+      <p class="small muted">O código é divulgado nos canais dos estudantes (centro acadêmico, grupos de turma). Ele não identifica você: o acesso continua anônimo.</p>`}
       <p class="small muted">Projeto independente de estudantes, sem vínculo com o DCC ou com a UFMG.</p>
     </div>
   </section>`;
-  $('#gate-form').addEventListener('submit', async (e) => {
+  const enter = () => { document.body.classList.remove('gated'); state.boot = null; router(); };
+  $('#gate-code')?.addEventListener('submit', async (e) => {
     e.preventDefault();
     const btn = $('button', e.target);
     btn.disabled = true;
     try {
       await api('/api/access', { method: 'POST', body: { code: new FormData(e.target).get('code').trim() } });
-      document.body.classList.remove('gated');
-      state.boot = null;
-      router();
+      enter();
     } catch (err) {
-      $('#gate-err').textContent = err.message;
+      $('.err', e.target).textContent = err.message;
       btn.disabled = false;
     }
   });
-  $('input[name=code]').focus();
+  // os desafios (tokens assinados, sem o código e sem o e-mail) ficam na aba: recarregar a página não perde o código
+  // pedido. Guarda os últimos 3: com e-mail lento, a pessoa pede outro e o primeiro chega depois — qualquer um serve.
+  const KEY = 'dcchub-otp', PENDING = 3, RESEND_WAIT = 60_000;
+  const load = () => {
+    try {
+      const v = JSON.parse(sessionStorage.getItem(KEY) || 'null');
+      const items = (v?.items || []).filter((i) => i.exp > Date.now());
+      return items.length ? { ...v, items } : null;
+    } catch (_) { return null; }
+  };
+  const save = (v) => { try { v ? sessionStorage.setItem(KEY, JSON.stringify(v)) : sessionStorage.removeItem(KEY); } catch (_) { /* sem armazenamento */ } };
+  let pending = load();
+  const form = $('#gate-email'), otp = $('#gate-otp'), retry = $('#gate-retry');
+  // espera antes de pedir outro código: quase sempre o primeiro só está atrasado
+  let waitTimer = null;
+  const tickWait = () => {
+    clearTimeout(waitTimer);
+    const left = pending ? Math.ceil((pending.sentAt + RESEND_WAIT - Date.now()) / 1000) : 0;
+    if (!retry?.isConnected) return; // saiu da tela de acesso
+    retry.disabled = left > 0;
+    $('#gate-wait').textContent = left > 0 ? ` (em ${left} s)` : '';
+    if (left > 0) waitTimer = setTimeout(tickWait, 1000);
+  };
+  const showOtp = (msg) => {
+    $('.gate-sent-msg').textContent = msg;
+    form.hidden = true;
+    $('#gate-sent').hidden = false;
+    $('.err', otp).textContent = '';
+    $('input', otp).value = '';
+    $('input', otp).focus();
+    tickWait();
+  };
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = $('button', form), err = $('.err', form);
+    const value = new FormData(form).get('email').trim();
+    err.textContent = '';
+    if (!/^[^@\s]+@[^@\s]+$/.test(value)) { err.textContent = 'Digite um e-mail válido.'; return; }
+    if (!value.toLowerCase().endsWith('@ufmg.br')) { err.textContent = 'Use seu e-mail @ufmg.br.'; return; }
+    btn.disabled = true;
+    try {
+      const res = await api('/api/access/email', { method: 'POST', body: { email: value } });
+      const item = { challenge: res.challenge, exp: Date.now() + res.expiresIn * 1000 };
+      pending = { items: [item, ...(load()?.items || [])].slice(0, PENDING), msg: res.message, sentAt: Date.now() };
+      save(pending);
+      showOtp(res.message);
+    } catch (e2) {
+      err.textContent = e2.message;
+    }
+    btn.disabled = false;
+  });
+  otp?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = $('button', otp), err = $('.err', otp);
+    const code = $('input', otp).value.replace(/\D/g, '');
+    err.textContent = '';
+    if (code.length !== 6) { err.textContent = 'Digite os 6 dígitos do código.'; return; }
+    pending = load();
+    if (!pending) { err.textContent = 'O código expirou. Peça outro.'; return; }
+    btn.disabled = true;
+    try {
+      await api('/api/access/email/verify', { method: 'POST', body: { challenges: pending.items.map((i) => i.challenge), code } });
+      save(null);
+      toast('Pronto! Este navegador tem acesso por 180 dias.');
+      enter();
+      return;
+    } catch (e2) {
+      err.textContent = e2.message;
+      $('input', otp).select();
+    }
+    btn.disabled = false;
+  });
+  // colou ou digitou os 6 dígitos: envia sozinho
+  $('input', otp)?.addEventListener('input', (e) => { if (e.target.value.replace(/\D/g, '').length === 6) otp.requestSubmit(); });
+  retry?.addEventListener('click', () => { $('#gate-sent').hidden = true; form.hidden = false; $('input', form).focus(); });
+  if (email && pending) { showOtp(pending.msg); return; }
+  $(email ? 'input[name=email]' : 'input[name=code]').focus();
 }
 
 function errorBlock(err) {
@@ -543,10 +639,10 @@ function wireReviewList(reviews, show) {
   const redraw = () => {
     const sorted = reviews.filter((r) => (!filter || r.course === filter || r.professor === filter) && (!term || r.term === term));
     const by = {
-      helpful: (a, b) => b.helpful - a.helpful || b.createdAt - a.createdAt,
-      recent: (a, b) => b.createdAt - a.createdAt,
-      high: (a, b) => b.ratings.overall - a.ratings.overall || b.createdAt - a.createdAt,
-      low: (a, b) => a.ratings.overall - b.ratings.overall || b.createdAt - a.createdAt,
+      helpful: (a, b) => b.helpful - a.helpful || b.createdAt - a.createdAt || b.id - a.id,
+      recent: (a, b) => b.createdAt - a.createdAt || b.id - a.id,
+      high: (a, b) => b.ratings.overall - a.ratings.overall || b.createdAt - a.createdAt || b.id - a.id,
+      low: (a, b) => a.ratings.overall - b.ratings.overall || b.createdAt - a.createdAt || b.id - a.id,
     }[sort];
     list.innerHTML = sorted.sort(by).map((r) => reviewCard(r, { show })).join('') || '<p class="muted">Nenhuma avaliação com esse filtro.</p>';
   };
@@ -1305,7 +1401,7 @@ async function viewReviewForm({ params, isCurrent }) {
   })();
   main.innerHTML = `<section class="page narrow">
     <div class="page-head"><p class="eyebrow">${existing ? 'Editar' : 'Sua vez'}</p><h1>${existing ? 'Editar avaliação' : 'Como foi a turma?'}</h1>
-      <p class="lead-sm">Sem login e sem dados pessoais. Fale sobre a disciplina e as práticas de ensino — não sobre a vida pessoal de ninguém.</p></div>
+      <p class="lead-sm">Anônimo e sem dados pessoais. Fale sobre a disciplina e as práticas de ensino — não sobre a vida pessoal de ninguém.</p></div>
     <form id="review-form" class="review-form" novalidate>
       <fieldset class="form-step"><legend><span>1</span> Turma</legend>
         <label class="field">Docente
@@ -1575,7 +1671,9 @@ async function viewAbout() {
 
     <h2 id="privacidade">Privacidade</h2>
     <ul>
-      <li>Sem cadastro: não pedimos nome, e-mail ou matrícula.</li>
+      ${b.emailAccess
+        ? `<li>Sem cadastro e sem conta. O e-mail @ufmg.br serve só para enviar o código de acesso: <b>não é guardado</b> (nem no banco, nem em logs), e o acesso que ele libera não tem nenhuma ligação com as avaliações que você escreve. Não pedimos nome nem matrícula.</li>`
+        : '<li>Sem cadastro: não pedimos nome, e-mail ou matrícula.</li>'}
       <li>Seu navegador recebe um identificador aleatório (cookie <code>HttpOnly</code>). O banco guarda apenas um <abbr title="HMAC-SHA256 com chave secreta do servidor">hash</abbr> dele — usado só para impedir avaliações repetidas e permitir edição.</li>
       <li>O servidor não registra endereços IP em logs. O IP é usado apenas em memória, por alguns minutos, para limitar abusos.</li>
       <li>Sem Google Fonts, analytics ou qualquer recurso de terceiros: fotos e dados são servidos pelo próprio site.</li>

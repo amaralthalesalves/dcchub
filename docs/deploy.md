@@ -10,7 +10,7 @@ O DCCHub é um único processo Python com SQLite (~30 MB de RAM). Qualquer VM m�
 |---|---|
 | `docker-compose.yml` | DCCHub + [Caddy](https://caddyserver.com) com HTTPS automático (Let's Encrypt) |
 | `Caddyfile` | Proxy reverso para o app |
-| `.env.example` | `DOMAIN`, `DCCHUB_ADMIN_TOKEN`, `DCCHUB_ACCESS_CODES` |
+| `.env.example` | `DOMAIN`, `DCCHUB_ADMIN_TOKEN`, `DCCHUB_ACCESS_CODES`, acesso por e-mail e SMTP |
 | `cron.example` | Atualização diária/semanal dos dados e backup diário |
 | `backup.sh` | Cópia consistente do banco + chave, guarda 14 dias |
 | `fly.toml` | Alternativa no Fly.io (pago, ~US$ 2–3/mês) |
@@ -65,11 +65,41 @@ git clone git@github.com:amaralthalesalves/dcchub.git /opt/dcchub
 cd /opt/dcchub/deploy
 cp .env.example .env
 python3 -c "import secrets; print(secrets.token_urlsafe(32))"   # → DCCHUB_ADMIN_TOKEN
-nano .env                                                        # DOMAIN, token, código de acesso
+nano .env                                                        # DOMAIN, token, código de acesso e/ou e-mail
 docker compose up -d --build
 docker compose logs -f caddy                                     # espere "certificate obtained"
 ```
 Abra `https://seu.dominio` — deve aparecer a tela do código de acesso.
+
+### Envio de e-mail (acesso por @ufmg.br)
+Para o login por e-mail, configure um serviço de envio — VMs na nuvem normalmente bloqueiam o envio direto (porta 25), e e-mail sem SPF/DKIM cai no spam.
+
+**Sem domínio próprio: Gmail.** Crie uma conta Gmail só do projeto, ative a verificação em duas etapas e gere uma senha de app em [myaccount.google.com/apppasswords](https://myaccount.google.com/apppasswords). No `.env`:
+```bash
+DCCHUB_EMAIL_LOGIN=1
+DCCHUB_SMTP_HOST=smtp.gmail.com
+DCCHUB_SMTP_PORT=587
+DCCHUB_SMTP_USER=conta.do.projeto@gmail.com
+DCCHUB_SMTP_PASSWORD=abcdefghijklmnop   # senha de app, 16 letras sem espaços
+DCCHUB_SMTP_FROM=DCCHub <conta.do.projeto@gmail.com>
+```
+O Gmail aceita ~500 envios por dia; o padrão de `DCCHUB_EMAIL_DAILY_LIMIT` (250) fica abaixo disso. Conta nova que de repente manda muito pode ser limitada pelo Google por alguns dias: crie a conta antes de divulgar o site.
+
+**Com domínio próprio: um serviço de envio**, para mandar de `acesso@seu.dominio`:
+
+1. Crie uma conta num serviço com plano grátis, por exemplo o **Brevo** (~300 e-mails/dia).
+2. No serviço, **verifique o seu domínio**: ele mostra registros DNS (SPF, DKIM, às vezes DMARC) para você criar onde o domínio está registrado.
+3. Gere uma credencial SMTP e preencha no `.env`:
+   ```bash
+   DCCHUB_EMAIL_LOGIN=1
+   DCCHUB_SMTP_HOST=smtp-relay.brevo.com
+   DCCHUB_SMTP_PORT=587
+   DCCHUB_SMTP_USER=...            # login SMTP do serviço
+   DCCHUB_SMTP_PASSWORD=...        # chave SMTP do serviço
+   DCCHUB_SMTP_FROM=DCCHub <acesso@seu.dominio>
+   ```
+4. `docker compose up -d` e teste com o seu `@ufmg.br`. Se não chegar, veja `docker compose logs app` — falhas de envio aparecem lá (sem o endereço).
+
 
 ### 6. Atualização dos dados e backup
 ```bash
@@ -117,7 +147,7 @@ Coloque atrás de um proxy com HTTPS (Caddy/nginx) e mantenha `DCCHUB_TRUST_PROX
 
 ## Limites em memória
 
-Os limites de abuso (avaliações, votos e denúncias por rede) e a contagem de denúncias por rede vivem **só na memória** do processo, de propósito: nada disso vai para o banco. Consequências:
+Os limites de abuso (avaliações, votos e denúncias por rede, códigos por e-mail por dia, tentativas por código) e a contagem de denúncias por rede vivem **só na memória** do processo, de propósito: nada disso vai para o banco. Consequências:
 
 - **Rode uma única instância.** Com duas, cada uma conta pela metade. No Fly, mantenha uma máquina (`fly scale count 1`).
 - **Reiniciar zera os contadores.** No Fly com `auto_stop_machines`, cada parada também zera. Isso deixa a retirada automática por denúncias mais conservadora (as denúncias seguem no banco e na fila), mas reabre por um momento os limites diários.
