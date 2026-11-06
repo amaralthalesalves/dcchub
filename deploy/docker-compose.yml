@@ -17,6 +17,9 @@ services:
       DCCHUB_SMTP_FROM: ${DCCHUB_SMTP_FROM:-}
       DCCHUB_EMAIL_EPOCH: ${DCCHUB_EMAIL_EPOCH:-1}
       DCCHUB_EMAIL_DAILY_LIMIT: ${DCCHUB_EMAIL_DAILY_LIMIT:-250}
+      # avisos à moderação quando algo entra na fila (mesmo SMTP); o link do painel usa o domínio
+      DCCHUB_MOD_EMAIL: ${DCCHUB_MOD_EMAIL:-}
+      DCCHUB_PUBLIC_URL: https://${DOMAIN}
     volumes:
       - dcchub-var:/app/var              # banco SQLite + chave secreta: é ISTO que precisa de backup
   caddy:

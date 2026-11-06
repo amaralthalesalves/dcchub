@@ -154,26 +154,41 @@ def message(cfg: Config, to: str, code: str) -> EmailMessage:
     return msg
 
 
+def smtp_send(cfg: Config, msg: EmailMessage) -> None:
+    """Envia pelo SMTP configurado. Exceções sobem para quem chamou (que registra sem o endereço)."""
+    context = ssl.create_default_context()
+    if cfg.smtp_tls == "ssl":
+        server = smtplib.SMTP_SSL(cfg.smtp_host, cfg.smtp_port, timeout=20, context=context)
+    else:
+        server = smtplib.SMTP(cfg.smtp_host, cfg.smtp_port, timeout=20)
+        if cfg.smtp_tls == "starttls":
+            server.starttls(context=context)
+    with server:
+        if cfg.smtp_user:
+            server.login(cfg.smtp_user, cfg.smtp_password)
+        server.send_message(msg)
+
+
 def deliver(cfg: Config, to: str, code: str) -> None:
     """Envia o e-mail (chamado numa thread). Sem SMTP configurado, mostra o código no terminal (desenvolvimento)."""
     if not cfg.smtp_host:
         print(f"[login] SMTP não configurado; código de acesso (desenvolvimento): {code}", file=sys.stderr, flush=True)
         return
     try:
-        msg = message(cfg, to, code)
-        context = ssl.create_default_context()
-        if cfg.smtp_tls == "ssl":
-            server = smtplib.SMTP_SSL(cfg.smtp_host, cfg.smtp_port, timeout=20, context=context)
-        else:
-            server = smtplib.SMTP(cfg.smtp_host, cfg.smtp_port, timeout=20)
-            if cfg.smtp_tls == "starttls":
-                server.starttls(context=context)
-        with server:
-            if cfg.smtp_user:
-                server.login(cfg.smtp_user, cfg.smtp_password)
-            server.send_message(msg)
+        smtp_send(cfg, message(cfg, to, code))
     except Exception as exc:  # noqa: BLE001
         print(f"[login] falha ao enviar e-mail: {describe_error(exc)}", file=sys.stderr, flush=True)
+
+
+def text_message(cfg: Config, to: list[str], subject: str, body: str) -> EmailMessage:
+    msg = EmailMessage()
+    msg["Subject"] = subject
+    msg["From"] = cfg.smtp_from or formataddr(("DCCHub", cfg.smtp_user))
+    msg["To"] = ", ".join(to)
+    sender_domain = cfg.smtp_from.rsplit("@", 1)[-1].strip("> ") if "@" in cfg.smtp_from else None
+    msg["Message-ID"] = make_msgid(domain=sender_domain or None)
+    msg.set_content(body)
+    return msg
 
 
 def describe_error(exc: BaseException) -> str:

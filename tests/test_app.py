@@ -10,7 +10,9 @@ import os
 import sys
 import tempfile
 import threading
+import time
 import unittest
+from contextlib import contextmanager
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -457,6 +459,95 @@ class ServerTest(unittest.TestCase):
             self.assertIn(503, statuses)
         finally:
             app.EMAIL.enabled, app.email_login.send_async, app.EMAIL_DAILY_LIMIT, app.LIMITS["login"] = original
+
+    @contextmanager
+    def mod_mail(self, first=0.05, interval=0.4):
+        """Avisos de moderação com prazos curtos; devolve a lista de e-mails 'enviados'."""
+        import mod_notify
+        n = app.notifier
+        original = (mod_notify.FIRST_DELAY, mod_notify.MIN_INTERVAL, n.recipients, n.send, n.last_sent)
+        sent = []
+        mod_notify.FIRST_DELAY, mod_notify.MIN_INTERVAL = first, interval
+        n.recipients, n.send, n.last_sent, n.timer = ["moderacao@exemplo.org"], lambda subj, body: sent.append((subj, body)), 0.0, None
+        try:
+            yield sent
+        finally:
+            if n.timer:
+                n.timer.cancel()
+            n.timer = None
+            mod_notify.FIRST_DELAY, mod_notify.MIN_INTERVAL, n.recipients, n.send, n.last_sent = original
+
+    @staticmethod
+    def wait_for(cond, timeout=3.0):
+        end = time.monotonic() + timeout
+        while time.monotonic() < end and not cond():
+            time.sleep(0.02)
+        return cond()
+
+    def test_moderation_email_when_review_is_held(self):
+        """Avaliação segurada → um aviso à moderação, só com contagens: nada de docente, disciplina ou texto."""
+        comment = "Ele é machista: só chama os meninos para responder no quadro."
+        with self.mod_mail() as sent:
+            status, data, _ = self.client().post("/api/reviews", review(comment=comment))
+            self.assertEqual(data["status"], "held")
+            self.client().post("/api/reviews", review())  # publicada: não conta
+            self.assertTrue(self.wait_for(lambda: sent), "aviso enviado")
+            subject, body = sent[0]
+            self.assertEqual(subject, "DCCHub: 1 avaliação aguardando revisão")
+            self.assertIn("1 segurada pelo filtro", body)
+            self.assertIn("/#/moderacao", body)
+            for secret in ("ana", "Ana Silva", "DCC206", "machista", "meninos", "2025.1"):
+                self.assertNotIn(secret.lower(), (subject + body).lower(), f"{secret!r} não pode sair no e-mail")
+
+    def test_moderation_email_is_grouped_and_rate_limited(self):
+        with self.mod_mail(first=0.1, interval=0.6) as sent:
+            for i in range(3):  # chegam juntas: um e-mail só
+                c = self.client()
+                c.post("/api/reviews", review(professor="bruno-costa" if i else "ana-silva",
+                                              course="DCC206" if i < 2 else "DCC205",
+                                              comment=f"Achei o docente racista em vários momentos da disciplina, caso {i}."))
+            self.assertTrue(self.wait_for(lambda: sent))
+            time.sleep(0.15)
+            self.assertEqual(len(sent), 1)
+            self.assertIn("3 avaliações aguardando", sent[0][0])
+            # outra logo depois: espera o intervalo mínimo
+            self.client().post("/api/reviews", review(professor="bruno-costa", course="DCC205",
+                                                      comment="Professor machista com as alunas, fiquei muito desconfortável."))
+            time.sleep(0.2)
+            self.assertEqual(len(sent), 1, "ainda dentro do intervalo")
+            self.assertTrue(self.wait_for(lambda: len(sent) == 2))
+            self.assertIn("4 avaliações aguardando", sent[1][0])
+
+    def test_moderation_email_skipped_when_already_resolved(self):
+        with self.mod_mail(first=0.3) as sent:
+            _, data, _ = self.client().post("/api/reviews", review(comment="O professor é machista e trata as alunas de forma diferente."))
+            self.client().post(f"/api/admin/reviews/{data['id']}", {"action": "publish"}, headers={"Authorization": "Bearer admin-teste"})
+            time.sleep(0.5)
+            self.assertEqual(sent, [], "a moderação já resolveu antes do aviso sair")
+
+    def test_moderation_email_summary_counts_reports(self):
+        import mod_notify
+        with app.connect() as conn:
+            day = app.review_day()
+            for rid, status, reason in ((1, "held", "Possível acusação"), (2, "held", "denúncias de 4 redes diferentes"),
+                                        (3, "published", None), (4, "published", None)):
+                conn.execute("""INSERT INTO reviews (id, professor, course, term, overall, didactics, fairness, difficulty, workload,
+                                comment, status, held_reason, reviewer_hash, created_at)
+                                VALUES (?, 'ana-silva', ?, '2024.1', 3, 3, 3, 3, 3, 'Comentário de teste com tamanho suficiente.', ?, ?, ?, ?)""",
+                             (rid, f"DCC20{rid}", status, reason, f"h{rid}", day))
+            conn.execute("INSERT INTO reports (review_id, reporter_hash, reason, created_at) VALUES (3, 'x', ?, ?)", (app.REPORT_REASONS[0], day))
+            counts = mod_notify.summary(conn)
+        self.assertEqual(counts, {"held": 2, "filter": 1, "reports": 1, "reported": 1})
+        subject, body = mod_notify.render(counts, "https://dcchub.exemplo/#/moderacao")
+        self.assertEqual(subject, "DCCHub: 2 avaliações aguardando revisão")
+        self.assertIn("1 retirada do ar por denúncias", body)
+        self.assertIn("1 publicada com denúncias pendentes", body)
+        self.assertIn("https://dcchub.exemplo/#/moderacao", body)
+
+    def test_moderation_email_off_without_recipients(self):
+        self.assertFalse(app.notifier.enabled)
+        self.client().post("/api/reviews", review(comment="Ele é machista: só chama os meninos para responder no quadro."))
+        self.assertIsNone(app.notifier.timer)
 
     def test_email_login_disabled_by_default(self):
         self.assertEqual(self.client().post("/api/access/email", {"email": "a@ufmg.br"})[0], 404)

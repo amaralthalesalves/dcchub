@@ -23,6 +23,7 @@ flowchart LR
 - **`app.py`** serve os arquivos estáticos e a API, valida e grava avaliações, aplica limites de abuso, código de acesso e cabeçalhos de segurança. Recarrega `data/*.json` sozinho quando os arquivos mudam. Respostas com gzip (~20 KB para carregar o catálogo).
 - **`email_login.py`** valida o domínio, gera o código e o desafio assinado e envia o código por SMTP (numa thread, sem guardar o e-mail).
 - **`moderation.py`** decide publicar, devolver ou segurar cada comentário. Veja [Moderação](moderacao.md).
+- **`mod_notify.py`** avisa a moderação por e-mail quando algo entra na fila (só contagens, no máximo a cada 30 min).
 - **`static/`** é a interface: `index.html`, `app.js` (rotas como `#/professor/…`, `#/oferta`), `select.js` (seletores estilizados), `style.css` (tokens de cor com modo claro/escuro), `theme.js` e as fotos.
 - **`scripts/`** geram os dados a partir das páginas públicas. Veja [Dados](dados.md).
 
@@ -32,6 +33,7 @@ flowchart LR
 app.py                       servidor HTTP + API JSON
 moderation.py                filtro automático de comentários
 email_login.py               acesso por código enviado ao e-mail @ufmg.br
+mod_notify.py                avisos por e-mail à moderação
 scripts/
   sync_dcc.py                docentes, disciplinas e ofertas do site do DCC
   audit_catalog.py           confere o catálogo contra todas as ofertas oficiais
@@ -64,6 +66,8 @@ Linguagem visual sóbria e institucional: superfícies neutras, **um** azul de d
 | `DCCHUB_EMAIL_LOGIN` | — | `1` libera o acesso por código de 6 dígitos enviado ao e-mail `@ufmg.br`. Veja [Comunidade e privacidade](comunidade-e-privacidade.md#acesso-pelo-e-mail-ufmgbr). |
 | `DCCHUB_SMTP_HOST` · `_PORT` · `_USER` · `_PASSWORD` · `_FROM` · `_TLS` | porta 587, `starttls` (`ssl` na 465) | Envio dos códigos. Sem `SMTP_HOST`, o código aparece no terminal (desenvolvimento). Gmail: `smtp.gmail.com` com senha de app ([Deploy](deploy.md)). |
 | `DCCHUB_EMAIL_EPOCH` | `1` | Trocar o valor revoga todos os acessos feitos por e-mail. |
+| `DCCHUB_MOD_EMAIL` | — | E-mail(s) da moderação, separados por vírgula: recebem um aviso quando algo entra na fila de revisão. Usa o SMTP acima. Veja [Moderação](moderacao.md#aviso-por-e-mail-à-moderação). |
+| `DCCHUB_PUBLIC_URL` | — | Endereço do site (ex.: `https://dcchub.com.br`), para o link do painel no aviso à moderação. |
 | `DCCHUB_EMAIL_DAILY_LIMIT` | `250` | Teto global de e-mails enviados por dia (abaixo da cota do serviço de envio: Gmail ~500, Brevo grátis 300). Cada conexão pede no máximo 20 por dia. |
 | `DCCHUB_TRUST_PROXY` | — | `1` atrás de um proxy confiável: usa o **último** item de `X-Forwarded-For` (o que o proxy viu; os anteriores podem ser forjados), marca o cookie como `Secure` e envia HSTS. |
 | `HOST` / `PORT` | `0.0.0.0` / `8000` | Endereço de escuta. |

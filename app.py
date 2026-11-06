@@ -14,6 +14,9 @@ Variáveis de ambiente (todas opcionais):
     DCCHUB_TRUST_PROXY  "1" para usar X-Forwarded-For como IP (somente atrás de proxy confiável)
     DCCHUB_ACCESS_CODES códigos de acesso da comunidade, separados por vírgula; se definido, os dados só saem
                         para navegadores que digitaram um código válido (trocar o código revoga os acessos antigos)
+    DCCHUB_MOD_EMAIL    e-mail(s) da moderação, separados por vírgula: recebem um aviso (só contagens e motivos, no máximo
+                        a cada 30 min) quando uma avaliação entra na fila de revisão. Usa o SMTP abaixo.
+                        DCCHUB_PUBLIC_URL (ex.: https://seu.dominio) vira o link do painel no aviso.
     DCCHUB_EMAIL_LOGIN  "1" para liberar o acesso por código enviado ao e-mail @ufmg.br (ver email_login.py); o e-mail
                         não é guardado. Configuração do envio: DCCHUB_SMTP_HOST/PORT/USER/PASSWORD/FROM/TLS; sem SMTP,
                         o código aparece no terminal (desenvolvimento). DCCHUB_EMAIL_EPOCH: trocar o valor revoga todos
@@ -48,6 +51,7 @@ from pathlib import Path
 from urllib.parse import parse_qs, unquote, urlparse
 
 import email_login
+import mod_notify
 import moderation
 
 ROOT = Path(__file__).resolve().parent
@@ -66,6 +70,9 @@ ADMIN_TOKEN = env("ADMIN_TOKEN", "") or ""
 ACCESS_COOKIE = "dcchub_access"
 ACCESS_CODES = [c.strip() for c in (env("ACCESS_CODES") or "").split(",") if c.strip()]
 EMAIL = email_login.Config(env)
+# avisos à moderação quando algo entra na fila (ver mod_notify.py); usa o mesmo SMTP do acesso por e-mail
+MOD_EMAILS = [a.strip() for a in (env("MOD_EMAIL") or "").split(",") if a.strip()]
+PUBLIC_URL = (env("PUBLIC_URL") or "").rstrip("/")
 GATE_FREE = {"/api/access", "/api/access/email", "/api/access/email/verify"}
 MAX_BODY = 16_384
 ACTIVE_TERMS = 4  # disciplina sem oferta nos últimos 4 semestres publicados (2 anos) = fora de oferta
@@ -631,6 +638,10 @@ def gate_methods() -> list[str]:
     return (["email"] if EMAIL.enabled else []) + (["code"] if ACCESS_CODES else [])
 
 
+notifier = mod_notify.Notifier(EMAIL, MOD_EMAILS, lambda: connect(),
+                               f"{PUBLIC_URL}/#/moderacao" if PUBLIC_URL else "o painel /#/moderacao do site")
+
+
 class App(BaseHTTPRequestHandler):
     server_version = "DCCHub/2.0"
     sys_version = ""
@@ -1148,6 +1159,8 @@ class App(BaseHTTPRequestHandler):
                     f"INSERT INTO reviews (id, {', '.join(REVIEW_COLUMNS)}, status, held_reason, reviewer_hash, created_at) "
                     f"VALUES ({', '.join('?' * (len(REVIEW_COLUMNS) + 5))})",
                     [review_id, *(review[c] for c in REVIEW_COLUMNS), status, "; ".join(flags) or None, viewer, review_day()])
+            if status == "held":
+                notifier.held()
         except sqlite3.IntegrityError:
             with connect() as conn:
                 existing = conn.execute("SELECT id FROM reviews WHERE reviewer_hash=? AND professor=? AND course=?",
@@ -1213,6 +1226,8 @@ class App(BaseHTTPRequestHandler):
             status = "held" if flags else "published"
             conn.execute(f"UPDATE reviews SET {', '.join(f'{c}=?' for c in REVIEW_COLUMNS)}, status=?, held_reason=?, updated_at=? WHERE id=?",
                          [*(review[c] for c in REVIEW_COLUMNS), status, "; ".join(flags) or None, review_day(), row["id"]])
+        if status == "held":
+            notifier.held()
         self.send_json({"id": row["id"], "status": status, "held": status == "held",
                         "message": "Avaliação atualizada." if status == "published" else "Avaliação atualizada e enviada para revisão."})
 
@@ -1257,6 +1272,7 @@ class App(BaseHTTPRequestHandler):
             networks = report_networks.add(row["id"], self.client_ip())
             if networks >= AUTO_HIDE_REPORTS:
                 conn.execute("UPDATE reviews SET status='held', held_reason=? WHERE id=?", (f"denúncias de {networks} redes diferentes", row["id"]))
+                notifier.held()
         self.send_json({"message": "Obrigado. A denúncia foi registrada e será analisada."})
 
     # ---- identidade anônima
@@ -1523,6 +1539,9 @@ if __name__ == "__main__":
     print(f"DCCHub em http://localhost:{port}  ({len(CATALOG.professors)} docentes, {len(CATALOG.courses)} disciplinas)")
     if not ADMIN_TOKEN:
         print("Moderação desativada: defina DCCHUB_ADMIN_TOKEN para habilitar o painel /#/moderacao.")
+    if notifier.enabled:
+        print(f"Avisos de moderação por e-mail ativos ({len(MOD_EMAILS)} destinatário(s))."
+              + ("" if EMAIL.smtp_host else " SMTP não configurado: os avisos aparecem aqui no terminal."))
     if EMAIL.enabled:
         print(f"Acesso por e-mail @{EMAIL.domain} ativo." + ("" if EMAIL.smtp_host else
               " SMTP não configurado: os códigos aparecem aqui no terminal (só para desenvolvimento)."))

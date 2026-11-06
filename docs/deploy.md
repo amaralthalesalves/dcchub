@@ -151,3 +151,4 @@ Os limites de abuso (avaliações, votos e denúncias por rede, códigos por e-m
 
 - **Rode uma única instância.** Com duas, cada uma conta pela metade. No Fly, mantenha uma máquina (`fly scale count 1`).
 - **Reiniciar zera os contadores.** No Fly com `auto_stop_machines`, cada parada também zera. Isso deixa a retirada automática por denúncias mais conservadora (as denúncias seguem no banco e na fila), mas reabre por um momento os limites diários.
+- **Aviso à moderação agendado se perde num reinício.** A fila continua no painel, e o próximo item que entrar nela agenda um aviso novo, que traz a contagem completa.
