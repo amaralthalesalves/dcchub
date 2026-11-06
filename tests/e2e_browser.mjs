@@ -41,8 +41,9 @@ ok(termGroups[0]?.startsWith('Turmas confirmadas'), 'semestres confirmados suger
 await ev(`document.querySelector('#review-form').requestSubmit()`); await sleep(200);
 await sleep(300);
 ok((await ev(`return document.querySelector('[data-err="overall"]')?.textContent || ''`)).length > 0, 'validação no cliente aponta notas faltando');
+ok((await ev(`return document.querySelector('[data-err="passing"]')?.textContent || ''`)).length > 0, 'dificuldade para passar é pergunta separada e obrigatória');
 await ev(`const t=document.querySelector('#f-term'); t.value=t.querySelector('optgroup option').value;
-  for (const [k,v] of Object.entries({overall:5,didactics:4,fairness:5,difficulty:3,workload:4})) document.querySelector('input[name='+k+'][value="'+v+'"]').click();
+  for (const [k,v] of Object.entries({overall:5,didactics:4,fairness:5,difficulty:3,passing:2,workload:4})) document.querySelector('input[name='+k+'][value="'+v+'"]').click();
   document.querySelector('input[name=retake][value=true]').click();
   [...document.querySelectorAll('input[name=tags]')].slice(0,2).forEach(x=>x.click());
   const c=document.querySelector('#f-comment'); c.value='Ótima disciplina, provas coerentes com as listas e professor muito disponível.'; c.dispatchEvent(new Event('input',{bubbles:true}));
@@ -53,7 +54,7 @@ ok(await ev(`return !!document.querySelector('.review .review-foot a[href^="#/av
 // 3) repetir dá 409 com link de edição
 await go('#/avaliar?professor=renato-vimieiro&course=DCC207'); await sleep(800);
 await ev(`const t=document.querySelector('#f-term'); t.value='2024.1';
-  for (const k of ['overall','didactics','fairness','difficulty','workload']) document.querySelector('input[name='+k+'][value="3"]').click();
+  for (const k of ['overall','didactics','fairness','difficulty','passing','workload']) document.querySelector('input[name='+k+'][value="3"]').click();
   const c=document.querySelector('#f-comment'); c.value='Segunda tentativa de avaliação da mesma turma pelo mesmo navegador.'; document.querySelector('#review-form').requestSubmit();`);
 await sleep(1200);
 ok((await ev(`return document.querySelector('#form-message').innerHTML`)).includes('edit='), 'duplicada oferece editar a existente');
@@ -66,6 +67,23 @@ await go('#/disciplina/DCC034'); await sleep(800);
 const before = await ev(`return document.querySelector('.helpful b').textContent`);
 await ev(`document.querySelector('.helpful').click()`); await sleep(800);
 ok(await ev(`return document.querySelector('.helpful').classList.contains('on')`), `voto útil marcado (antes "${before}")`);
+// 5b) evolução por semestre: gráfico, tooltip no foco, clique filtra as avaliações pelo semestre
+await go('#/professor/adriano-cesar-machado-pereira');
+const evo = await ev(`
+  const hits = document.querySelectorAll('.evo-hit');
+  if (hits.length < 2) return { hits: hits.length };
+  hits[1].dispatchEvent(new FocusEvent('focus'));
+  const tip = document.querySelector('.evo-tip');
+  const tipOk = !tip.hidden && /geral/.test(tip.textContent);
+  const term = hits[1].getAttribute('aria-label').split(':')[0];
+  hits[1].dispatchEvent(new MouseEvent('click', { bubbles: true }));
+  await new Promise((r) => setTimeout(r, 300));
+  const sel = document.querySelector('[data-filter-term="reviews"]').value;
+  const cards = [...document.querySelectorAll('.review-list .review')];
+  return { hits: hits.length, tipOk, term, sel, cards: cards.length, allTerm: cards.every((c) => c.querySelector('header p').textContent.trim().startsWith(term)), table: document.querySelectorAll('.evo-table tbody tr').length };`);
+ok(evo.hits >= 2 && evo.table === evo.hits, `gráfico de evolução com um ponto por semestre (${evo.hits}) e tabela equivalente`);
+ok(evo.tipOk, 'tooltip do semestre aparece no foco do teclado');
+ok(evo.sel === evo.term && evo.cards > 0 && evo.allTerm, `clicar em ${evo.term} filtra as avaliações daquele semestre (${evo.cards})`);
 // 6) grade
 await go('#/oferta'); await sleep(1000);
 await ev(`document.querySelectorAll('[data-pick]')[0].click()`); await sleep(200);
@@ -78,6 +96,19 @@ await ev(`document.querySelectorAll('.offer-row:not(.on) [data-pick]')[0].click(
 ok((await ev(`return document.querySelectorAll('.offer-row.on').length`)) === 2, 'segunda turma adicionada (um clique = uma ação)');
 const clash = await ev(`return document.querySelectorAll('.week-cell.clash').length`);
 console.log('  células em conflito:', clash);
+// 6b) exportar a grade para .ics (gerado no navegador; captura o Blob em vez de baixar)
+const ics = await ev(`
+  let blob = null; const orig = URL.createObjectURL; URL.createObjectURL = (b) => { blob = b; return orig.call(URL, b); };
+  document.querySelector('#ics-export').open = true;
+  const f = document.querySelector('#ics-form');
+  f.start.value = '2026-08-10'; f.end.value = '2026-12-12';
+  f.requestSubmit();
+  await new Promise((r) => setTimeout(r, 300));
+  URL.createObjectURL = orig;
+  return blob ? { type: blob.type, text: await blob.text() } : null;`);
+ok(ics && ics.type.startsWith('text/calendar') && (ics.text.match(/BEGIN:VEVENT/g) || []).length >= 2 && /RRULE:FREQ=WEEKLY;UNTIL=20261213T025959Z/.test(ics.text), 'grade exportada para .ics com eventos semanais');
+await go('#/oferta'); await sleep(800);
+ok((await ev(`document.querySelector('#ics-export').open = true; return document.querySelector('#ics-form').start.value`)) === '2026-08-10', 'datas das aulas lembradas neste navegador');
 // 7) minhas avaliações + código
 await go('#/minhas'); await sleep(800);
 ok((await ev(`return document.querySelectorAll('.review').length`)) === 1, 'minhas avaliações lista 1');

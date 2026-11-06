@@ -102,7 +102,8 @@ Uma avaliação recusada pela moderação responde `400` com `fields.comment` (m
 ## Testes
 
 ```bash
-python3 -m unittest discover -s tests -v    # 64 testes: API, acesso, moderação, segurança, parsers, versões de disciplina
+python3 -m unittest discover -s tests -v    # API, acesso, moderação, segurança, parsers, versões de disciplina
+node --test tests/test_ics.mjs              # gerador de .ics da grade (static/ics.js)
 ```
 
 Teste de ponta a ponta no Chrome headless (Node 22+, sem dependências), **sempre num servidor temporário** — ele cria e apaga avaliações:
@@ -115,6 +116,15 @@ node tests/e2e_browser.mjs http://localhost:8766
 
 > [!CAUTION]
 > `tests/seed_demo.py` cria avaliações **fictícias** atribuídas a docentes reais. Use só em bancos temporários — o script se recusa a escrever no banco padrão.
+
+### CI (GitHub Actions)
+
+| Workflow | Quando | O que faz |
+|---|---|---|
+| [`ci.yml`](../.github/workflows/ci.yml) | todo PR e push no `main` | Testes Python em 3.10 e 3.13; sintaxe do JS; testes do `.ics`; e2e no Chrome com banco de demonstração |
+| [`sync.yml`](../.github/workflows/sync.yml) | segunda 6h30 (Brasília) ou manual | Roda os syncs de catálogo, oportunidades e materiais; se `data/` mudou e os testes passam, abre um PR. Falha (e avisa) se algum site mudou de formato |
+
+O `sync.yml` precisa de **Settings → Actions → General → "Allow GitHub Actions to create and approve pull requests"**. PRs abertos por ele não disparam o `ci.yml` (limite do `GITHUB_TOKEN`), por isso os testes rodam dentro do próprio sync.
 
 ## Convenções
 

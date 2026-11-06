@@ -1,0 +1,59 @@
+# Testes a cada push no main e em todo PR. Sem dependências: só Python (biblioteca padrão), Node e o Chrome
+# que já vem no runner do GitHub.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  unit:
+    name: Testes (Python ${{ matrix.python }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.10", "3.13"]  # a menor versão suportada (README) e a da imagem Docker
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Testes do servidor, sync e moderação
+        run: python -m unittest discover -s tests -v
+
+  frontend:
+    name: Front-end (sintaxe, .ics e navegador)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"  # o e2e usa o WebSocket nativo do Node 22+
+      - name: Sintaxe do JavaScript
+        run: for f in static/*.js tests/*.mjs; do node --check "$f"; done
+      - name: Gerador de .ics da grade
+        run: node --test tests/test_ics.mjs
+      - name: Ponta a ponta no Chrome (banco de demonstração)
+        run: |
+          python3 tests/seed_demo.py "$RUNNER_TEMP/demo.db"
+          DCCHUB_DB="$RUNNER_TEMP/demo.db" PORT=8766 python3 app.py > "$RUNNER_TEMP/server.log" 2>&1 &
+          for i in $(seq 1 30); do curl -sf http://localhost:8766/ > /dev/null && break; sleep 1; done
+          node tests/e2e_browser.mjs http://localhost:8766
+      - name: Log do servidor (se falhar)
+        if: failure()
+        run: cat "$RUNNER_TEMP/server.log" || true

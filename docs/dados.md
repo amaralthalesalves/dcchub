@@ -102,3 +102,5 @@ Indexa o [acervo de provas antigas](https://drive.google.com/drive/folders/11qr5
 ```
 
 Em produção com Docker, use `deploy/cron.example` (roda os scripts dentro do container). O servidor recarrega os arquivos sozinho quando mudam.
+
+No GitHub, o workflow [`sync.yml`](../.github/workflows/sync.yml) roda os mesmos scripts toda segunda e abre um PR com o que mudou em `data/`, para que uma imagem nova não suba com dados velhos. Veja [Desenvolvimento → CI](desenvolvimento.md#ci-github-actions).

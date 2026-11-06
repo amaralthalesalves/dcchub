@@ -67,8 +67,14 @@ function scoreClass(v, neutral = false) {
   if (neutral) return v >= 4 ? 'n-high' : v >= 2.6 ? 'n-mid' : 'n-low';
   return v >= 4 ? 'good' : v >= 3 ? 'ok' : 'bad';
 }
-const pill = (v, { neutral = false, title = '' } = {}) =>
-  `<span class="pill ${scoreClass(v, neutral)}" ${title ? `title="${esc(title)}"` : ''}>${v == null ? '—' : fmt(v)}</span>`;
+// escalas neutras (dificuldade, carga): nome do ponto mais próximo da média — "3,8" sozinho parece nota boa
+const level = (c, v) => (v == null || !c?.levels ? '' : c.levels[Math.min(4, Math.max(0, Math.round(v) - 1))]);
+// com `crit`, a pílula é neutra quando o critério é e ganha o nome do nível no tooltip (tabelas não têm espaço para o texto)
+const pill = (v, { neutral = false, title = '', crit = null } = {}) => {
+  if (crit) { neutral = !!crit.neutral; title = title || (level(crit, v) ? `${crit.label}: ${level(crit, v).toLowerCase()}` : ''); }
+  return `<span class="pill ${scoreClass(v, neutral)}" ${title ? `title="${esc(title)}"` : ''}>${v == null ? '—' : fmt(v)}</span>`;
+};
+const critByKey = (k) => state.boot.criteria.find((c) => c.key === k);
 
 function stars(v) {
   const pct = v == null ? 0 : (v / 5) * 100;
@@ -390,12 +396,15 @@ function courseRow(c) {
 }
 function firstNameLast(name) { const p = name.split(' '); return p.length > 1 ? `${p[0]} ${p[p.length - 1]}` : name; }
 
-function bars(avg, criteria) {
+function bars(avg, criteria, { answered = {}, count = 0 } = {}) {
+  const hasLevels = criteria.some((c) => c.levels); // coluna do nível em todas as linhas, para as barras ficarem alinhadas
   return `<dl class="bars">${criteria.map((c) => {
     const v = avg?.[c.key];
-    return `<div class="bar-row" title="${esc(c.hint)}">
-      <dt>${esc(c.label)}</dt>
-      <dd><span class="bar"><span class="bar-fill ${scoreClass(v, c.neutral)}" style="width:${v ? (v / 5) * 100 : 0}%"></span></span><b>${fmt(v)}</b></dd>
+    const partial = answered[c.key] != null && answered[c.key] < count; // ex.: "passar" não existia nas avaliações antigas
+    const note = partial ? (answered[c.key] ? ` <small class="muted">(${answered[c.key]} de ${count})</small>` : ' <small class="muted">(ainda sem respostas)</small>') : '';
+    return `<div class="bar-row" title="${esc(c.hint)}${partial ? ' — pergunta nova: as avaliações anteriores não a respondiam' : ''}">
+      <dt>${esc(c.label)}${note}</dt>
+      <dd><span class="bar"><span class="bar-fill ${scoreClass(v, c.neutral)}" style="width:${v ? (v / 5) * 100 : 0}%"></span></span><b>${fmt(v)}</b>${hasLevels ? `<small class="bar-level">${esc(level(c, v))}</small>` : ''}</dd>
     </div>`;
   }).join('')}</dl>`;
 }
@@ -416,13 +425,112 @@ function summaryBlock(summary, { subject = 'docente' } = {}) {
       <span class="muted small">${plural(summary.count, 'avaliação', 'avaliações')}</span>
       ${summary.retake != null ? `<span class="retake"><b>${summary.retake}%</b> faria de novo</span>` : ''}
     </div>
-    <div class="summary-bars">${bars(summary.avg, crit.filter((c) => c.key !== 'overall'))}</div>
+    <div class="summary-bars">${bars(summary.avg, crit.filter((c) => c.key !== 'overall'), { answered: summary.answered, count: summary.count })}</div>
     <div class="summary-dist" aria-label="Distribuição das notas gerais">
       ${[5, 4, 3, 2, 1].map((n) => `<div class="dist-row"><span>${n}★</span><span class="bar"><span class="bar-fill ${scoreClass(n)}" style="width:${(dist[n] / max) * 100}%"></span></span><span class="muted">${dist[n]}</span></div>`).join('')}
     </div>
     ${summary.tags.length ? `<div class="summary-tags"><h4>O que mais dizem</h4><div class="chips">${summary.tags.map((t) => `<span class="chip ${tagTone(t.tag)}">${esc(t.tag)} <b>${t.count}</b></span>`).join('')}</div></div>` : ''}
     ${gradeTotal ? `<div class="summary-grades"><h4>Conceitos informados</h4><div class="grade-bars">${grades.map(([g, n]) => `<div class="grade-col" title="${n} × ${g}"><span class="grade-bar" style="height:${(n / gradeTotal) * 100}%"></span><span>${g}</span></div>`).join('')}</div></div>` : ''}
   </div>`;
+}
+
+// ---- evolução por semestre cursado: linha da nota geral (1–5), um ponto por semestre com avaliações.
+// Ponto vazado = menos de EVOLUTION_MIN avaliações naquele semestre (pouco para chamar de tendência).
+const EVOLUTION_MIN = 3;
+function evolutionBlock(summary) {
+  const terms = summary?.byTerm || [];
+  if (terms.length < 2) return '';
+  const crit = state.boot.criteria;
+  return `<section class="block evolution" aria-labelledby="evo-title">
+    <div class="section-head"><h2 id="evo-title">Evolução por semestre</h2><span class="muted small">nota geral, pelo semestre em que a turma foi cursada</span></div>
+    <div class="evo-chart" id="evo-chart"></div>
+    <p class="small muted evo-note"><span class="evo-key evo-key-few" aria-hidden="true"></span> menos de ${EVOLUTION_MIN} avaliações no semestre · clique num semestre para ver as avaliações dele</p>
+    <details class="evo-table"><summary class="small">Ver em tabela</summary>
+      <div class="table-wrap"><table class="table">
+        <thead><tr><th>Semestre</th><th class="num">Aval.</th>${crit.map((c) => `<th class="num" title="${esc(c.label)}">${esc(c.short || c.label)}</th>`).join('')}</tr></thead>
+        <tbody>${terms.slice().reverse().map((t) => `<tr><td>${esc(t.term)}</td><td class="num">${t.count}</td>${crit.map((c) => `<td class="num">${pill(t[c.key], { crit: c })}</td>`).join('')}</tr>`).join('')}</tbody>
+      </table></div>
+    </details>
+  </section>`;
+}
+
+function wireEvolution(summary, { onPick } = {}) {
+  const box = $('#evo-chart');
+  if (!box) return;
+  const terms = summary.byTerm;
+  const svgNS = 'http://www.w3.org/2000/svg';
+  const el = (tag, attrs = {}, parent) => { const n = document.createElementNS(svgNS, tag); for (const [k, v] of Object.entries(attrs)) n.setAttribute(k, v); if (parent) parent.append(n); return n; };
+  const tip = document.createElement('div');
+  tip.className = 'evo-tip';
+  tip.hidden = true;
+  const draw = () => {
+    const W = Math.max(280, box.clientWidth);
+    const H = 190;
+    const m = { top: 14, right: 48, bottom: 28, left: 42 };
+    const x = (i) => m.left + (terms.length === 1 ? (W - m.left - m.right) / 2 : (i * (W - m.left - m.right)) / (terms.length - 1));
+    const y = (v) => m.top + ((5 - v) / 4) * (H - m.top - m.bottom);
+    box.replaceChildren();
+    const svg = el('svg', { width: W, height: H, viewBox: `0 0 ${W} ${H}`, role: 'group', 'aria-label': 'Nota geral por semestre' }, box);
+    const deco = el('g', { 'aria-hidden': 'true' }, svg); // grade, eixos, linha e pontos: o leitor de tela usa os alvos e a tabela
+    for (let v = 1; v <= 5; v += 1) { // grade recessiva + rótulos do eixo
+      el('line', { x1: m.left, x2: W - m.right + 8, y1: y(v), y2: y(v), class: 'evo-grid' }, deco);
+      el('text', { x: m.left - 10, y: y(v) + 4, class: 'evo-axis', 'text-anchor': 'end' }, deco).textContent = v;
+    }
+    const every = Math.ceil(terms.length / Math.max(1, Math.floor((W - m.left - m.right) / 56))); // rótulos do X sem colidir
+    const labeled = new Set(terms.map((_, i) => i).filter((i) => i % every === 0));
+    const lastI = terms.length - 1;
+    if (!labeled.has(lastI)) { labeled.delete(lastI - (lastI % every)); labeled.add(lastI); } // o mais recente sempre aparece
+    terms.forEach((t, i) => {
+      if (labeled.has(i)) el('text', { x: x(i), y: H - 8, class: 'evo-axis', 'text-anchor': 'middle' }, deco).textContent = t.term;
+    });
+    const cross = el('line', { y1: m.top - 4, y2: H - m.bottom, class: 'evo-cross', visibility: 'hidden' }, deco);
+    el('polyline', { points: terms.map((t, i) => `${x(i)},${y(t.overall)}`).join(' '), class: 'evo-line' }, deco);
+    terms.forEach((t, i) => el('circle', { cx: x(i), cy: y(t.overall), r: 4.5, class: t.count < EVOLUTION_MIN ? 'evo-dot few' : 'evo-dot' }, deco));
+    const last = terms[terms.length - 1]; // valor só na ponta (o resto fica no tooltip e na tabela)
+    el('text', { x: x(terms.length - 1) + 10, y: y(last.overall) + 4, class: 'evo-end' }, deco).textContent = fmt(last.overall);
+    // alvos de hover/foco: a faixa inteira de cada semestre, bem maior que o ponto
+    const half = terms.length > 1 ? (x(1) - x(0)) / 2 : 40;
+    terms.forEach((t, i) => {
+      const hit = el('rect', { x: x(i) - half, y: 0, width: half * 2, height: H, class: 'evo-hit', tabindex: 0, role: 'button',
+        'aria-label': `${t.term}: nota geral ${fmt(t.overall)}, ${t.count} ${t.count === 1 ? 'avaliação' : 'avaliações'}. Ver avaliações deste semestre.` }, svg);
+      const show = () => {
+        cross.setAttribute('x1', x(i)); cross.setAttribute('x2', x(i)); cross.setAttribute('visibility', 'visible');
+        tip.replaceChildren();
+        const head = document.createElement('div'); head.className = 'evo-tip-head';
+        const val = document.createElement('b'); val.textContent = fmt(t.overall);
+        const lbl = document.createElement('span'); lbl.textContent = ` geral · ${t.term}`;
+        head.append(val, lbl);
+        const rows = document.createElement('dl');
+        state.boot.criteria.filter((c) => c.key !== 'overall' && t[c.key] != null).forEach((c) => {
+          const dt = document.createElement('dt'); dt.textContent = c.short || c.label;
+          const dd = document.createElement('dd'); dd.textContent = fmt(t[c.key]);
+          rows.append(dt, dd);
+        });
+        const foot = document.createElement('div'); foot.className = 'evo-tip-foot';
+        foot.textContent = `${t.count} ${t.count === 1 ? 'avaliação' : 'avaliações'}${t.count < EVOLUTION_MIN ? ' · poucas para indicar tendência' : ''}`;
+        tip.append(head, rows, foot);
+        tip.hidden = false;
+        // ao lado da linha vertical (direita, ou esquerda se não couber): nunca cobre o ponto nem a linha
+        const right = x(i) + 14;
+        tip.style.left = `${right + tip.offsetWidth <= W ? right : Math.max(0, x(i) - 14 - tip.offsetWidth)}px`;
+        tip.style.top = '0px';
+      };
+      const hide = () => { cross.setAttribute('visibility', 'hidden'); tip.hidden = true; };
+      hit.addEventListener('pointerenter', show);
+      hit.addEventListener('focus', show);
+      hit.addEventListener('pointerleave', hide);
+      hit.addEventListener('blur', hide);
+      const pick = () => onPick?.(t.term);
+      hit.addEventListener('click', pick);
+      hit.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(); } });
+    });
+    box.append(tip);
+  };
+  draw();
+  if (window.ResizeObserver) {
+    let lastW = box.clientWidth;
+    new ResizeObserver(() => { if (box.isConnected && box.clientWidth !== lastW) { lastW = box.clientWidth; draw(); } }).observe(box);
+  }
 }
 
 function tagTone(tag) {
@@ -450,7 +558,7 @@ function reviewCard(r, { show = 'course' } = {}) {
       </div>
     </header>
     <ul class="review-metrics">
-      ${crit.map((c) => `<li><span>${esc(c.label)}</span>${pill(r.ratings[c.key], { neutral: c.neutral })}</li>`).join('')}
+      ${crit.filter((c) => r.ratings[c.key] != null).map((c) => `<li><span>${esc(c.label)}</span>${pill(r.ratings[c.key], { crit: c })}${c.levels ? `<small>${esc(level(c, r.ratings[c.key]).toLowerCase())}</small>` : ''}</li>`).join('')}
       ${r.wouldRetake != null ? `<li><span>Faria de novo</span><b class="${r.wouldRetake ? 'yes' : 'no'}">${r.wouldRetake ? 'Sim' : 'Não'}</b></li>` : ''}
       ${r.grade ? `<li><span>Conceito</span><b>${esc(r.grade)}</b></li>` : ''}
     </ul>
@@ -470,10 +578,14 @@ function reviewCard(r, { show = 'course' } = {}) {
 function reviewsSection({ reviews, show, filterOptions, filterLabel, ctaHref, subjectName }) {
   const opts = filterOptions?.length > 1
     ? `<label class="select-inline">${esc(filterLabel)} <select data-filter="reviews"><option value="">Todas</option>${filterOptions.map((o) => `<option value="${esc(o.value)}">${esc(o.label)} (${o.count})</option>`).join('')}</select></label>` : '';
+  const termCounts = reviews.reduce((acc, r) => ({ ...acc, [r.term]: (acc[r.term] || 0) + 1 }), {});
+  const termKeys = Object.keys(termCounts).sort().reverse();
+  const termOpts = termKeys.length > 1
+    ? `<label class="select-inline">Semestre <select data-filter-term="reviews"><option value="">Todos</option>${termKeys.map((t) => `<option value="${esc(t)}">${esc(t)} (${termCounts[t]})</option>`).join('')}</select></label>` : '';
   return `<section class="reviews-section" id="avaliacoes">
     <div class="section-head">
       <h2>Avaliações <span class="count">${reviews.length}</span></h2>
-      <div class="row-gap">${opts}
+      <div class="row-gap">${opts}${termOpts}
         <label class="select-inline">Ordenar <select data-sort="reviews">
           <option value="helpful">Mais úteis</option><option value="recent">Mais recentes</option><option value="high">Melhores notas</option><option value="low">Piores notas</option>
         </select></label>
@@ -489,9 +601,10 @@ function wireReviewList(reviews, show) {
   const list = $('.review-list');
   if (!list) return;
   let filter = '';
+  let term = '';
   let sort = 'helpful';
   const redraw = () => {
-    const sorted = reviews.filter((r) => !filter || r.course === filter || r.professor === filter);
+    const sorted = reviews.filter((r) => (!filter || r.course === filter || r.professor === filter) && (!term || r.term === term));
     const by = {
       helpful: (a, b) => b.helpful - a.helpful || b.createdAt - a.createdAt || b.id - a.id,
       recent: (a, b) => b.createdAt - a.createdAt || b.id - a.id,
@@ -502,7 +615,19 @@ function wireReviewList(reviews, show) {
   };
   $('[data-filter="reviews"]')?.addEventListener('change', (e) => { filter = e.target.value; redraw(); });
   $('[data-sort="reviews"]')?.addEventListener('change', (e) => { sort = e.target.value; redraw(); });
+  const termSelect = $('[data-filter-term="reviews"]');
+  termSelect?.addEventListener('change', (e) => { term = e.target.value; redraw(); });
   list._reviews = reviews;
+  // usado pelo gráfico de evolução: clicar num semestre filtra a lista
+  return {
+    showTerm(t) {
+      if (!termSelect || ![...termSelect.options].some((o) => o.value === t)) return;
+      termSelect.value = t;
+      term = t;
+      redraw();
+      $('#avaliacoes')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    },
+  };
 }
 
 // ---------------------------------------------------------------- ações globais (delegação)
@@ -742,7 +867,8 @@ async function viewProfessors({ params }) {
         <option value="name">Nome (A–Z)</option>
         <option value="score" ${params.get('sort') === 'score' ? 'selected' : ''}>Melhor avaliados</option>
         <option value="count" ${params.get('sort') === 'count' ? 'selected' : ''}>Mais avaliados</option>
-        <option value="easy" ${params.get('sort') === 'easy' ? 'selected' : ''}>Menor dificuldade</option>
+        <option value="easy" ${params.get('sort') === 'easy' ? 'selected' : ''}>Mais fácil de aprender</option>
+        <option value="pass" ${params.get('sort') === 'pass' ? 'selected' : ''}>Mais fácil de passar</option>
       </select></label>
     </form>
     <p class="result-count muted" id="result-count" aria-live="polite"></p>
@@ -767,6 +893,7 @@ async function viewProfessors({ params }) {
       score: (x, y) => (y.stats?.score ?? -1) - (x.stats?.score ?? -1) || x.name.localeCompare(y.name),
       count: (x, y) => (y.stats?.count ?? 0) - (x.stats?.count ?? 0) || x.name.localeCompare(y.name),
       easy: (x, y) => (x.stats?.difficulty ?? 9) - (y.stats?.difficulty ?? 9) || x.name.localeCompare(y.name),
+      pass: (x, y) => (x.stats?.passing ?? 9) - (y.stats?.passing ?? 9) || x.name.localeCompare(y.name),
     }[sort];
     list = list.sort(by);
     $('#result-count').textContent = plural(list.length, 'docente', 'docentes');
@@ -824,6 +951,7 @@ async function viewProfessor({ args, isCurrent }) {
     </header>
 
     ${summaryBlock(data.summary)}
+    ${evolutionBlock(data.summary)}
 
     ${communityBlock(data.community, { mode: 'prof', subject: firstName(p.name) })}
 
@@ -838,12 +966,12 @@ async function viewProfessor({ args, isCurrent }) {
     <section class="block">
       <div class="section-head"><h2>Disciplinas</h2><span class="muted small">segundo a oferta oficial do DCC</span></div>
       ${activeCourses.length ? `<div class="table-wrap"><table class="table">
-        <thead><tr><th>Disciplina</th><th>Semestres</th><th>Geral</th><th>Didática</th><th>Dificuldade</th><th>Carga</th><th></th></tr></thead>
+        <thead><tr><th>Disciplina</th><th>Semestres</th><th>Geral</th><th>Didática</th><th title="Dificuldade para aprender">Aprender</th><th title="Dificuldade para passar">Passar</th><th>Carga</th><th></th></tr></thead>
         <tbody>${activeCourses.map((c) => `<tr>
           <td><a href="#/disciplina/${encodeURIComponent(c.id)}"><b>${esc(c.name)}</b></a><br><span class="code">${esc(courseCode(c))}</span></td>
           <td>${c.terms.length ? `${c.terms.length}× <span class="muted small">(último ${esc(c.terms[c.terms.length - 1])})</span>` : '<span class="muted small">—</span>'}</td>
           <td>${pill(c.stats?.overall)} <span class="muted small">${c.stats ? c.stats.count : ''}</span></td>
-          <td>${pill(c.stats?.didactics)}</td><td>${pill(c.stats?.difficulty, { neutral: true })}</td><td>${pill(c.stats?.workload, { neutral: true })}</td>
+          <td>${pill(c.stats?.didactics)}</td>${['difficulty', 'passing', 'workload'].map((k) => `<td>${pill(c.stats?.[k], { crit: critByKey(k) })}</td>`).join('')}
           <td>${c.active ? `<a class="link-btn" href="#/avaliar?professor=${slug}&course=${encodeURIComponent(c.id)}">Avaliar</a>` : '<span class="small muted">fora de oferta</span>'}</td>
         </tr>`).join('')}</tbody></table></div>` : '<p class="muted">Nenhuma disciplina em oferta nos últimos semestres.</p>'}
       ${oldCourses.length ? `<p class="small muted old-courses">Também lecionou, em currículos ou temas que não são mais ofertados: ${oldCourses.map((c) => `<a href="#/disciplina/${encodeURIComponent(c.id)}">${esc(c.name)}</a> (${esc(c.terms[c.terms.length - 1])})`).join(', ')}.</p>` : ''}
@@ -861,7 +989,8 @@ async function viewProfessor({ args, isCurrent }) {
       filterOptions: Object.entries(reviewCounts).map(([id, count]) => ({ value: id, label: state.course.get(id)?.name || id, count })),
     })}
   </section>`;
-  wireReviewList(data.reviews, 'course');
+  const profList = wireReviewList(data.reviews, 'course');
+  wireEvolution(data.summary, { onPick: (t) => profList?.showTerm(t) });
   wireCommunity({ professor: slug, mode: 'prof', reload: () => router() });
 }
 
@@ -960,6 +1089,7 @@ async function viewCourse({ args, isCurrent }) {
     </header>
 
     ${c.active || data.summary.count ? summaryBlock(data.summary, { subject: 'disciplina' }) : ''}
+    ${evolutionBlock(data.summary)}
 
     ${c.active ? communityBlock(data.community, { mode: 'course' }) : ''}
 
@@ -978,7 +1108,7 @@ async function viewCourse({ args, isCurrent }) {
       <div class="section-head"><h2>Comparar docentes</h2><span class="muted small">notas apenas desta disciplina</span></div>
       ${data.professors.length ? `<div class="table-wrap"><table class="table compare" id="compare">
         <thead><tr><th data-k="name">Docente</th><th data-k="sections" class="num">Turmas</th><th data-k="last">Último</th>
-          ${crit.map((k) => `<th data-k="${k.key}" class="num" title="${esc(k.hint)}">${esc(k.label.replace('Avaliação geral', 'Geral').replace('Avaliações justas', 'Justiça').replace('Carga de trabalho', 'Carga'))}</th>`).join('')}
+          ${crit.map((k) => `<th data-k="${k.key}" class="num" title="${esc(k.hint)}">${esc(k.short || k.label)}</th>`).join('')}
           <th data-k="retake" class="num">Faria de novo</th><th data-k="count" class="num">Aval.</th></tr></thead>
         <tbody></tbody></table></div>
         <p class="small muted">Clique no cabeçalho para ordenar. Dificuldade e carga: valores maiores = mais pesada.</p>`
@@ -994,7 +1124,8 @@ async function viewCourse({ args, isCurrent }) {
       filterOptions: Object.entries(reviewCounts).map(([slug, count]) => ({ value: slug, label: state.prof.get(slug)?.name || slug, count })),
     })}
   </section>`;
-  wireReviewList(data.reviews, 'prof');
+  const courseList = wireReviewList(data.reviews, 'prof');
+  wireEvolution(data.summary, { onPick: (t) => courseList?.showTerm(t) });
   wireCommunity({ course: c.id, mode: 'course', reload: () => router() });
   const table = $('#compare');
   if (table) {
@@ -1012,14 +1143,14 @@ async function viewCourse({ args, isCurrent }) {
       $('tbody', table).innerHTML = rows.map((p) => `<tr class="${p.terms.includes(latest) ? 'row-live' : ''}">
         <td><a class="prof-inline" href="#/professor/${p.slug}">${avatar(p, 'sm')} <span>${esc(p.name)}</span></a>${p.terms.includes(latest) ? ` <span class="badge badge-live">${esc(latest)}</span>` : ''}</td>
         <td class="num">${p.sections || '—'}</td><td>${esc(p.terms[p.terms.length - 1] || '—')}</td>
-        ${crit.map((k) => `<td class="num">${pill(p.stats?.[k.key], { neutral: k.neutral })}</td>`).join('')}
+        ${crit.map((k) => `<td class="num">${pill(p.stats?.[k.key], { crit: k })}</td>`).join('')}
         <td class="num">${p.stats?.retake != null ? `${p.stats.retake}%` : '—'}</td><td class="num">${p.stats?.count || 0}</td></tr>`).join('');
       $$('th', table).forEach((th) => th.setAttribute('aria-sort', th.dataset.k === key ? (dir > 0 ? 'ascending' : 'descending') : 'none'));
     };
     $('thead', table).addEventListener('click', (e) => {
       const th = e.target.closest('th');
       if (!th) return;
-      if (key === th.dataset.k) dir = -dir; else { key = th.dataset.k; dir = key === 'name' || key === 'difficulty' || key === 'workload' ? 1 : -1; }
+      if (key === th.dataset.k) dir = -dir; else { key = th.dataset.k; dir = key === 'name' || key === 'difficulty' || key === 'passing' || key === 'workload' ? 1 : -1; }
       draw();
     });
     draw();
@@ -1041,6 +1172,9 @@ async function viewOffer({ params, isCurrent }) {
   if (!isCurrent()) return;
   const key = `avalie-grade-${term}`;
   let picked = new Set(store.get(key, []));
+  const icsKey = `avalie-aulas-${term}`; // datas de início/fim das aulas, só neste navegador
+  let icsDates = store.get(icsKey, {});
+  let icsOpen = false;
   const offerings = data.offerings.map((o, i) => ({ ...o, uid: `${o.course}|${o.class || ''}|${o.professors.join(',')}|${o.schedule.map(fmtSlot).join(',')}|${i}` }));
   // ids estáveis entre visitas: sem o índice quando possível
   offerings.forEach((o) => { o.key = o.uid.replace(/\|\d+$/, ''); });
@@ -1091,7 +1225,51 @@ async function viewOffer({ params, isCurrent }) {
     </div>
     ${hasConflict ? '<p class="warn small">⚠ Há turmas com horários sobrepostos (em vermelho).</p>' : ''}
     <ul class="planner-list">${list.map((o) => { const c = state.course.get(o.course); return `<li><span class="dot" style="--h:${hue.get(o.course)}"></span><a href="#/disciplina/${encodeURIComponent(o.course)}">${esc(c?.name || o.course)}</a> <span class="muted small">${esc(o.professors.map((s) => firstNameLast(state.prof.get(s)?.name || s)).join(', '))}</span><button class="link-btn unpick" data-unpick="${esc(o.key)}" aria-label="Remover">✕</button></li>`; }).join('')}</ul>
-    <p class="small muted">${plural(list.length, 'disciplina', 'disciplinas')} · ${list.reduce((a, o) => a + o.schedule.reduce((x, s) => x + (toMin(s.end) - toMin(s.start)), 0), 0) / 60 | 0}h/semana em sala</p>`;
+    <p class="small muted">${plural(list.length, 'disciplina', 'disciplinas')} · ${list.reduce((a, o) => a + o.schedule.reduce((x, s) => x + (toMin(s.end) - toMin(s.start)), 0), 0) / 60 | 0}h/semana em sala</p>
+    <details class="ics-export" id="ics-export" ${icsOpen ? 'open' : ''}><summary>Exportar para o calendário (.ics)</summary>
+      <form id="ics-form" class="ics-form">
+        <div class="ics-dates">
+          <label class="field"><span>Início das aulas</span><input type="date" name="start" required value="${esc(icsDates.start || '')}"></label>
+          <label class="field"><span>Fim das aulas</span><input type="date" name="end" required value="${esc(icsDates.end || '')}"></label>
+        </div>
+        <button class="btn btn-sm" type="submit">Baixar ${esc(term)}.ics</button>
+        <p class="small muted">Use as datas do calendário acadêmico da UFMG. Cada horário vira um evento semanal; feriados e recessos não são removidos. O arquivo é gerado aqui, no seu navegador.</p>
+      </form>
+    </details>`;
+    $('#ics-export').addEventListener('toggle', (e) => { icsOpen = e.target.open; });
+    $('#ics-form').addEventListener('input', (e) => { icsDates = { ...icsDates, [e.target.name]: e.target.value }; store.set(icsKey, icsDates); });
+    $('#ics-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const fd = new FormData(e.target); // lê do formulário (preenchimento automático não dispara 'input')
+      icsDates = { start: fd.get('start'), end: fd.get('end') };
+      store.set(icsKey, icsDates);
+      exportIcs(list);
+    });
+  };
+
+  // grade -> .ics, gerado no navegador (static/ics.js): a grade continua sem passar pelo servidor
+  const exportIcs = (list) => {
+    try {
+      const items = list.map((o) => {
+        const c = state.course.get(o.course);
+        const profs = o.professors.map((s) => state.prof.get(s)?.name || s).join(', ');
+        return {
+          uid: `${term}-${o.key}`,
+          title: c ? `${c.codes[0]} — ${c.name}` : o.course,
+          description: [o.class && `Turma ${o.class}`, profs && `Docentes: ${profs}`, `Oferta ${term} (DCCHub). Confira a sala no SIGA.`].filter(Boolean).join('\n'),
+          schedule: o.schedule,
+        };
+      });
+      const { ics, events, skipped } = window.DCCHubICS.build(items, { ...icsDates, term });
+      if (!events) { toast('Nenhuma turma da grade tem horário dentro dessas datas.', 'warn'); return; }
+      const url = URL.createObjectURL(new Blob([ics], { type: 'text/calendar;charset=utf-8' }));
+      const a = Object.assign(document.createElement('a'), { href: url, download: `grade-${term}.ics` });
+      document.body.append(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 10_000);
+      toast(`${plural(events, 'horário semanal exportado', 'horários semanais exportados')}${skipped ? ` · ${plural(skipped, 'turma sem horário ficou', 'turmas sem horário ficaram')} de fora` : ''}.`);
+    } catch (err) { toast(err.message, 'error'); }
   };
 
   const draw = () => {

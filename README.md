@@ -25,10 +25,10 @@
 
 | | |
 |---|---|
-| **Oferta & grade** | Todas as turmas do semestre com a nota do docente *naquela disciplina*, filtros por turno e dia, e uma grade semanal que acusa conflitos (salva no navegador). |
-| **Docentes** | Foto, áreas, sala e links; resumo das notas; nota **por disciplina**; histórico de turmas desde 2020 com planos de ensino; oportunidades abertas que citam o docente. |
-| **Disciplinas** | Turmas do semestre, **comparação de quem já deu a disciplina** (didática, dificuldade, carga…), histórico de ofertas e materiais. |
-| **Avaliações** | Geral, didática, avaliações justas, dificuldade e carga (1–5); "faria de novo?"; conceito; marcadores; comentário. Selo de **turma confirmada** quando a oferta oficial bate. Rankings por média bayesiana. |
+| **Oferta & grade** | Todas as turmas do semestre com a nota do docente *naquela disciplina*, filtros por turno e dia, e uma grade semanal que acusa conflitos (salva no navegador) e exporta para o calendário (`.ics`). |
+| **Docentes** | Foto, áreas, sala e links; resumo das notas; nota **por disciplina**; **evolução por semestre** (clique num semestre para ver as avaliações dele); histórico de turmas desde 2020 com planos de ensino; oportunidades abertas que citam o docente. |
+| **Disciplinas** | Turmas do semestre, **comparação de quem já deu a disciplina** (didática, dificuldade para aprender e para passar, carga…), evolução da nota por semestre, histórico de ofertas e materiais. Avaliações filtráveis por semestre. |
+| **Avaliações** | Geral, didática, avaliações justas, dificuldade **para aprender** e **para passar** (separadas: matéria difícil pode ter prova tranquila, e vice-versa) e carga (1–5); "faria de novo?"; conceito; marcadores; comentário. Selo de **turma confirmada** quando a oferta oficial bate. Rankings por média bayesiana. |
 | **Materiais** | Índice do acervo de provas antigas mantido pelos estudantes no Google Drive, ligado a cada disciplina. |
 | **Oportunidades** | Chamadas de IC, bolsas e estágios de [dcc.ufmg.br/oportunidades](https://dcc.ufmg.br/oportunidades/), com filtros por tipo, público e área. |
 | **Moderação automática** | Filtro que publica, devolve para reescrever ou segura para revisão — mostrando o motivo **enquanto a pessoa digita**. [Como funciona →](docs/moderacao.md) |
