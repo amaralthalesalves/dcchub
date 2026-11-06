@@ -71,6 +71,7 @@ sequenceDiagram
 | `votes` | Voto "útil": avaliação + hash de quem votou |
 | `reports` | Denúncias: avaliação + hash de quem denunciou + motivo |
 | `class_reports` | Relatos "docente X dá a disciplina Y neste semestre" + hash de quem relatou |
+| `feedback` | Feedback anônimo sobre o site (`/#/feedback`): tipo, texto e dia. **Sem hash, sem IP:** o envio nem lê nem cria o cookie anônimo, então não dá para ligar um feedback a quem o mandou ou às avaliações dessa pessoa. O IP só limita envios (5 por hora), em memória. |
 | `used_links` | Identificador aleatório de cada código de acesso já usado, até ele expirar (para o uso único). Sem e-mail nem o código. O nome vem da versão anterior, que mandava um link. |
 
 Comentários recusados pela moderação **não são guardados**.

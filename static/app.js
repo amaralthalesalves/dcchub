@@ -214,6 +214,7 @@ const routes = [
   [/^oportunidades$/, viewOportunidades],
   [/^provas$/, () => location.replace('#/materiais')], // endereço antigo
   [/^moderacao$/, viewModeration],
+  [/^feedback$/, viewFeedback],
 ];
 
 function parseHash() {
@@ -1688,6 +1689,7 @@ async function viewAbout() {
       <li>Qualquer pessoa pode denunciar uma avaliação; toda denúncia chega à moderação. Denunciada por várias pessoas, de redes diferentes, ela sai do ar até ser revisada — várias denúncias do mesmo computador ou da mesma rede não bastam.</li>
       <li>Docentes que se sentirem expostos de forma injusta podem usar o botão “Denunciar”.</li>
     </ul>
+    <p>Sugestões, erros ou ideias? Mande um <a href="#/feedback">feedback anônimo</a>.</p>
 
     <h2 id="dados">De onde vêm os dados</h2>
     <p>A lista de docentes (com áreas de pesquisa e contatos) vem de <a href="${safeHref(b.sources.professors || 'https://dcc.ufmg.br/professores/')}" target="_blank" rel="noreferrer">dcc.ufmg.br/professores</a>. Disciplinas, turmas, horários e planos de ensino vêm das páginas públicas de <b>oferta de disciplinas</b> do DCC (${esc(b.terms[0])} a ${esc(b.latestTerm)}).</p>
@@ -1704,6 +1706,59 @@ async function viewAbout() {
     <details><summary>O que significa “turma confirmada”?</summary><p>Que a oferta oficial do DCC lista aquele docente naquela disciplina no semestre informado. Não confirma que quem avaliou cursou a turma — isso é impossível sem identificar a pessoa.</p></details>
     <details><summary>Posso avaliar uma disciplina de outro departamento?</summary><p>Por enquanto só disciplinas ofertadas pelo DCC.</p></details>
   </section>`;
+}
+
+// ---- feedback anônimo sobre o site
+const FEEDBACK_KINDS = [['sugestao', 'Sugestão'], ['problema', 'Algo não funciona'], ['dados', 'Dado errado ou faltando'], ['outro', 'Outro']];
+const FEEDBACK_MAX = 2000;
+
+async function viewFeedback() {
+  setTitle('Feedback');
+  const draftKey = 'dcchub-feedback';
+  const draft = store.get(draftKey) || {};
+  main.innerHTML = `<section class="page narrow">
+    <div class="page-head"><p class="eyebrow">Fale com a equipe</p><h1>Feedback anônimo</h1>
+      <p class="lead-sm">Sugestões, problemas, dados errados ou qualquer ideia para melhorar o DCCHub. Chega direto para quem mantém o site.</p></div>
+    <p class="notice" role="note"><svg class="ico" aria-hidden="true"><use href="#i-shield"/></svg><span><b>Anônimo de verdade.</b> O feedback não fica ligado ao seu navegador nem às suas avaliações, e não guardamos IP nem horário (só o dia). Por isso não temos como responder: se quiser retorno, deixe um contato no texto.</span></p>
+    <form class="review-form" id="feedback-form" novalidate>
+      <div class="field" role="radiogroup" aria-labelledby="fb-kind"><span id="fb-kind">Sobre o quê?</span>
+        <div class="chips tag-picker">${FEEDBACK_KINDS.map(([v, l]) => `<label class="chip neu"><input type="radio" name="kind" value="${v}" ${(draft.kind || 'sugestao') === v ? 'checked' : ''}><span>${l}</span></label>`).join('')}</div>
+      </div>
+      <label class="field"><span>Mensagem</span>
+        <textarea id="fb-message" name="message" rows="7" maxlength="${FEEDBACK_MAX}" placeholder="O que poderia ser melhor? Encontrou algum erro? Falta alguma coisa?">${esc(draft.message || '')}</textarea>
+        <div class="field-foot"><small class="err" data-err="message"></small><small class="muted"><span id="fb-count">0</span>/${FEEDBACK_MAX}</small></div>
+      </label>
+      <p class="small muted">Denúncia sobre uma avaliação? Use o botão “Denunciar” nela. Assédio, abuso ou crimes: Ouvidoria da UFMG ou DCE, que têm canais sigilosos.</p>
+      <input name="website" tabindex="-1" autocomplete="off" aria-hidden="true" class="hp">
+      <div class="form-actions"><button class="btn btn-lg" type="submit">Enviar feedback <span aria-hidden="true">→</span></button></div>
+      <p id="form-message" class="form-message" role="status"></p>
+    </form>
+  </section>`;
+  const form = $('#feedback-form');
+  const text = $('#fb-message');
+  const sync = () => {
+    $('#fb-count').textContent = text.value.length;
+    store.set(draftKey, { kind: new FormData(form).get('kind'), message: text.value });
+  };
+  sync();
+  form.addEventListener('input', sync);
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const fd = new FormData(form);
+    const btn = form.querySelector('[type=submit]');
+    $('[data-err=message]').textContent = '';
+    btn.disabled = true;
+    try {
+      const res = await api('/api/feedback', { method: 'POST', body: { kind: fd.get('kind'), message: fd.get('message'), website: fd.get('website') } });
+      store.del(draftKey);
+      main.querySelector('.page').innerHTML = `<div class="empty-state callout"><h3>Obrigado!</h3><p>${esc(res.message)}</p><div class="row-gap"><a class="btn" href="#/">Voltar ao início</a><button class="btn btn-ghost" type="button" id="fb-again">Mandar outro</button></div></div>`;
+      $('#fb-again').addEventListener('click', () => router());
+    } catch (err) {
+      if (err.data?.fields?.message) $('[data-err=message]').textContent = err.data.fields.message;
+      $('#form-message').textContent = err.message;
+      btn.disabled = false;
+    }
+  });
 }
 
 // ---- materiais (acervo newCompleaks no Google Drive: só links, nada é carregado do Drive)
@@ -1886,10 +1941,25 @@ async function viewModeration() {
       const { items } = await api('/api/admin/class-reports', { headers: { Authorization: `Bearer ${token}` } });
       $('#queue').insertAdjacentHTML('beforeend', `<h2>Turmas informadas por estudantes</h2>${items.length ? `<ul class="community-list">${items.map((it) => `<li><b>${esc(it.term)}</b> ${esc(state.prof.get(it.professor)?.name || it.professor)} — ${esc(state.course.get(it.course)?.name || it.course)} <span class="small muted">${plural(it.count, 'relato', 'relatos')}</span>
         <button class="btn btn-sm btn-danger" data-cdel data-term="${esc(it.term)}" data-prof="${esc(it.professor)}" data-course="${esc(it.course)}">Remover</button></li>`).join('')}</ul>` : '<p class="muted">Nenhum relato.</p>'}`);
+      const fb = await api('/api/admin/feedback', { headers: { Authorization: `Bearer ${token}` } });
+      const kindLabel = Object.fromEntries(FEEDBACK_KINDS);
+      $('#queue').insertAdjacentHTML('beforeend', `<h2 id="feedback">Feedback anônimo</h2>${fb.items.length ? fb.items.map((it) => `<div class="mod-item">
+        <p class="small muted"><b>${esc(kindLabel[it.kind] || it.kind)}</b> · ${new Date(it.day * 1000).toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' })}</p>
+        <p class="feedback-text">${esc(it.message)}</p>
+        <div class="row-gap"><button class="btn btn-sm btn-ghost" data-fdel="${it.id}">Lido — apagar</button></div></div>`).join('') : '<p class="muted">Nenhum feedback.</p>'}`);
     } catch (err) { $('#queue').innerHTML = `<p class="warn">${esc(err.message)}</p>`; }
   };
   $('#admin-form').addEventListener('submit', (e) => { e.preventDefault(); token = new FormData(e.target).get('token'); load(); });
   $('#queue').addEventListener('click', async (e) => {
+    const fdel = e.target.closest('[data-fdel]');
+    if (fdel) {
+      try {
+        await api(`/api/admin/feedback/${fdel.dataset.fdel}`, { method: 'DELETE', headers: { Authorization: `Bearer ${token}` } });
+        toast('Apagado.');
+        load();
+      } catch (err) { toast(err.message, 'error'); }
+      return;
+    }
     const del = e.target.closest('[data-cdel]');
     if (del) {
       try {

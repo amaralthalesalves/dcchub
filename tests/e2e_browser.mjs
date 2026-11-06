@@ -117,5 +117,16 @@ ok((await ev(`return document.querySelector('#code-box').textContent.length`)) =
 // 8) apagar
 await ev(`window.confirm=()=>true; document.querySelector('[data-action="delete-review"]').click()`); await sleep(1500);
 ok((await ev(`return document.querySelectorAll('.review').length`)) === 0, 'avaliação apagada');
+// 9) feedback anônimo: rascunho guardado, erro de validação, envio
+await go('#/feedback');
+await ev(`document.querySelector('input[name=kind][value=problema]').click(); const t=document.querySelector('#fb-message'); t.value='curto'; t.dispatchEvent(new Event('input',{bubbles:true})); document.querySelector('#feedback-form').requestSubmit();`);
+await sleep(600);
+ok((await ev(`return document.querySelector('[data-err=message]').textContent`)).length > 0, 'feedback curto demais mostra erro no campo');
+await go('#/'); await go('#/feedback');
+ok(await ev(`return document.querySelector('#fb-message').value === 'curto' && document.querySelector('input[name=kind][value=problema]').checked`), 'rascunho do feedback lembrado neste navegador');
+await ev(`const t=document.querySelector('#fb-message'); t.value='A grade poderia avisar quando duas turmas têm prova no mesmo dia.'; t.dispatchEvent(new Event('input',{bubbles:true})); document.querySelector('#feedback-form').requestSubmit();`);
+await sleep(1000);
+ok(/Obrigado/.test(await ev(`return document.querySelector('.callout')?.textContent || ''`)), 'feedback enviado com agradecimento');
+ok(await ev(`return localStorage.getItem('dcchub-feedback') === null`), 'rascunho apagado após o envio');
 ok(errors.length === 0, 'nenhum erro de JS no console' + (errors.length ? ': ' + errors.join(' | ') : ''));
 ws.close(); chrome.kill('SIGKILL');

@@ -145,7 +145,7 @@ class ServerTest(unittest.TestCase):
 
     def setUp(self):
         with app.connect() as conn:
-            conn.executescript("DELETE FROM votes; DELETE FROM reports; DELETE FROM reviews; DELETE FROM class_reports;")
+            conn.executescript("DELETE FROM votes; DELETE FROM reports; DELETE FROM reviews; DELETE FROM class_reports; DELETE FROM feedback;")
         app.limiter.events.clear()
         app.report_networks.by_review.clear()
 
@@ -537,12 +537,63 @@ class ServerTest(unittest.TestCase):
                              (rid, f"DCC20{rid}", status, reason, f"h{rid}", day))
             conn.execute("INSERT INTO reports (review_id, reporter_hash, reason, created_at) VALUES (3, 'x', ?, ?)", (app.REPORT_REASONS[0], day))
             counts = mod_notify.summary(conn)
-        self.assertEqual(counts, {"held": 2, "filter": 1, "reports": 1, "reported": 1})
+        self.assertEqual(counts, {"held": 2, "filter": 1, "reports": 1, "reported": 1, "feedback": 0})
         subject, body = mod_notify.render(counts, "https://dcchub.exemplo/#/moderacao")
         self.assertEqual(subject, "DCCHub: 2 avaliações aguardando revisão")
         self.assertIn("1 retirada do ar por denúncias", body)
         self.assertIn("1 publicada com denúncias pendentes", body)
         self.assertIn("https://dcchub.exemplo/#/moderacao", body)
+
+    def test_feedback_is_anonymous(self):
+        """Feedback não cria nem lê o cookie anônimo e não guarda nada de quem enviou."""
+        c = self.client()
+        status, data, res = c.post("/api/feedback", {"kind": "sugestao", "message": "Seria ótimo filtrar por horário na grade."})
+        self.assertEqual(status, 201, data)
+        self.assertIsNone(res.getheader("Set-Cookie"), "feedback não pode criar identidade")
+        with app.connect() as conn:
+            cols = [r[1] for r in conn.execute("PRAGMA table_info(feedback)")]
+            row = conn.execute("SELECT * FROM feedback").fetchone()
+        self.assertEqual(cols, ["id", "kind", "message", "created_at"])
+        self.assertEqual(row["created_at"], app.review_day(), "data só com precisão de dia")
+        # quem já tem identidade (avaliou) manda feedback sem que ele fique ligado a ela
+        c.post("/api/reviews", review())
+        self.assertEqual(c.post("/api/feedback", {"kind": "xyz", "message": "Outro feedback qualquer, bem curtinho."})[0], 201)
+        with app.connect() as conn:
+            self.assertEqual(conn.execute("SELECT kind FROM feedback ORDER BY id DESC").fetchone()[0], "outro")
+
+    def test_feedback_validation_and_limits(self):
+        c = self.client()
+        status, data, _ = c.post("/api/feedback", {"message": "curto"})
+        self.assertEqual(status, 400)
+        self.assertIn("message", data["fields"])
+        self.assertEqual(c.post("/api/feedback", {"message": "x" * 2001})[0], 400)
+        self.assertEqual(c.post("/api/feedback", {"message": "Mensagem de robô bem comprida.", "website": "x"})[0], 400)
+        for i in range(app.LIMITS["feedback"][0]):
+            self.assertEqual(c.post("/api/feedback", {"message": f"Feedback número {i} sobre o site."})[0], 201)
+        self.assertEqual(c.post("/api/feedback", {"message": "Mais um feedback sobre o site."})[0], 429)
+
+    def test_feedback_admin_list_and_delete(self):
+        admin = {"Authorization": "Bearer admin-teste"}
+        c = self.client()
+        c.post("/api/feedback", {"kind": "problema", "message": "A busca não acha disciplina pelo código antigo."})
+        self.assertEqual(c.get("/api/admin/feedback")[0], 401)
+        status, data, _ = c.get("/api/admin/feedback", headers=admin)
+        self.assertEqual(status, 200)
+        [item] = data["items"]
+        self.assertEqual((item["kind"], item["message"]), ("problema", "A busca não acha disciplina pelo código antigo."))
+        self.assertEqual(c.request("DELETE", f"/api/admin/feedback/{item['id']}", headers=admin)[0], 200)
+        self.assertEqual(c.get("/api/admin/feedback", headers=admin)[1]["items"], [])
+        self.assertEqual(c.request("DELETE", f"/api/admin/feedback/{item['id']}", headers=admin)[0], 404)
+
+    def test_moderation_email_for_feedback_has_no_text(self):
+        with self.mod_mail() as sent:
+            self.client().post("/api/feedback", {"kind": "outro", "message": "O professor Fulano devia ser removido do site."})
+            self.assertTrue(self.wait_for(lambda: sent))
+            subject, body = sent[0]
+            self.assertEqual(subject, "DCCHub: 1 feedback para ler")
+            self.assertIn("1 feedback anônimo", body)
+            for secret in ("fulano", "removido", "outro"):
+                self.assertNotIn(secret, (subject + body).lower())
 
     def test_moderation_email_off_without_recipients(self):
         self.assertFalse(app.notifier.enabled)

@@ -360,6 +360,13 @@ CREATE TABLE IF NOT EXISTS reports (
   resolved INTEGER NOT NULL DEFAULT 0,
   PRIMARY KEY (review_id, reporter_hash)
 ) WITHOUT ROWID;
+-- feedback sobre o site: anônimo de verdade — sem hash de quem enviou, sem IP, data só com precisão de dia
+CREATE TABLE IF NOT EXISTS feedback (
+  id INTEGER PRIMARY KEY,
+  kind TEXT NOT NULL,
+  message TEXT NOT NULL,
+  created_at INTEGER NOT NULL
+);
 """
 # votos, denúncias, turmas informadas e links usados não têm rowid (WITHOUT ROWID): ficam guardados na ordem da chave,
 # não na ordem de chegada — senão a posição no arquivo diria em que ordem cada hash agiu num mesmo dia.
@@ -571,7 +578,11 @@ class RateLimiter:
             return True
 
 
+FEEDBACK_KINDS = ("sugestao", "problema", "dados", "outro")
+FEEDBACK_MIN, FEEDBACK_MAX = 10, 2000
+
 LIMITS = {"check": (120, 60), "access": (10, 600), "login": (5, 600), "classreport": (20, 600), "review": (6, 600), "vote": (60, 60), "report": (10, 600), "restore": (10, 600), "admin": (30, 60),
+          "feedback": (5, 3600),
           # identidade anônima nova sai de graça (basta apagar o cookie), então os limites abaixo valem por rede (IP) e,
           # no acesso por e-mail, por login — nunca guardados: só em memória, como os demais
           "login-day": (20, 86400),       # códigos pedidos por IP por dia (protege a cota diária do serviço de e-mail)
@@ -800,12 +811,15 @@ class App(BaseHTTPRequestHandler):
         ("GET", r"/api/me", "get_me"),
         ("POST", r"/api/me/code", "post_me_code"),
         ("POST", r"/api/me/restore", "post_restore"),
+        ("POST", r"/api/feedback", "post_feedback"),
         ("POST", r"/api/class-reports", "post_class_report"),
         ("DELETE", r"/api/class-reports", "delete_class_report"),
         ("GET", r"/api/admin/queue", "get_admin_queue"),
         ("GET", r"/api/admin/class-reports", "get_admin_class_reports"),
         ("POST", r"/api/admin/class-reports/delete", "post_admin_class_report_delete"),
         ("POST", r"/api/admin/reviews/(\d+)", "post_admin_review"),
+        ("GET", r"/api/admin/feedback", "get_admin_feedback"),
+        ("DELETE", r"/api/admin/feedback/(\d+)", "delete_admin_feedback"),
         # compatibilidade com o front-end antigo
         ("GET", r"/api/catalog", "get_bootstrap"),
     ]
@@ -1376,6 +1390,38 @@ class App(BaseHTTPRequestHandler):
             n = conn.execute("DELETE FROM class_reports WHERE term=? AND professor=? AND course=?",
                              (str(data.get("term")), str(data.get("professor")), str(data.get("course")))).rowcount
         self.send_json({"message": f"{n} relato(s) removido(s)."})
+
+    # ---- feedback sobre o site
+    def post_feedback(self) -> None:
+        """Sugestões e problemas. Não lê nem cria o cookie anônimo e não guarda IP: nada liga o feedback a quem enviou
+        (nem às avaliações dessa pessoa). O IP só limita envios, em memória, como no resto do site."""
+        data = self.read_json()
+        if data.get("website"):  # campo-armadilha
+            raise ApiError(400, "Não foi possível enviar.")
+        kind = data.get("kind") if data.get("kind") in FEEDBACK_KINDS else "outro"
+        message = clean_comment(data.get("message"))
+        if len(message) < FEEDBACK_MIN:
+            raise ApiError(400, "Escreva um pouco mais.", fields={"message": f"Escreva pelo menos {FEEDBACK_MIN} caracteres."})
+        if len(message) > FEEDBACK_MAX:
+            raise ApiError(400, "Texto longo demais.", fields={"message": f"Use no máximo {FEEDBACK_MAX} caracteres."})
+        self.limit("feedback", message="Você já mandou vários feedbacks agora há pouco. Tente de novo mais tarde.")
+        with connect() as conn:
+            conn.execute("INSERT INTO feedback (kind, message, created_at) VALUES (?,?,?)", (kind, message, review_day()))
+        notifier.held()
+        self.send_json({"message": "Obrigado! Seu feedback chegou à equipe."}, 201)
+
+    def get_admin_feedback(self) -> None:
+        self.require_admin()
+        with connect() as conn:
+            rows = conn.execute("SELECT id, kind, message, created_at FROM feedback ORDER BY id DESC LIMIT 200").fetchall()
+        self.send_json({"items": [{"id": r["id"], "kind": r["kind"], "message": r["message"], "day": r["created_at"]} for r in rows]})
+
+    def delete_admin_feedback(self, fid: str) -> None:
+        self.require_admin()
+        with connect() as conn:
+            if not conn.execute("DELETE FROM feedback WHERE id=?", (int(fid),)).rowcount:
+                raise ApiError(404, "Feedback não encontrado.")
+        self.send_json({"message": "Apagado."})
 
     # ---- acesso da comunidade
     @staticmethod

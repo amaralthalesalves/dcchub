@@ -418,6 +418,7 @@ a.chip:hover { border-color: var(--line-strong); color: var(--ink); text-decorat
 .helpful:hover { background: var(--surface-2); color: var(--ink); }
 .helpful.on { background: var(--primary-soft); color: var(--primary-soft-ink); border-color: color-mix(in srgb, var(--primary) 40%, var(--line)); }
 .mod-item { border-bottom: 1px solid var(--line); padding: 18px 0; display: grid; gap: 10px; }
+.feedback-text { white-space: pre-wrap; overflow-wrap: anywhere; margin: 0; }
 
 /* ---------- filtros e formulários */
 .filters { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 10px; margin-bottom: 16px; position: sticky; top: 66px; z-index: 5; box-shadow: var(--shadow); }

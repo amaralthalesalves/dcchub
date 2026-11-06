@@ -15,10 +15,11 @@ O filtro (`moderation.py`) foi feito para que **quase ninguém precise revisar c
 Hoje só **acusações de discriminação** ("ele é machista", "racista") são seguradas: podem ser uma crítica legítima e importante ou difamação, e isso uma regra não decide.
 
 ### Aviso por e-mail à moderação
-Com `DCCHUB_MOD_EMAIL` definido (um ou mais endereços, separados por vírgula), a moderação recebe um e-mail quando algo entra na fila: avaliação nova ou editada segurada pelo filtro, ou avaliação retirada do ar por denúncias. Usa o mesmo SMTP do acesso por e-mail (`mod_notify.py`).
+Com `DCCHUB_MOD_EMAIL` definido (um ou mais endereços, separados por vírgula), a moderação recebe um e-mail quando algo entra na fila: avaliação nova ou editada segurada pelo filtro, avaliação retirada do ar por denúncias, ou feedback anônimo novo sobre o site. Usa o mesmo SMTP do acesso por e-mail (`mod_notify.py`).
 
 - **Sem encher a caixa:** o primeiro aviso espera 2 minutos para agrupar o que chegar junto; depois, no máximo um e-mail a cada 30 minutos. O resumo é montado na hora do envio: se a fila já foi resolvida, nada é enviado.
-- **Só contagens e motivos:** "2 seguradas pelo filtro", "1 retirada do ar por denúncias", "3 publicadas com denúncias pendentes", e o link do painel (`DCCHUB_PUBLIC_URL` + `/#/moderacao`). Nunca docente, disciplina, texto ou dado de quem escreveu — acusações contra pessoas nomeadas não ficam guardadas numa caixa de e-mail; o conteúdo se lê no painel.
+- **Só contagens e motivos:** "2 seguradas pelo filtro", "1 retirada do ar por denúncias", "3 publicadas com denúncias pendentes", "1 feedback anônimo sobre o site", e o link do painel (`DCCHUB_PUBLIC_URL` + `/#/moderacao`). Nunca docente, disciplina, texto ou dado de quem escreveu — acusações contra pessoas nomeadas não ficam guardadas numa caixa de e-mail; o conteúdo se lê no painel.
+- **Feedback:** o texto também fica só no painel, na seção "Feedback anônimo", onde cada um é apagado depois de lido.
 
 ### Aviso enquanto digita
 O formulário consulta `POST /api/moderation/check` alguns instantes depois que a pessoa para de digitar e mostra, abaixo do comentário, o motivo e o trecho exato que bateu na regra. Assim quase ninguém chega a ser recusado no envio.
