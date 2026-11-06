@@ -80,7 +80,9 @@ class BackupScriptTest(unittest.TestCase):
             self.assertEqual(tar.extractfile("secret.key").read(), b"chave-secreta-de-teste")
         wrong = subprocess.run(["openssl", "enc", "-d", "-aes-256-cbc", "-pbkdf2", "-iter", "600000", "-pass", "pass:errada"],
                                input=data, capture_output=True)
-        self.assertNotEqual(wrong.returncode, 0)
+        # AES-CBC sem autenticação: com senha errada o openssl às vezes (~1/256) aceita o padding e devolve lixo, com
+        # código 0. O que importa é que o conteúdo não sai (e o gzip/tar recusa o lixo na restauração)
+        self.assertTrue(wrong.returncode != 0 or wrong.stdout != plain)
 
     def test_offsite_off_without_settings(self):
         res = self.run_backup("DOMAIN=x\n")
