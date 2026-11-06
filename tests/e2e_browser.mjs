@@ -7,13 +7,22 @@ import { mkdtempSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 const port = 9333, base = process.argv[2] || 'http://localhost:8000';
-const chrome = spawn('google-chrome', ['--headless=new', '--no-sandbox', '--disable-gpu', `--remote-debugging-port=${port}`, `--user-data-dir=${mkdtempSync(join(tmpdir(), 'avalie-e2e-'))}`, '--window-size=1300,1000', 'about:blank'], { stdio: 'ignore' });
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-let target;
-for (let i = 0; i < 150 && !target; i++) { // até 30 s: o Chrome do runner às vezes demora para abrir
-  await sleep(200); try { target = (await (await fetch(`http://127.0.0.1:${port}/json`)).json()).find((t) => t.type === 'page'); } catch {} }
+// O Chrome do runner do GitHub às vezes demora ou não sobe na primeira vez: espera até 30 s e tenta abrir de novo
+// uma vez. Se não der, falha dizendo por quê (a saída de erro do Chrome), não com um TypeError obscuro.
+let chrome, target, chromeLog = '';
+for (let attempt = 1; attempt <= 2 && !target; attempt++) {
+  chrome = spawn('google-chrome', ['--headless=new', '--no-sandbox', '--disable-gpu', '--disable-dev-shm-usage', `--remote-debugging-port=${port}`, `--user-data-dir=${mkdtempSync(join(tmpdir(), 'avalie-e2e-'))}`, '--window-size=1300,1000', 'about:blank'], { stdio: ['ignore', 'ignore', 'pipe'] });
+  chrome.stderr.on('data', (d) => { chromeLog = (chromeLog + d).slice(-4000); });
+  chrome.on('error', (e) => { chromeLog += `\n${e.message}`; });
+  for (let i = 0; i < 150 && !target; i++) {
+    await sleep(200); try { target = (await (await fetch(`http://127.0.0.1:${port}/json`)).json()).find((t) => t.type === 'page'); } catch {}
+  }
+  if (!target) { console.log(`Chrome não respondeu (tentativa ${attempt})`); chrome.kill('SIGKILL'); await sleep(1000); }
+}
+if (!target) { console.error(`Chrome não abriu a depuração em 2 tentativas. Saída de erro:\n${chromeLog}`); process.exit(1); }
 const ws = new WebSocket(target.webSocketDebuggerUrl);
-await new Promise((r) => ws.addEventListener('open', r));
+await new Promise((r, reject) => { ws.addEventListener('open', r); ws.addEventListener('error', () => reject(new Error('WebSocket do Chrome não conectou'))); });
 let id = 0; const pending = new Map(); const errors = [];
 ws.addEventListener('message', (e) => { const m = JSON.parse(e.data); if (m.id && pending.has(m.id)) { pending.get(m.id)(m); pending.delete(m.id); }
   if (m.method === 'Runtime.exceptionThrown') errors.push(m.params.exceptionDetails.exception?.description || m.params.exceptionDetails.text);
