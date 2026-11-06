@@ -21,6 +21,9 @@ Variáveis de ambiente (todas opcionais):
                         não é guardado. Configuração do envio: DCCHUB_SMTP_HOST/PORT/USER/PASSWORD/FROM/TLS; sem SMTP,
                         o código aparece no terminal (desenvolvimento). DCCHUB_EMAIL_EPOCH: trocar o valor revoga todos
                         os acessos feitos por e-mail; DCCHUB_EMAIL_DAILY_LIMIT: teto de e-mails por dia (250)
+    DCCHUB_DOCENTE_LOGIN "1" (com o acesso por e-mail ligado) para o modo docente: o e-mail publicado de um docente
+                        recebe um código que abre só a página dele, reduzida (sem semestre, conceito nem data das
+                        avaliações; disciplinas com menos de 3 avaliações não aparecem). Desligado por padrão.
   Os nomes antigos (AVALIA_DCC_*) continuam aceitos.
     HOST / PORT             endereço de escuta (padrão 0.0.0.0:8000)
 """
@@ -73,7 +76,11 @@ EMAIL = email_login.Config(env)
 # avisos à moderação quando algo entra na fila (ver mod_notify.py); usa o mesmo SMTP do acesso por e-mail
 MOD_EMAILS = [a.strip() for a in (env("MOD_EMAIL") or "").split(",") if a.strip()]
 PUBLIC_URL = (env("PUBLIC_URL") or "").rstrip("/")
-GATE_FREE = {"/api/access", "/api/access/email", "/api/access/email/verify"}
+GATE_FREE = {"/api/access", "/api/access/email", "/api/access/email/verify", "/api/access/logout"}
+# modo docente: o e-mail publicado de um docente dá acesso só à própria página, em versão reduzida (ver get_docente)
+DOCENTE_LOGIN = EMAIL.enabled and env("DOCENTE_LOGIN") == "1"
+DOCENTE_MIN = 3  # avaliações de uma disciplina só aparecem para o docente a partir deste número
+DOCENTE_ROUTES = (r"/api/docente", r"/api/docente/reviews/\d+/report")
 MAX_BODY = 16_384
 ACTIVE_TERMS = 4  # disciplina sem oferta nos últimos 4 semestres publicados (2 anos) = fora de oferta
 
@@ -551,6 +558,30 @@ def aggregate(rows: list[sqlite3.Row]) -> dict:
     }
 
 
+def reduced_summary(rows: list[sqlite3.Row]) -> dict:
+    """aggregate() sem o que ajuda a identificar quem escreveu: evolução por semestre e conceitos."""
+    out = aggregate(rows)
+    out.pop("byTerm", None)
+    out.pop("grades", None)
+    return out
+
+
+_docente_emails: tuple[str, dict[str, str]] = ("", {})
+
+
+def docente_by_email() -> dict[str, str]:
+    """E-mail publicado (minúsculo) → slug, a partir do catálogo; refeito quando o catálogo muda."""
+    global _docente_emails
+    if _docente_emails[0] != CATALOG.version:
+        emails = {}
+        for slug, p in CATALOG.professors.items():
+            for e in [p.get("email"), *p.get("emails", [])]:
+                if addr := email_login.normalize(e):
+                    emails[addr] = slug
+        _docente_emails = (CATALOG.version, emails)
+    return _docente_emails[1]
+
+
 def bayes(avg: float | None, n: int, prior: float, weight: int = 3) -> float | None:
     if not n or avg is None:
         return None
@@ -646,7 +677,7 @@ CSP = ("default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inlin
 
 
 def gate_methods() -> list[str]:
-    return (["email"] if EMAIL.enabled else []) + (["code"] if ACCESS_CODES else [])
+    return (["email"] if EMAIL.enabled else []) + (["code"] if ACCESS_CODES else []) + (["docente"] if DOCENTE_LOGIN else [])
 
 
 notifier = mod_notify.Notifier(EMAIL, MOD_EMAILS, lambda: connect(),
@@ -795,6 +826,9 @@ class App(BaseHTTPRequestHandler):
         ("POST", r"/api/access", "post_access"),
         ("POST", r"/api/access/email", "post_access_email"),
         ("POST", r"/api/access/email/verify", "post_access_email_verify"),
+        ("POST", r"/api/access/logout", "post_access_logout"),
+        ("GET", r"/api/docente", "get_docente"),
+        ("POST", r"/api/docente/reviews/(\d+)/report", "post_docente_report"),
         ("GET", r"/api/bootstrap", "get_bootstrap"),
         ("GET", r"/api/offerings", "get_offerings"),
         ("GET", r"/api/professors/([a-z0-9-]+)", "get_professor"),
@@ -843,7 +877,11 @@ class App(BaseHTTPRequestHandler):
             if method in ("GET", "HEAD"):
                 return self.serve_static(path)
             return self.send_json({"error": "Método não permitido."}, 405)
-        if (ACCESS_CODES or EMAIL.enabled) and path not in GATE_FREE and not self.has_access():
+        if DOCENTE_LOGIN and path not in GATE_FREE and (slug := self.docente()):
+            # docente: só a própria página reduzida; o resto da API não existe para ele
+            if not any(re.fullmatch(r, path) for r in DOCENTE_ROUTES):
+                return self.send_json({"error": "Acesso de docente: só a sua página está disponível.", "docente": slug}, 403)
+        elif (ACCESS_CODES or EMAIL.enabled) and path not in GATE_FREE and not self.has_access():
             # nada de dados sem o código da comunidade ou o e-mail @ufmg.br; o front mostra a tela de acesso
             return self.send_json({"error": "Acesso restrito à comunidade.", "gate": True, "methods": gate_methods()}, 401)
         try:
@@ -1463,11 +1501,13 @@ class App(BaseHTTPRequestHandler):
         address = email_login.normalize(self.read_json().get("email"))
         if not address:
             raise ApiError(400, "Digite um e-mail válido.", fields={"email": ["Digite um e-mail válido."]})
-        if not email_login.allowed(address, EMAIL.domain):
+        docente = docente_by_email().get(address) if DOCENTE_LOGIN else None
+        if not docente and not email_login.allowed(address, EMAIL.domain):
             msg = f"Use seu e-mail @{EMAIL.domain}."
             raise ApiError(400, msg, fields={"email": [msg]})
         self.limit("login-day", message="Muitos pedidos de código a partir desta conexão hoje. Tente amanhã.")
-        code, challenge = email_login.new_code(SECRET)
+        # e-mail publicado de um docente (mesmo que seja @ufmg.br): o código abre só a página dele
+        code, challenge = email_login.new_docente_code(SECRET, docente) if docente else email_login.new_code(SECRET)
         # no máximo 3 e-mails por endereço por hora (chave HMAC só em memória). Acima disso a resposta é a mesma, com
         # um desafio de verdade, mas nada é enviado: ninguém usa o site para encher a caixa de outra pessoa.
         if limiter.hit("login-addr", email_login.address_key(SECRET, address), 3, 3600):
@@ -1475,7 +1515,10 @@ class App(BaseHTTPRequestHandler):
             if not limiter.hit("login-global", "*", EMAIL_DAILY_LIMIT, 86400):
                 raise ApiError(503, "O limite diário de envios de e-mail foi atingido. Tente de novo amanhã"
                                + (" ou entre com o código da comunidade." if ACCESS_CODES else "."))
-            email_login.send_async(EMAIL, address, code)
+            if docente:
+                email_login.send_async(EMAIL, address, code, email_login.DOCENTE_TTL // 86400)
+            else:
+                email_login.send_async(EMAIL, address, code)
         self.send_json({"ok": True, "challenge": challenge, "expiresIn": email_login.CODE_TTL,
                         "message": f"Enviamos um código de 6 dígitos para {address}. Ele vale por "
                                    f"{email_login.CODE_TTL // 60} minutos."})
@@ -1496,14 +1539,16 @@ class App(BaseHTTPRequestHandler):
         if not email_login.clean_code(code):
             raise ApiError(400, "Digite os 6 dígitos do código.", fields={"code": ["Digite os 6 dígitos do código."]})
         # tentativas por desafio, só em memória: 5 chutes em 1.000.000 por e-mail enviado
-        nonce, tried = None, False
+        nonce, slug, tried = None, None, False
         for challenge, candidate in challenges:
             if not limiter.hit("login-try", candidate, email_login.CODE_TRIES, email_login.CODE_TTL):
                 continue
             tried = True
-            if email_login.check_code(SECRET, challenge, code):
-                nonce = candidate
+            if ok := email_login.check_any_code(SECRET, challenge, code):
+                nonce, slug = ok
                 break
+        if slug and (not DOCENTE_LOGIN or slug not in CATALOG.professors):
+            nonce = None
         if not tried:
             raise ApiError(429, "Tentativas demais com este código. Peça um novo.")
         if not nonce:
@@ -1516,8 +1561,80 @@ class App(BaseHTTPRequestHandler):
                 conn.execute("INSERT INTO used_links (nonce, expires_at) VALUES (?, ?)", (nonce, now + email_login.CODE_TTL))
             except sqlite3.IntegrityError:
                 raise ApiError(400, "Este código já foi usado. Peça um novo.") from None
+        if slug:
+            self.set_access_cookie(email_login.docente_token(SECRET, EMAIL.epoch, slug), email_login.DOCENTE_TTL)
+            return self.send_json({"ok": True, "docente": True})
         self.set_access_cookie(email_login.access_token(SECRET, EMAIL.epoch), email_login.ACCESS_TTL)
         self.send_json({"ok": True})
+
+    def post_access_logout(self) -> None:
+        self.set_access_cookie("", 0)
+        self.send_json({"ok": True})
+
+    # ---- modo docente
+    def docente(self) -> str | None:
+        """Slug do docente, se este navegador entrou pelo modo docente."""
+        given = self.cookie(ACCESS_COOKIE)
+        if not given.startswith("d1."):
+            return None
+        slug = email_login.check_docente(SECRET, EMAIL.epoch, given)
+        return slug if slug in CATALOG.professors else None
+
+    def get_docente(self) -> None:
+        """A página do docente, reduzida para não ajudar a descobrir quem escreveu:
+        - cada avaliação aparece sem semestre, conceito, data, edição e votos — quem dá aula sabe quem cursou quando e
+          com que nota, e esses campos cruzados com a turma apontariam a pessoa;
+        - disciplinas com menos de DOCENTE_MIN avaliações não mostram notas nem textos, só que existem;
+        - sem evolução por semestre e sem distribuição de conceitos;
+        - dentro de cada disciplina, ordem pelo id (aleatório), não por data."""
+        slug = self.docente()
+        if not slug:
+            raise ApiError(401, "Acesso de docente expirado. Entre de novo com seu e-mail.", gate=True, methods=gate_methods())
+        prof = CATALOG.professors[slug]
+        with connect() as conn:
+            rows = conn.execute("SELECT * FROM reviews WHERE professor=? AND status='published' ORDER BY course, id",
+                                (slug,)).fetchall()
+        by_course: dict[str, list] = defaultdict(list)
+        for r in rows:
+            by_course[r["course"]].append(r)
+        courses, shown_rows = [], []
+        for cid, rs in sorted(by_course.items(), key=lambda kv: -len(kv[1])):
+            c = CATALOG.courses.get(cid, {})
+            item = {"id": cid, "name": c.get("name", cid), "codes": c.get("codes", []), "count": len(rs)}
+            if len(rs) >= DOCENTE_MIN:
+                shown_rows += rs
+                item["summary"] = reduced_summary(rs)
+                item["reviews"] = [{"id": r["id"], "ratings": {k: r[k] for k in CRITERIA_KEYS},
+                                    "wouldRetake": None if r["would_retake"] is None else bool(r["would_retake"]),
+                                    "tags": json.loads(r["tags"] or "[]"), "comment": r["comment"]} for r in rs]
+            courses.append(item)
+        self.send_json({
+            "professor": {"slug": slug, "name": prof["name"], "photo": prof.get("photo"), "areas": prof.get("areas", [])},
+            "total": len(rows), "summary": reduced_summary(shown_rows) if shown_rows else None, "courses": courses,
+            "minPerCourse": DOCENTE_MIN, "criteria": CRITERIA, "tags": TAGS, "reportReasons": REPORT_REASONS,
+        })
+
+    def post_docente_report(self, review_id: str) -> None:
+        """Denúncia do próprio docente: vai para a fila da moderação, mas nunca tira a avaliação do ar sozinha
+        (não conta como rede diferente: senão bastaria ao docente denunciar de casa, do celular e do campus)."""
+        slug = self.docente()
+        if not slug:
+            raise ApiError(401, "Acesso de docente expirado.")
+        self.limit("report")
+        data = self.read_json()
+        reason = data.get("reason")
+        if reason not in REPORT_REASONS:
+            raise ApiError(400, "Escolha um motivo.")
+        detail = clean_line(data.get("detail"), 300) or None
+        with connect() as conn:
+            row = conn.execute("SELECT professor FROM reviews WHERE id=? AND status='published'", (int(review_id),)).fetchone()
+            if not row or row["professor"] != slug:
+                raise ApiError(404, "Avaliação não encontrada.")
+            conn.execute("""INSERT OR REPLACE INTO reports (review_id, reporter_hash, reason, detail, created_at)
+                            VALUES (?,?,?,?,?)""",
+                         (int(review_id), token_hash(f"docente:{slug}"), reason,
+                          f"[pelo docente] {detail}" if detail else "[pelo docente]", review_day()))
+        self.send_json({"message": "Denúncia enviada à moderação. Obrigado."}, 201)
 
     def require_admin(self) -> None:
         self.limit("admin")
@@ -1588,6 +1705,8 @@ if __name__ == "__main__":
     if notifier.enabled:
         print(f"Avisos de moderação por e-mail ativos ({len(MOD_EMAILS)} destinatário(s))."
               + ("" if EMAIL.smtp_host else " SMTP não configurado: os avisos aparecem aqui no terminal."))
+    if DOCENTE_LOGIN:
+        print(f"Modo docente ativo: {len(docente_by_email())} e-mails de docentes abrem só a própria página.")
     if EMAIL.enabled:
         print(f"Acesso por e-mail @{EMAIL.domain} ativo." + ("" if EMAIL.smtp_host else
               " SMTP não configurado: os códigos aparecem aqui no terminal (só para desenvolvimento)."))

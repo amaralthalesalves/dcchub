@@ -236,6 +236,7 @@ async function router() {
   const token = ++renderToken;
   const { path, params, anchor } = parseHash();
   $$('#nav a[data-nav]').forEach((a) => a.toggleAttribute('aria-current', a.dataset.nav ? path.startsWith(a.dataset.nav) : path === ''));
+  if (state.boot?.docente) { viewDocente().catch((err) => { main.innerHTML = errorBlock(err); }); return; }
   for (const [re, view] of routes) {
     const m = path.match(re);
     if (!m) continue;
@@ -249,6 +250,7 @@ async function router() {
     } catch (err) {
       if (token !== renderToken) return;
       if (err.data?.gate) { viewGate(err.data.methods); return; }
+      if (err.data?.docente) { viewDocente().catch((e) => { main.innerHTML = errorBlock(e); }); return; }
       main.innerHTML = errorBlock(err);
     }
     return;
@@ -346,7 +348,8 @@ function viewGate(methods = ['code']) {
     const value = new FormData(form).get('email').trim();
     err.textContent = '';
     if (!/^[^@\s]+@[^@\s]+$/.test(value)) { err.textContent = 'Digite um e-mail válido.'; return; }
-    if (!value.toLowerCase().endsWith('@ufmg.br')) { err.textContent = 'Use seu e-mail @ufmg.br.'; return; }
+    // com o modo docente, o e-mail publicado de um docente também vale: quem decide é o servidor
+    if (!methods.includes('docente') && !value.toLowerCase().endsWith('@ufmg.br')) { err.textContent = 'Use seu e-mail @ufmg.br.'; return; }
     btn.disabled = true;
     try {
       const res = await api('/api/access/email', { method: 'POST', body: { email: value } });
@@ -369,9 +372,9 @@ function viewGate(methods = ['code']) {
     if (!pending) { err.textContent = 'O código expirou. Peça outro.'; return; }
     btn.disabled = true;
     try {
-      await api('/api/access/email/verify', { method: 'POST', body: { challenges: pending.items.map((i) => i.challenge), code } });
+      const res = await api('/api/access/email/verify', { method: 'POST', body: { challenges: pending.items.map((i) => i.challenge), code } });
       save(null);
-      toast('Pronto! Este navegador tem acesso por 180 dias.');
+      toast(res.docente ? 'Pronto! Este navegador tem acesso à sua página por 30 dias.' : 'Pronto! Este navegador tem acesso por 180 dias.');
       enter();
       return;
     } catch (e2) {
@@ -1706,6 +1709,71 @@ async function viewAbout() {
     <details><summary>O que significa “turma confirmada”?</summary><p>Que a oferta oficial do DCC lista aquele docente naquela disciplina no semestre informado. Não confirma que quem avaliou cursou a turma — isso é impossível sem identificar a pessoa.</p></details>
     <details><summary>Posso avaliar uma disciplina de outro departamento?</summary><p>Por enquanto só disciplinas ofertadas pelo DCC.</p></details>
   </section>`;
+}
+
+// ---- modo docente: o docente que entra com o e-mail publicado vê só a própria página, reduzida. Tudo é decidido no
+// servidor (o resto da API responde 403 para ele); aqui só se monta a tela, sem navegação para o resto do site.
+async function viewDocente() {
+  document.body.classList.add('gated');
+  setTitle('Sua página');
+  let d;
+  try { d = await api('/api/docente'); } catch (err) {
+    if (err.data?.gate) { state.boot = null; viewGate(err.data.methods); return; }
+    throw err;
+  }
+  // estado mínimo para os componentes de resumo (critérios e marcadores); o resto do site não carrega
+  state.boot = { docente: true, criteria: d.criteria, tags: d.tags, reportReasons: d.reportReasons };
+  const crit = d.criteria.filter((c) => c.key !== 'overall');
+  const card = (r) => `<article class="review" id="review-${r.id}">
+    <header class="review-head"><span class="score-tile ${scoreClass(r.ratings.overall)}" aria-label="Nota geral ${r.ratings.overall} de 5">${r.ratings.overall}</span><div><p class="muted small">Nota geral</p></div></header>
+    <ul class="review-metrics">
+      ${crit.filter((c) => r.ratings[c.key] != null).map((c) => `<li><span>${esc(c.label)}</span>${pill(r.ratings[c.key], { crit: c })}${c.levels ? `<small>${esc(level(c, r.ratings[c.key]).toLowerCase())}</small>` : ''}</li>`).join('')}
+      ${r.wouldRetake != null ? `<li><span>Faria de novo</span><b class="${r.wouldRetake ? 'yes' : 'no'}">${r.wouldRetake ? 'Sim' : 'Não'}</b></li>` : ''}
+    </ul>
+    ${r.tags.length ? `<div class="chips">${r.tags.map((t) => `<span class="chip ${tagTone(t)}">${esc(t)}</span>`).join('')}</div>` : ''}
+    <div class="review-text">${esc(r.comment).split(/\n{2,}/).map((p) => `<p>${p.replace(/\n/g, '<br>')}</p>`).join('')}</div>
+    <footer class="review-foot"><button class="link-btn muted" data-docente-report="${r.id}">Denunciar à moderação</button></footer>
+  </article>`;
+  const few = d.courses.filter((c) => !c.reviews);
+  main.innerHTML = `<section class="page">
+    <div class="page-head docente-head">${avatar(d.professor, 'xl')}<div><p class="eyebrow">Sua página no DCCHub</p><h1>${esc(d.professor.name)}</h1>
+      <p class="lead-sm">${plural(d.total, 'avaliação publicada', 'avaliações publicadas')} por estudantes.</p></div>
+      <button class="btn btn-ghost btn-sm" id="docente-exit" type="button">Sair</button></div>
+    <p class="notice notice-old" role="note"><svg class="ico" aria-hidden="true"><use href="#i-shield"/></svg><span><b>Versão para docentes.</b> Para proteger quem escreveu, as avaliações aparecem sem semestre, conceito e data, e disciplinas com menos de ${d.minPerCourse} avaliações mostram só quantas há. Se algo for falso, ofensivo ou expuser alguém, use “Denunciar à moderação”: a avaliação é revisada por uma pessoa.</span></p>
+    ${d.summary ? summaryBlock(d.summary) : '<p class="muted">Ainda não há disciplina com avaliações suficientes para mostrar.</p>'}
+    ${d.courses.filter((c) => c.reviews).map((c) => `<section class="block">
+      <div class="section-head"><h2>${esc(c.name)}</h2><span class="muted small">${esc(c.codes.join(' / '))} · ${plural(c.count, 'avaliação', 'avaliações')}${c.summary.avg.overall != null ? ` · média geral ${fmt(c.summary.avg.overall)}` : ''}</span></div>
+      <div class="review-list">${c.reviews.map(card).join('')}</div></section>`).join('')}
+    ${few.length ? `<section class="block"><h2>Com poucas avaliações</h2><ul class="community-list">${few.map((c) => `<li><span>${esc(c.name)}</span><span class="small muted">${plural(c.count, 'avaliação', 'avaliações')} — aparece a partir de ${d.minPerCourse}</span></li>`).join('')}</ul></section>` : ''}
+  </section>`;
+  $('#docente-exit').addEventListener('click', async () => {
+    await api('/api/access/logout', { method: 'POST', body: {} }).catch(() => {});
+    state.boot = null;
+    router();
+  });
+  $('.page', main).addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-docente-report]');
+    if (!btn) return;
+    const dlg = $('#dialog');
+    dlg.innerHTML = `<form method="dialog" class="dialog-body" id="report-form">
+      <h2>Denunciar à moderação</h2>
+      <p class="muted">A avaliação continua no ar até uma pessoa da moderação revisá-la.</p>
+      <fieldset class="radio-list">${d.reportReasons.map((r, i) => `<label><input type="radio" name="reason" value="${esc(r)}" ${i === 0 ? 'checked' : ''}> ${esc(r)}</label>`).join('')}</fieldset>
+      <label class="field">Detalhes (opcional)<textarea name="detail" maxlength="300" rows="3"></textarea></label>
+      <div class="row-gap end"><button class="btn btn-ghost" value="cancel" formnovalidate>Cancelar</button><button class="btn" value="send">Enviar</button></div>
+    </form>`;
+    dlg.showModal();
+    $('#report-form').addEventListener('submit', async (ev) => {
+      if (ev.submitter?.value !== 'send') return;
+      ev.preventDefault();
+      const fd = new FormData(ev.target);
+      try {
+        const res = await api(`/api/docente/reviews/${btn.dataset.docenteReport}/report`, { method: 'POST', body: { reason: fd.get('reason'), detail: fd.get('detail') } });
+        toast(res.message);
+        dlg.close();
+      } catch (err) { toast(err.message, 'error'); }
+    });
+  });
 }
 
 // ---- feedback anônimo sobre o site

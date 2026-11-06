@@ -731,6 +731,9 @@ a.chip:hover { border-color: var(--line-strong); color: var(--ink); text-decorat
 body.gated .sidebar, body.gated .topbar, body.gated .footer-links { display: none; }
 body.gated .shell { grid-template-columns: 1fr; }
 body.gated { padding-bottom: 0; }
+.docente-head { display: flex; align-items: center; gap: 16px; }
+.docente-head > div { flex: 1; min-width: 0; }
+@media (max-width: 600px) { .docente-head { flex-wrap: wrap; align-items: flex-start; } .docente-head .avatar-xl { width: 64px; height: 64px; } .docente-head h1 { font-size: 26px; } }
 .gate { min-height: 70vh; display: grid; place-items: center; }
 .gate-card { width: 100%; max-width: 440px; background: var(--surface); border: 1px solid var(--line); border-radius: 16px; box-shadow: var(--shadow); padding: 32px 28px; display: grid; gap: 14px; text-align: center; justify-items: center; }
 .gate-card .brand-logo { width: 44px; height: 44px; font-size: 20px; border-radius: 12px; }
