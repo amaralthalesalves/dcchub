@@ -744,6 +744,7 @@ body.gated { padding-bottom: 0; }
 .gate-sent-icon .ico { width: 20px; height: 20px; }
 .gate-sent-msg { font-weight: 600; color: var(--ink) !important; }
 .gate-sent .link-btn { padding: 0 2px; font-size: inherit; }
+.gate-sent .link-btn:disabled { color: var(--muted); text-decoration: none; cursor: default; }
 .otp-input { font: 600 24px/1.2 var(--mono, ui-monospace, monospace); letter-spacing: .35em; text-align: center; padding-left: .35em; }
 .otp-input::placeholder { color: var(--muted); opacity: .5; }
 .gate-alt { width: 100%; text-align: left; border-top: 1px solid var(--line); padding-top: 12px; }

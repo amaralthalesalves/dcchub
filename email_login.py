@@ -1,10 +1,11 @@
 """Acesso por e-mail institucional (@ufmg.br) com código de 6 dígitos — sem conta e sem guardar o e-mail.
 
 Fluxo:
-  1. a pessoa digita o e-mail; se for exatamente @ufmg.br, o servidor envia um código (10 min) e devolve ao navegador
+  1. a pessoa digita o e-mail; se for exatamente @ufmg.br, o servidor envia um código (30 min) e devolve ao navegador
      um "desafio": token assinado que amarra o código sem contê-lo (HMAC com a chave do servidor);
   2. a pessoa digita o código no mesmo navegador — pode ter lido o e-mail no celular — e o servidor troca desafio +
-     código por um cookie de acesso de 180 dias. Uso único, no máximo 5 tentativas por desafio.
+     código por um cookie de acesso de 180 dias. Uso único, no máximo 5 tentativas por desafio. O navegador guarda os
+     últimos 3 desafios: se o e-mail demorar e a pessoa pedir outro, o código que chegar primeiro serve.
 
 Sem a chave do servidor não há como testar códigos fora do ar: o único ataque é tentar online, e as 5 tentativas
 dão 5 em 1.000.000 de chance por e-mail enviado (que já é limitado por endereço, por rede e por dia).
@@ -33,8 +34,12 @@ import time
 from email.message import EmailMessage
 from email.utils import formataddr, make_msgid
 
-CODE_TTL = 10 * 60
+# 30 min, não 10: o correio da UFMG (e o redirecionamento para outras caixas) chega a levar vários minutos. O tempo não
+# muda a chance de chute — quem limita isso são as tentativas por código
+CODE_TTL = 30 * 60
 CODE_TRIES = 5
+# códigos pedidos em seguida continuam valendo (até este número): com e-mail lento, a pessoa pede outro e o primeiro chega
+CODE_PENDING = 3
 ACCESS_TTL = 180 * 86400
 EMAIL = re.compile(r"[a-z0-9](?:[a-z0-9._%+-]{0,62}[a-z0-9])?@([a-z0-9.-]+)")
 TOKEN = re.compile(r"[a-z]\d\.\d{10}\.[A-Za-z0-9_-]{22}\.[0-9a-f]{40}")

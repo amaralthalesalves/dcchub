@@ -1423,17 +1423,29 @@ class App(BaseHTTPRequestHandler):
             raise ApiError(404, "Acesso por e-mail desativado.")
         self.limit("access")
         body = self.read_json()
-        challenge = body.get("challenge")
-        nonce = email_login.challenge_nonce(challenge)
-        if not nonce:
+        # os últimos desafios pedidos neste navegador (e-mail lento: vale o código de qualquer um deles)
+        given = body.get("challenges")
+        given = given if isinstance(given, list) else [body.get("challenge")]
+        challenges = [(c, n) for c in dict.fromkeys(x for x in given[:email_login.CODE_PENDING] if isinstance(x, str))
+                      if (n := email_login.challenge_nonce(c))]
+        if not challenges:
             raise ApiError(400, "Código expirado. Peça um novo.")
-        if not email_login.clean_code(body.get("code")):
+        code = body.get("code")
+        if not email_login.clean_code(code):
             raise ApiError(400, "Digite os 6 dígitos do código.", fields={"code": ["Digite os 6 dígitos do código."]})
         # tentativas por desafio, só em memória: 5 chutes em 1.000.000 por e-mail enviado
-        if not limiter.hit("login-try", nonce, email_login.CODE_TRIES, email_login.CODE_TTL):
+        nonce, tried = None, False
+        for challenge, candidate in challenges:
+            if not limiter.hit("login-try", candidate, email_login.CODE_TRIES, email_login.CODE_TTL):
+                continue
+            tried = True
+            if email_login.check_code(SECRET, challenge, code):
+                nonce = candidate
+                break
+        if not tried:
             raise ApiError(429, "Tentativas demais com este código. Peça um novo.")
-        if not email_login.check_code(SECRET, challenge, body.get("code")):
-            raise ApiError(400, "Código incorreto ou expirado. Confira o último e-mail recebido.",
+        if not nonce:
+            raise ApiError(400, "Código incorreto ou expirado. Confira os e-mails recebidos.",
                            fields={"code": ["Código incorreto ou expirado."]})
         now = int(time.time())
         with connect() as conn:

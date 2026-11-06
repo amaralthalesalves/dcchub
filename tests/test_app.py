@@ -418,6 +418,31 @@ class ServerTest(unittest.TestCase):
         finally:
             app.ACCESS_CODES, app.EMAIL.enabled, app.email_login.send_async, app.LIMITS["access"] = original
 
+    def test_email_code_slow_mail(self):
+        """Correio lento: quem pede outro código pode usar o primeiro que chegar (os últimos 3 valem)."""
+        original = (app.ACCESS_CODES, app.EMAIL.enabled, app.email_login.send_async, app.LIMITS["access"])
+        sent = []
+        app.ACCESS_CODES, app.EMAIL.enabled, app.LIMITS["access"] = [], True, (100, 600)
+        app.email_login.send_async = lambda cfg, to, code: sent.append(code)
+        try:
+            self.assertGreaterEqual(app.email_login.CODE_TTL, 30 * 60)
+            c = self.client()
+            challenges = [c.post("/api/access/email", {"email": "lenta@ufmg.br"})[1]["challenge"] for _ in range(3)]
+            newest_first = challenges[::-1]
+            status, _, _ = c.post("/api/access/email/verify", {"challenges": newest_first, "code": sent[0]})
+            self.assertEqual(status, 200, "o primeiro código (que chegou atrasado) ainda vale")
+            # só os 3 primeiros desafios da lista contam; lixo e repetidos são ignorados
+            app.limiter.events.clear()
+            more = [c.post("/api/access/email", {"email": "lenta2@ufmg.br"})[1]["challenge"] for _ in range(2)]
+            code_old = sent[-2]
+            payload = {"challenges": ["lixo", more[1], more[1], 42, more[0]], "code": code_old}
+            self.assertEqual(c.post("/api/access/email/verify", payload)[0], 400, "o 4º item da lista não é considerado")
+            payload = {"challenges": [more[1], more[0]], "code": code_old}
+            self.assertEqual(c.post("/api/access/email/verify", payload)[0], 200)
+            self.assertEqual(c.post("/api/access/email/verify", {"challenges": [], "code": "123456"})[0], 400)
+        finally:
+            app.ACCESS_CODES, app.EMAIL.enabled, app.email_login.send_async, app.LIMITS["access"] = original
+
     def test_email_login_daily_caps(self):
         """Poucas conexões não podem gastar a cota diária do serviço de e-mail (e travar o acesso de todo mundo)."""
         original = (app.EMAIL.enabled, app.email_login.send_async, app.EMAIL_DAILY_LIMIT, app.LIMITS["login"])

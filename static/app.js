@@ -284,7 +284,8 @@ function viewGate(methods = ['code']) {
           <button class="btn btn-lg" type="submit">Entrar</button>
           <p class="err" role="alert"></p>
         </form>
-        <p class="small muted">Pode abrir o e-mail no celular e digitar o código aqui. Não chegou? Confira o spam ou <button class="link-btn" type="button" id="gate-retry">peça outro código</button>.</p>
+        <p class="small muted">O e-mail da UFMG pode levar <b>alguns minutos</b> para chegar (mais ainda se ele é redirecionado para outra caixa). Pode abrir no celular e digitar o código aqui.</p>
+        <p class="small muted">Não chegou? Confira o spam ou <button class="link-btn" type="button" id="gate-retry">peça outro código</button><span id="gate-wait"></span>. Os códigos anteriores continuam valendo.</p>
       </div>
       <p class="small muted">Sem conta e sem senha: o e-mail só é usado para enviar o código e <b>não fica guardado</b>. Seu acesso não tem ligação com as avaliações que você escreve, que continuam anônimas.</p>
       ${code ? `<details class="gate-alt"><summary>Tenho um código de acesso</summary>${codeForm}</details>` : ''}`
@@ -306,12 +307,29 @@ function viewGate(methods = ['code']) {
       btn.disabled = false;
     }
   });
-  // o desafio (token assinado, sem o código e sem o e-mail) fica na aba: recarregar a página não perde o código pedido
-  const KEY = 'dcchub-otp';
-  const saved = () => { try { const v = JSON.parse(sessionStorage.getItem(KEY) || 'null'); return v && v.exp > Date.now() ? v : null; } catch (_) { return null; } };
+  // os desafios (tokens assinados, sem o código e sem o e-mail) ficam na aba: recarregar a página não perde o código
+  // pedido. Guarda os últimos 3: com e-mail lento, a pessoa pede outro e o primeiro chega depois — qualquer um serve.
+  const KEY = 'dcchub-otp', PENDING = 3, RESEND_WAIT = 60_000;
+  const load = () => {
+    try {
+      const v = JSON.parse(sessionStorage.getItem(KEY) || 'null');
+      const items = (v?.items || []).filter((i) => i.exp > Date.now());
+      return items.length ? { ...v, items } : null;
+    } catch (_) { return null; }
+  };
   const save = (v) => { try { v ? sessionStorage.setItem(KEY, JSON.stringify(v)) : sessionStorage.removeItem(KEY); } catch (_) { /* sem armazenamento */ } };
-  let pending = saved();
-  const form = $('#gate-email'), otp = $('#gate-otp');
+  let pending = load();
+  const form = $('#gate-email'), otp = $('#gate-otp'), retry = $('#gate-retry');
+  // espera antes de pedir outro código: quase sempre o primeiro só está atrasado
+  let waitTimer = null;
+  const tickWait = () => {
+    clearTimeout(waitTimer);
+    const left = pending ? Math.ceil((pending.sentAt + RESEND_WAIT - Date.now()) / 1000) : 0;
+    if (!retry?.isConnected) return; // saiu da tela de acesso
+    retry.disabled = left > 0;
+    $('#gate-wait').textContent = left > 0 ? ` (em ${left} s)` : '';
+    if (left > 0) waitTimer = setTimeout(tickWait, 1000);
+  };
   const showOtp = (msg) => {
     $('.gate-sent-msg').textContent = msg;
     form.hidden = true;
@@ -319,6 +337,7 @@ function viewGate(methods = ['code']) {
     $('.err', otp).textContent = '';
     $('input', otp).value = '';
     $('input', otp).focus();
+    tickWait();
   };
   form?.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -330,7 +349,8 @@ function viewGate(methods = ['code']) {
     btn.disabled = true;
     try {
       const res = await api('/api/access/email', { method: 'POST', body: { email: value } });
-      pending = { challenge: res.challenge, exp: Date.now() + res.expiresIn * 1000, msg: res.message };
+      const item = { challenge: res.challenge, exp: Date.now() + res.expiresIn * 1000 };
+      pending = { items: [item, ...(load()?.items || [])].slice(0, PENDING), msg: res.message, sentAt: Date.now() };
       save(pending);
       showOtp(res.message);
     } catch (e2) {
@@ -344,10 +364,11 @@ function viewGate(methods = ['code']) {
     const code = $('input', otp).value.replace(/\D/g, '');
     err.textContent = '';
     if (code.length !== 6) { err.textContent = 'Digite os 6 dígitos do código.'; return; }
-    if (!pending || pending.exp <= Date.now()) { err.textContent = 'O código expirou. Peça outro.'; return; }
+    pending = load();
+    if (!pending) { err.textContent = 'O código expirou. Peça outro.'; return; }
     btn.disabled = true;
     try {
-      await api('/api/access/email/verify', { method: 'POST', body: { challenge: pending.challenge, code } });
+      await api('/api/access/email/verify', { method: 'POST', body: { challenges: pending.items.map((i) => i.challenge), code } });
       save(null);
       toast('Pronto! Este navegador tem acesso por 180 dias.');
       enter();
@@ -360,7 +381,7 @@ function viewGate(methods = ['code']) {
   });
   // colou ou digitou os 6 dígitos: envia sozinho
   $('input', otp)?.addEventListener('input', (e) => { if (e.target.value.replace(/\D/g, '').length === 6) otp.requestSubmit(); });
-  $('#gate-retry')?.addEventListener('click', () => { save(null); pending = null; $('#gate-sent').hidden = true; form.hidden = false; $('input', form).focus(); });
+  retry?.addEventListener('click', () => { $('#gate-sent').hidden = true; form.hidden = false; $('input', form).focus(); });
   if (email && pending) { showOtp(pending.msg); return; }
   $(email ? 'input[name=email]' : 'input[name=code]').focus();
 }
