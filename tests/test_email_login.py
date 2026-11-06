@@ -12,6 +12,7 @@ import threading
 import time
 import unittest
 from email import message_from_bytes
+from email.header import decode_header, make_header
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
@@ -78,31 +79,45 @@ class EmailLoginTest(unittest.TestCase):
             self.assertIsNone(email_login.normalize(junk), repr(junk))
 
     def test_tokens(self):
-        link = email_login.link_token(self.SECRET)
-        self.assertTrue(email_login.check_link(self.SECRET, link))
-        self.assertIsNone(email_login.check_link("outra", link))
-        self.assertIsNone(email_login.check_link(self.SECRET, email_login._token("l1", self.SECRET, -1)), "expirado")
+        code, challenge = email_login.new_code(self.SECRET)
+        self.assertRegex(code, r"^\d{6}$")
+        self.assertNotIn(code, challenge.split(".", 1)[1], "o desafio não traz o código")
+        self.assertTrue(email_login.check_code(self.SECRET, challenge, code))
+        self.assertTrue(email_login.check_code(self.SECRET, challenge, f"{code[:3]} {code[3:]}"), "aceita espaço")
+        self.assertTrue(email_login.check_code(self.SECRET, challenge, f"{code[:3]}-{code[3:]}"), "aceita traço")
+        self.assertIsNone(email_login.check_code(self.SECRET, challenge, f"{(int(code) + 1) % 10 ** 6:06d}"))
+        self.assertIsNone(email_login.check_code("outra", challenge, code))
+        for junk in ("", "12345", "1234567", "abcdef", None, 3.5):
+            self.assertIsNone(email_login.check_code(self.SECRET, challenge, junk), repr(junk))
+        expired = email_login._token("c1", self.SECRET, -1, code)
+        self.assertIsNone(email_login.check_code(self.SECRET, expired, code), "expirado")
+        self.assertEqual(email_login.challenge_nonce(challenge), challenge.split(".")[2])
+        self.assertIsNone(email_login.challenge_nonce("x"))
         access = email_login.access_token(self.SECRET, "1")
         self.assertTrue(email_login.check_access(self.SECRET, "1", access))
         self.assertFalse(email_login.check_access(self.SECRET, "2", access), "trocar a época revoga")
-        self.assertFalse(email_login.check_access(self.SECRET, "1", link), "link não serve como cookie")
-        self.assertIsNone(email_login.check_link(self.SECRET, access), "cookie não serve como link")
-        self.assertNotEqual(email_login.link_token(self.SECRET), link)
+        self.assertFalse(email_login.check_access(self.SECRET, "1", challenge), "desafio não serve como cookie")
+        self.assertIsNone(email_login.challenge_nonce(access), "cookie não serve como desafio")
+        self.assertNotEqual(email_login.new_code(self.SECRET)[1], challenge)
+        codes = {email_login.new_code(self.SECRET)[0] for _ in range(200)}
+        self.assertGreater(len(codes), 190, "códigos aleatórios")
 
     def test_message_is_neutral(self):
         cfg = config(SMTP_FROM="DCCHub <acesso@dcchub.exemplo>")
-        msg = email_login.message(cfg, "aluna@ufmg.br", "https://x/#/entrar?t=abc")
+        msg = email_login.message(cfg, "aluna@ufmg.br", "042917")
         text = (msg.as_string() + msg.get_content()).lower()
-        self.assertIn("https://x/#/entrar?t=abc", msg.get_content())
+        self.assertIn("042 917", msg.get_content())
+        self.assertTrue(msg["Subject"].startswith("042917 "), "código no assunto, para aparecer na notificação")
+        self.assertNotIn("http", msg.get_content(), "sem links: ninguém aprende a clicar em link de login por e-mail")
         for word in ("avalia", "professor", "docente", "disciplina"):
             self.assertNotIn(word, text, "um print do e-mail não deve dizer do que se trata o site")
         self.assertEqual(msg["To"], "aluna@ufmg.br")
 
-    def test_without_smtp_prints_link_but_not_address(self):
+    def test_without_smtp_prints_code_but_not_address(self):
         err = io.StringIO()
         with contextlib.redirect_stderr(err):
-            email_login.deliver(config(), "aluna@ufmg.br", "http://localhost:8000/#/entrar?t=abc")
-        self.assertIn("#/entrar?t=abc", err.getvalue())
+            email_login.deliver(config(), "aluna@ufmg.br", "123456")
+        self.assertIn("123456", err.getvalue())
         self.assertNotIn("aluna", err.getvalue())
 
     def test_smtp_delivery(self):
@@ -112,7 +127,7 @@ class EmailLoginTest(unittest.TestCase):
         try:
             cfg = config(EMAIL_LOGIN="1", SMTP_HOST="127.0.0.1", SMTP_PORT=str(server.server_address[1]), SMTP_TLS="none",
                          SMTP_USER="usuario", SMTP_PASSWORD="senha", SMTP_FROM="DCCHub <acesso@dcchub.exemplo>")
-            email_login.send_async(cfg, "aluna@ufmg.br", "https://dcchub.exemplo/#/entrar?t=XYZ")
+            email_login.send_async(cfg, "aluna@ufmg.br", "654321")
             for _ in range(100):
                 if FakeSMTP.inbox:
                     break
@@ -122,8 +137,8 @@ class EmailLoginTest(unittest.TestCase):
             self.assertEqual(mail["rcpt"], ["aluna@ufmg.br"])
             self.assertIsNotNone(mail["auth"], "autentica no SMTP")
             parsed = message_from_bytes(mail["data"])
-            self.assertEqual(parsed["Subject"], "Seu link de acesso")
-            self.assertIn("https://dcchub.exemplo/#/entrar?t=XYZ", parsed.get_payload(decode=True).decode())
+            self.assertEqual(str(make_header(decode_header(parsed["Subject"]))), "654321 é seu código de acesso ao DCCHub")
+            self.assertIn("654 321", parsed.get_payload(decode=True).decode())
         finally:
             server.shutdown()
             server.server_close()
@@ -132,7 +147,7 @@ class EmailLoginTest(unittest.TestCase):
         err = io.StringIO()
         cfg = config(SMTP_HOST="127.0.0.1", SMTP_PORT="1", SMTP_TLS="none")
         with contextlib.redirect_stderr(err):
-            email_login.deliver(cfg, "aluna@ufmg.br", "https://x/#/entrar?t=abc")
+            email_login.deliver(cfg, "aluna@ufmg.br", "123456")
         self.assertIn("falha ao enviar", err.getvalue())
         self.assertNotIn("aluna", err.getvalue())
 
@@ -152,7 +167,7 @@ class EmailLoginTest(unittest.TestCase):
 
         err = io.StringIO()
         with mock.patch.object(email_login.smtplib, "SMTP", Refusing), contextlib.redirect_stderr(err):
-            email_login.deliver(config(SMTP_HOST="smtp.exemplo"), "aluna@ufmg.br", "https://x/#/entrar?t=abc")
+            email_login.deliver(config(SMTP_HOST="smtp.exemplo"), "aluna@ufmg.br", "123456")
         self.assertIn("SMTPRecipientsRefused (código 550)", err.getvalue())
         self.assertNotIn("aluna", err.getvalue())
         data_error = smtplib.SMTPDataError(554, b"rejected for aluna@ufmg.br")

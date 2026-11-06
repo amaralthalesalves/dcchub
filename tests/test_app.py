@@ -319,12 +319,12 @@ class ServerTest(unittest.TestCase):
             app.ACCESS_CODES = original
 
     def test_email_login_ufmg(self):
-        """Link mágico só para @ufmg.br: sem conta, sem guardar o e-mail, uso único, revogável."""
+        """Código de 6 dígitos só para @ufmg.br: sem conta, sem guardar o e-mail, uso único, revogável."""
         import email_login
-        original = (app.ACCESS_CODES, app.EMAIL.enabled, app.EMAIL.epoch, app.EMAIL.public_url, app.email_login.send_async)
+        original = (app.ACCESS_CODES, app.EMAIL.enabled, app.EMAIL.epoch, app.email_login.send_async)
         sent = []
-        app.ACCESS_CODES, app.EMAIL.enabled, app.EMAIL.public_url = [], True, "https://dcchub.exemplo"
-        app.email_login.send_async = lambda cfg, to, url: sent.append((to, url))
+        app.ACCESS_CODES, app.EMAIL.enabled = [], True
+        app.email_login.send_async = lambda cfg, to, code: sent.append((to, code))
         try:
             c = self.client()
             status, data, _ = c.get("/api/bootstrap")
@@ -340,26 +340,36 @@ class ServerTest(unittest.TestCase):
 
             status, data, _ = c.post("/api/access/email", {"email": "  Aluna.Exemplo@UFMG.br "})
             self.assertEqual(status, 200)
-            self.assertEqual(sent[0][0], "aluna.exemplo@ufmg.br")
-            url = sent[0][1]
-            self.assertTrue(url.startswith("https://dcchub.exemplo/#/entrar?t="), "base fixa, nunca do cabeçalho Host")
-            token = url.split("t=", 1)[1]
-            self.assertNotIn("aluna", token)
-            self.assertEqual(c.get("/api/bootstrap")[0], 401, "pedir o link não dá acesso")
+            to, code = sent[0]
+            self.assertEqual(to, "aluna.exemplo@ufmg.br")
+            self.assertRegex(code, r"^\d{6}$")
+            challenge = data["challenge"]
+            self.assertNotIn(code, challenge, "o desafio não carrega o código")
+            self.assertNotIn("aluna", challenge.lower())
+            self.assertNotIn(code, json.dumps(data), "o código só vai por e-mail")
+            self.assertEqual(c.get("/api/bootstrap")[0], 401, "pedir o código não dá acesso")
 
-            for forged in ("", "l1.1.a.b", token[:-1] + ("0" if token[-1] != "0" else "1"),
-                           email_login._token("l1", app.SECRET, -10), email_login._token("l1", "outra-chave", 900),
-                           email_login.access_token(app.SECRET, app.EMAIL.epoch)):
-                self.assertEqual(c.post("/api/access/email/verify", {"token": forged})[0], 400, forged)
-            status, _, res = c.post("/api/access/email/verify", {"token": token})
-            self.assertEqual(status, 200)
+            wrong = f"{(int(code) + 1) % 10 ** 6:06d}"
+            for forged_challenge, forged_code in (
+                    ("", code), ("c1.1.a.b", code), (challenge, ""), (challenge, "12345"), (challenge, "abcdef"),
+                    (email_login._token("c1", app.SECRET, -10, code), code),             # expirado
+                    (email_login._token("c1", "outra-chave", 600, code), code),          # outra chave
+                    (email_login.access_token(app.SECRET, app.EMAIL.epoch), code)):      # cookie não serve de desafio
+                app.limiter.events.clear()
+                status = c.post("/api/access/email/verify", {"challenge": forged_challenge, "code": forged_code})[0]
+                self.assertEqual(status, 400, (forged_challenge, forged_code))
+            app.limiter.events.clear()
+            self.assertEqual(c.post("/api/access/email/verify", {"challenge": challenge, "code": wrong})[0], 400)
+            status, _, res = c.post("/api/access/email/verify", {"challenge": challenge, "code": f" {code[:3]} {code[3:]} "})
+            self.assertEqual(status, 200, "aceita o código com espaços, como aparece no e-mail")
             cookie = [h for h in res.getheaders() if h[0] == "Set-Cookie" and "dcchub_access=" in h[1]][0][1]
             self.assertIn("HttpOnly", cookie)
             self.assertIn("SameSite=Strict", cookie)
             self.assertNotIn("aluna", cookie.lower())
             c.cookie = cookie.split(";")[0]
             self.assertEqual(c.get("/api/bootstrap")[0], 200)
-            self.assertEqual(self.client().post("/api/access/email/verify", {"token": token})[0], 400, "link de uso único")
+            self.assertEqual(self.client().post("/api/access/email/verify", {"challenge": challenge, "code": code})[0], 400,
+                             "código de uso único")
 
             # o e-mail não fica em lugar nenhum do banco
             with app.connect() as conn:
@@ -367,10 +377,12 @@ class ServerTest(unittest.TestCase):
             for f in app.DB.parent.glob(app.DB.name + "*"):
                 self.assertNotIn(b"aluna", f.read_bytes().lower(), f.name)
 
-            # limite por endereço: a resposta é igual, mas nada além de 3 envios por hora
+            # limite por endereço: a resposta é igual (com desafio), mas nada além de 3 envios por hora
             app.limiter.events.clear()
             for _ in range(4):
-                self.assertEqual(self.client().post("/api/access/email", {"email": "outra@ufmg.br"})[0], 200)
+                status, data, _ = self.client().post("/api/access/email", {"email": "outra@ufmg.br"})
+                self.assertEqual(status, 200)
+                self.assertIn("challenge", data)
             self.assertEqual(sum(1 for to, _ in sent if to == "outra@ufmg.br"), 3)
             # limite por IP
             statuses = [self.client().post("/api/access/email", {"email": f"p{i}@ufmg.br"})[0] for i in range(6)]
@@ -382,14 +394,36 @@ class ServerTest(unittest.TestCase):
             app.ACCESS_CODES = ["codigo"]  # os dois caminhos juntos
             self.assertEqual(self.client().get("/api/bootstrap")[1]["methods"], ["email", "code"])
         finally:
-            app.ACCESS_CODES, app.EMAIL.enabled, app.EMAIL.epoch, app.EMAIL.public_url, app.email_login.send_async = original
+            app.ACCESS_CODES, app.EMAIL.enabled, app.EMAIL.epoch, app.email_login.send_async = original
+
+    def test_email_code_attempts(self):
+        """5 tentativas por código: depois disso nem o código certo entra (chutar 1.000.000 de códigos não dá)."""
+        original = (app.ACCESS_CODES, app.EMAIL.enabled, app.email_login.send_async, app.LIMITS["access"])
+        sent = []
+        app.ACCESS_CODES, app.EMAIL.enabled, app.LIMITS["access"] = [], True, (100, 600)
+        app.email_login.send_async = lambda cfg, to, code: sent.append(code)
+        try:
+            c = self.client()
+            challenge = c.post("/api/access/email", {"email": "chute@ufmg.br"})[1]["challenge"]
+            code = sent[0]
+            wrong = [f"{(int(code) + i) % 10 ** 6:06d}" for i in range(1, 6)]
+            for guess in wrong:
+                self.assertEqual(c.post("/api/access/email/verify", {"challenge": challenge, "code": guess})[0], 400)
+            status, data, _ = c.post("/api/access/email/verify", {"challenge": challenge, "code": code})
+            self.assertEqual(status, 429, "sexta tentativa bloqueada mesmo com o código certo")
+            self.assertIn("Peça um novo", data["error"])
+            # um código novo funciona normalmente
+            challenge = c.post("/api/access/email", {"email": "chute@ufmg.br"})[1]["challenge"]
+            self.assertEqual(c.post("/api/access/email/verify", {"challenge": challenge, "code": sent[1]})[0], 200)
+        finally:
+            app.ACCESS_CODES, app.EMAIL.enabled, app.email_login.send_async, app.LIMITS["access"] = original
 
     def test_email_login_daily_caps(self):
         """Poucas conexões não podem gastar a cota diária do serviço de e-mail (e travar o acesso de todo mundo)."""
         original = (app.EMAIL.enabled, app.email_login.send_async, app.EMAIL_DAILY_LIMIT, app.LIMITS["login"])
         sent = []
         app.EMAIL.enabled, app.EMAIL_DAILY_LIMIT, app.LIMITS["login"] = True, 4, (100, 600)
-        app.email_login.send_async = lambda cfg, to, url: sent.append(to)
+        app.email_login.send_async = lambda cfg, to, code: sent.append(to)
         try:
             per_ip = app.LIMITS["login-day"][0]
             statuses = [self.client().post("/api/access/email", {"email": f"a{i}@ufmg.br"})[0] for i in range(per_ip + 1)]
@@ -401,7 +435,7 @@ class ServerTest(unittest.TestCase):
 
     def test_email_login_disabled_by_default(self):
         self.assertEqual(self.client().post("/api/access/email", {"email": "a@ufmg.br"})[0], 404)
-        self.assertEqual(self.client().post("/api/access/email/verify", {"token": "x"})[0], 404)
+        self.assertEqual(self.client().post("/api/access/email/verify", {"challenge": "x", "code": "123456"})[0], 404)
 
     def test_unknown_professor_is_404(self):
         status, data, _ = self.client().get("/api/professors/fulano")

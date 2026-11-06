@@ -8,9 +8,8 @@ services:
       DCCHUB_TRUST_PROXY: "1"            # o IP real vem do Caddy (X-Forwarded-For)
       DCCHUB_ADMIN_TOKEN: ${DCCHUB_ADMIN_TOKEN:-}
       DCCHUB_ACCESS_CODES: ${DCCHUB_ACCESS_CODES:-}   # código(s) da comunidade; vazio = sem código
-      # acesso por link enviado ao e-mail @ufmg.br (o e-mail não é guardado)
+      # acesso por código enviado ao e-mail @ufmg.br (o e-mail não é guardado)
       DCCHUB_EMAIL_LOGIN: ${DCCHUB_EMAIL_LOGIN:-}
-      DCCHUB_PUBLIC_URL: https://${DOMAIN}
       DCCHUB_SMTP_HOST: ${DCCHUB_SMTP_HOST:-}
       DCCHUB_SMTP_PORT: ${DCCHUB_SMTP_PORT:-587}
       DCCHUB_SMTP_USER: ${DCCHUB_SMTP_USER:-}

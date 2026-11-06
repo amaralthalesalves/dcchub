@@ -235,7 +235,6 @@ async function router() {
   const token = ++renderToken;
   const { path, params, anchor } = parseHash();
   $$('#nav a[data-nav]').forEach((a) => a.toggleAttribute('aria-current', a.dataset.nav ? path.startsWith(a.dataset.nav) : path === ''));
-  if (path === 'entrar') { await viewEnter(params); return; } // link mágico: roda antes do catálogo (que exige acesso)
   for (const [re, view] of routes) {
     const m = path.match(re);
     if (!m) continue;
@@ -256,7 +255,7 @@ async function router() {
   main.innerHTML = `<section class="page narrow empty-state"><h1>Página não encontrada</h1><p>O endereço não existe ou mudou.</p><a class="btn" href="#/">Voltar ao início</a></section>`;
 }
 
-// Tela de acesso: o servidor só entrega dados a quem entrou com o e-mail @ufmg.br (link mágico, sem conta) ou com
+// Tela de acesso: o servidor só entrega dados a quem entrou com o e-mail @ufmg.br (código de 6 dígitos, sem conta) ou com
 // o código da comunidade. methods vem do servidor: ['email'], ['code'] ou os dois.
 function viewGate(methods = ['code']) {
   setTitle('Acesso da comunidade');
@@ -274,15 +273,20 @@ function viewGate(methods = ['code']) {
       <p>Espaço da comunidade estudantil do DCC/UFMG: avaliações anônimas de turmas, oferta do semestre, materiais e oportunidades.</p>
       ${email ? `<form id="gate-email" class="gate-form" novalidate>
         <label class="field">E-mail da UFMG<input name="email" type="email" autocomplete="email" autocapitalize="off" spellcheck="false" required placeholder="voce@ufmg.br"></label>
-        <button class="btn btn-lg" type="submit">Receber link de acesso</button>
+        <button class="btn btn-lg" type="submit">Receber código de acesso</button>
         <p class="err" role="alert"></p>
       </form>
       <div class="gate-sent" id="gate-sent" hidden>
         <span class="gate-sent-icon" aria-hidden="true"><svg class="ico"><use href="#i-mail"/></svg></span>
         <p class="gate-sent-msg" role="status"></p>
-        <p class="small muted">Não chegou? Confira o spam ou <button class="link-btn" type="button" id="gate-retry">tente de novo</button>.</p>
+        <form id="gate-otp" class="gate-form" novalidate>
+          <label class="field">Código de 6 dígitos<input name="code" class="otp-input" inputmode="numeric" autocomplete="one-time-code" maxlength="7" pattern="[0-9 ]*" required placeholder="000000"></label>
+          <button class="btn btn-lg" type="submit">Entrar</button>
+          <p class="err" role="alert"></p>
+        </form>
+        <p class="small muted">Pode abrir o e-mail no celular e digitar o código aqui. Não chegou? Confira o spam ou <button class="link-btn" type="button" id="gate-retry">peça outro código</button>.</p>
       </div>
-      <p class="small muted">Sem conta e sem senha: o e-mail só é usado para enviar o link e <b>não fica guardado</b>. Seu acesso não tem ligação com as avaliações que você escreve, que continuam anônimas.</p>
+      <p class="small muted">Sem conta e sem senha: o e-mail só é usado para enviar o código e <b>não fica guardado</b>. Seu acesso não tem ligação com as avaliações que você escreve, que continuam anônimas.</p>
       ${code ? `<details class="gate-alt"><summary>Tenho um código de acesso</summary>${codeForm}</details>` : ''}`
     : `${codeForm}
       <p class="small muted">O código é divulgado nos canais dos estudantes (centro acadêmico, grupos de turma). Ele não identifica você: o acesso continua anônimo.</p>`}
@@ -302,7 +306,20 @@ function viewGate(methods = ['code']) {
       btn.disabled = false;
     }
   });
-  const form = $('#gate-email');
+  // o desafio (token assinado, sem o código e sem o e-mail) fica na aba: recarregar a página não perde o código pedido
+  const KEY = 'dcchub-otp';
+  const saved = () => { try { const v = JSON.parse(sessionStorage.getItem(KEY) || 'null'); return v && v.exp > Date.now() ? v : null; } catch (_) { return null; } };
+  const save = (v) => { try { v ? sessionStorage.setItem(KEY, JSON.stringify(v)) : sessionStorage.removeItem(KEY); } catch (_) { /* sem armazenamento */ } };
+  let pending = saved();
+  const form = $('#gate-email'), otp = $('#gate-otp');
+  const showOtp = (msg) => {
+    $('.gate-sent-msg').textContent = msg;
+    form.hidden = true;
+    $('#gate-sent').hidden = false;
+    $('.err', otp).textContent = '';
+    $('input', otp).value = '';
+    $('input', otp).focus();
+  };
   form?.addEventListener('submit', async (e) => {
     e.preventDefault();
     const btn = $('button', form), err = $('.err', form);
@@ -313,44 +330,39 @@ function viewGate(methods = ['code']) {
     btn.disabled = true;
     try {
       const res = await api('/api/access/email', { method: 'POST', body: { email: value } });
-      $('.gate-sent-msg').textContent = res.message;
-      form.hidden = true;
-      $('#gate-sent').hidden = false;
+      pending = { challenge: res.challenge, exp: Date.now() + res.expiresIn * 1000, msg: res.message };
+      save(pending);
+      showOtp(res.message);
     } catch (e2) {
       err.textContent = e2.message;
     }
     btn.disabled = false;
   });
-  $('#gate-retry')?.addEventListener('click', () => { $('#gate-sent').hidden = true; form.hidden = false; $('input', form).focus(); });
+  otp?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = $('button', otp), err = $('.err', otp);
+    const code = $('input', otp).value.replace(/\D/g, '');
+    err.textContent = '';
+    if (code.length !== 6) { err.textContent = 'Digite os 6 dígitos do código.'; return; }
+    if (!pending || pending.exp <= Date.now()) { err.textContent = 'O código expirou. Peça outro.'; return; }
+    btn.disabled = true;
+    try {
+      await api('/api/access/email/verify', { method: 'POST', body: { challenge: pending.challenge, code } });
+      save(null);
+      toast('Pronto! Este navegador tem acesso por 180 dias.');
+      enter();
+      return;
+    } catch (e2) {
+      err.textContent = e2.message;
+      $('input', otp).select();
+    }
+    btn.disabled = false;
+  });
+  // colou ou digitou os 6 dígitos: envia sozinho
+  $('input', otp)?.addEventListener('input', (e) => { if (e.target.value.replace(/\D/g, '').length === 6) otp.requestSubmit(); });
+  $('#gate-retry')?.addEventListener('click', () => { save(null); pending = null; $('#gate-sent').hidden = true; form.hidden = false; $('input', form).focus(); });
+  if (email && pending) { showOtp(pending.msg); return; }
   $(email ? 'input[name=email]' : 'input[name=code]').focus();
-}
-
-// Destino do link enviado por e-mail (#/entrar?t=…). O token fica no fragmento da URL, que não vai para o servidor
-// quando o link é aberto: antivírus de e-mail que "visitam" links não conseguem gastar o token de uso único.
-async function viewEnter(params) {
-  const token = params.get('t') || '';
-  history.replaceState(null, '', '#/'); // tira o token da barra de endereço e do histórico
-  setTitle('Entrando…');
-  main.innerHTML = `<section class="page narrow gate"><div class="gate-card"><span class="brand-logo" aria-hidden="true">D</span><p>Entrando…</p></div></section>`;
-  try {
-    await api('/api/access/email/verify', { method: 'POST', body: { token } });
-    document.body.classList.remove('gated');
-    state.boot = null;
-    toast('Pronto! Este navegador tem acesso por 180 dias.');
-    router();
-  } catch (err) {
-    // link velho aberto num navegador que já tem acesso: só segue para o site
-    const hasAccess = await api('/api/provas').then(() => true, () => false);
-    if (hasAccess) { document.body.classList.remove('gated'); router(); return; }
-    document.body.classList.add('gated');
-    main.innerHTML = `<section class="page narrow gate"><div class="gate-card">
-      <span class="brand-logo" aria-hidden="true">D</span>
-      <h1>Link inválido</h1>
-      <p>${esc(err.message)}</p>
-      <button class="btn btn-lg" type="button" id="enter-retry">Pedir um novo link</button>
-    </div></section>`;
-    $('#enter-retry').addEventListener('click', () => router());
-  }
 }
 
 function errorBlock(err) {
@@ -1639,7 +1651,7 @@ async function viewAbout() {
     <h2 id="privacidade">Privacidade</h2>
     <ul>
       ${b.emailAccess
-        ? `<li>Sem cadastro e sem conta. O e-mail @ufmg.br serve só para enviar o link de acesso: <b>não é guardado</b> (nem no banco, nem em logs), e o acesso que ele libera não tem nenhuma ligação com as avaliações que você escreve. Não pedimos nome nem matrícula.</li>`
+        ? `<li>Sem cadastro e sem conta. O e-mail @ufmg.br serve só para enviar o código de acesso: <b>não é guardado</b> (nem no banco, nem em logs), e o acesso que ele libera não tem nenhuma ligação com as avaliações que você escreve. Não pedimos nome nem matrícula.</li>`
         : '<li>Sem cadastro: não pedimos nome, e-mail ou matrícula.</li>'}
       <li>Seu navegador recebe um identificador aleatório (cookie <code>HttpOnly</code>). O banco guarda apenas um <abbr title="HMAC-SHA256 com chave secreta do servidor">hash</abbr> dele — usado só para impedir avaliações repetidas e permitir edição.</li>
       <li>O servidor não registra endereços IP em logs. O IP é usado apenas em memória, por alguns minutos, para limitar abusos.</li>

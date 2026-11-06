@@ -74,6 +74,19 @@ Abra `https://seu.dominio` — deve aparecer a tela do código de acesso.
 ### Envio de e-mail (acesso por @ufmg.br)
 Para o login por e-mail, configure um serviço de envio — VMs na nuvem normalmente bloqueiam o envio direto (porta 25), e e-mail sem SPF/DKIM cai no spam.
 
+**Sem domínio próprio: Gmail.** Crie uma conta Gmail só do projeto, ative a verificação em duas etapas e gere uma senha de app em [myaccount.google.com/apppasswords](https://myaccount.google.com/apppasswords). No `.env`:
+```bash
+DCCHUB_EMAIL_LOGIN=1
+DCCHUB_SMTP_HOST=smtp.gmail.com
+DCCHUB_SMTP_PORT=587
+DCCHUB_SMTP_USER=conta.do.projeto@gmail.com
+DCCHUB_SMTP_PASSWORD=abcdefghijklmnop   # senha de app, 16 letras sem espaços
+DCCHUB_SMTP_FROM=DCCHub <conta.do.projeto@gmail.com>
+```
+O Gmail aceita ~500 envios por dia; o padrão de `DCCHUB_EMAIL_DAILY_LIMIT` (250) fica abaixo disso. Conta nova que de repente manda muito pode ser limitada pelo Google por alguns dias: crie a conta antes de divulgar o site.
+
+**Com domínio próprio: um serviço de envio**, para mandar de `acesso@seu.dominio`:
+
 1. Crie uma conta num serviço com plano grátis, por exemplo o **Brevo** (~300 e-mails/dia).
 2. No serviço, **verifique o seu domínio**: ele mostra registros DNS (SPF, DKIM, às vezes DMARC) para você criar onde o domínio está registrado.
 3. Gere uma credencial SMTP e preencha no `.env`:
@@ -87,7 +100,6 @@ Para o login por e-mail, configure um serviço de envio — VMs na nuvem normalm
    ```
 4. `docker compose up -d` e teste com o seu `@ufmg.br`. Se não chegar, veja `docker compose logs app` — falhas de envio aparecem lá (sem o endereço).
 
-O `DCCHUB_PUBLIC_URL` já vem do `DOMAIN` no `docker-compose.yml`. Sem domínio próprio (ex.: sslip.io) não dá para configurar SPF/DKIM; nesse caso, use só o código de acesso.
 
 ### 6. Atualização dos dados e backup
 ```bash
@@ -135,7 +147,7 @@ Coloque atrás de um proxy com HTTPS (Caddy/nginx) e mantenha `DCCHUB_TRUST_PROX
 
 ## Limites em memória
 
-Os limites de abuso (avaliações, votos e denúncias por rede, links de e-mail por dia) e a contagem de denúncias por rede vivem **só na memória** do processo, de propósito: nada disso vai para o banco. Consequências:
+Os limites de abuso (avaliações, votos e denúncias por rede, códigos por e-mail por dia, tentativas por código) e a contagem de denúncias por rede vivem **só na memória** do processo, de propósito: nada disso vai para o banco. Consequências:
 
 - **Rode uma única instância.** Com duas, cada uma conta pela metade. No Fly, mantenha uma máquina (`fly scale count 1`).
 - **Reiniciar zera os contadores.** No Fly com `auto_stop_machines`, cada parada também zera. Isso deixa a retirada automática por denúncias mais conservadora (as denúncias seguem no banco e na fila), mas reabre por um momento os limites diários.

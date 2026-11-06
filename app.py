@@ -14,10 +14,10 @@ Variáveis de ambiente (todas opcionais):
     DCCHUB_TRUST_PROXY  "1" para usar X-Forwarded-For como IP (somente atrás de proxy confiável)
     DCCHUB_ACCESS_CODES códigos de acesso da comunidade, separados por vírgula; se definido, os dados só saem
                         para navegadores que digitaram um código válido (trocar o código revoga os acessos antigos)
-    DCCHUB_EMAIL_LOGIN  "1" para liberar o acesso por link enviado ao e-mail @ufmg.br (ver email_login.py); o e-mail
-                        não é guardado. Configuração do envio: DCCHUB_PUBLIC_URL, DCCHUB_SMTP_HOST/PORT/USER/PASSWORD/
-                        FROM/TLS; sem SMTP, o link aparece no terminal (desenvolvimento). DCCHUB_EMAIL_EPOCH: trocar
-                        o valor revoga todos os acessos feitos por e-mail; DCCHUB_EMAIL_DAILY_LIMIT: teto de links por dia (250)
+    DCCHUB_EMAIL_LOGIN  "1" para liberar o acesso por código enviado ao e-mail @ufmg.br (ver email_login.py); o e-mail
+                        não é guardado. Configuração do envio: DCCHUB_SMTP_HOST/PORT/USER/PASSWORD/FROM/TLS; sem SMTP,
+                        o código aparece no terminal (desenvolvimento). DCCHUB_EMAIL_EPOCH: trocar o valor revoga todos
+                        os acessos feitos por e-mail; DCCHUB_EMAIL_DAILY_LIMIT: teto de e-mails por dia (250)
   Os nomes antigos (AVALIA_DCC_*) continuam aceitos.
     HOST / PORT             endereço de escuta (padrão 0.0.0.0:8000)
 """
@@ -339,6 +339,7 @@ CREATE TABLE IF NOT EXISTS class_reports (
   created_at INTEGER NOT NULL,
   PRIMARY KEY (term, professor, course, reporter_hash)
 ) WITHOUT ROWID;
+-- códigos de acesso por e-mail já usados (nonce do desafio, até expirar): uso único. Nome antigo, de quando era link
 CREATE TABLE IF NOT EXISTS used_links (
   nonce TEXT PRIMARY KEY,
   expires_at INTEGER NOT NULL
@@ -566,12 +567,12 @@ class RateLimiter:
 LIMITS = {"check": (120, 60), "access": (10, 600), "login": (5, 600), "classreport": (20, 600), "review": (6, 600), "vote": (60, 60), "report": (10, 600), "restore": (10, 600), "admin": (30, 60),
           # identidade anônima nova sai de graça (basta apagar o cookie), então os limites abaixo valem por rede (IP) e,
           # no acesso por e-mail, por login — nunca guardados: só em memória, como os demais
-          "login-day": (20, 86400),       # links pedidos por IP por dia (protege a cota diária do serviço de e-mail)
+          "login-day": (20, 86400),       # códigos pedidos por IP por dia (protege a cota diária do serviço de e-mail)
           "review-pair": (3, 86400),      # avaliações do MESMO docente+disciplina por IP por dia (3, não 1: Wi-Fi do campus é NAT)
           "review-access": (1, 86400),    # idem, por login de e-mail
           "vote-pair": (3, 86400)}        # votos "útil" na MESMA avaliação por IP por dia
 limiter = RateLimiter()
-EMAIL_DAILY_LIMIT = int(env("EMAIL_DAILY_LIMIT") or 250)  # teto global de links por dia (plano grátis do Brevo: 300)
+EMAIL_DAILY_LIMIT = int(env("EMAIL_DAILY_LIMIT") or 250)  # teto global de e-mails por dia (Gmail: ~500; Brevo grátis: 300)
 
 
 def ip_key(ip: str) -> str:
@@ -628,12 +629,6 @@ CSP = ("default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inlin
 
 def gate_methods() -> list[str]:
     return (["email"] if EMAIL.enabled else []) + (["code"] if ACCESS_CODES else [])
-
-
-def public_url(handler: "App") -> str:
-    """Base dos links enviados por e-mail. Vem da configuração, nunca do cabeçalho Host (um Host forjado faria o
-    link de outra pessoa apontar para um site de terceiros). Sem DCCHUB_PUBLIC_URL, só serve para desenvolvimento."""
-    return EMAIL.public_url or f"http://localhost:{handler.server.server_address[1]}"
 
 
 class App(BaseHTTPRequestHandler):
@@ -1399,7 +1394,7 @@ class App(BaseHTTPRequestHandler):
         self.send_json({"ok": True})
 
     def post_access_email(self) -> None:
-        """Envia o link de acesso. O e-mail só passa pela memória: não vai para banco nem log."""
+        """Envia o código de acesso e devolve o desafio. O e-mail só passa pela memória: não vai para banco nem log."""
         if not EMAIL.enabled:
             raise ApiError(404, "Acesso por e-mail desativado.")
         self.limit("login")
@@ -1409,32 +1404,44 @@ class App(BaseHTTPRequestHandler):
         if not email_login.allowed(address, EMAIL.domain):
             msg = f"Use seu e-mail @{EMAIL.domain}."
             raise ApiError(400, msg, fields={"email": [msg]})
-        # no máximo 3 links por endereço por hora (chave HMAC só em memória). Acima disso a resposta é a mesma,
-        # mas nada é enviado: ninguém usa o site para encher a caixa de outra pessoa.
-        self.limit("login-day", message="Muitos pedidos de link a partir desta conexão hoje. Tente amanhã.")
+        self.limit("login-day", message="Muitos pedidos de código a partir desta conexão hoje. Tente amanhã.")
+        code, challenge = email_login.new_code(SECRET)
+        # no máximo 3 e-mails por endereço por hora (chave HMAC só em memória). Acima disso a resposta é a mesma, com
+        # um desafio de verdade, mas nada é enviado: ninguém usa o site para encher a caixa de outra pessoa.
         if limiter.hit("login-addr", email_login.address_key(SECRET, address), 3, 3600):
             # teto global por dia: sem ele, poucas conexões gastariam a cota do serviço de envio e ninguém mais entraria
             if not limiter.hit("login-global", "*", EMAIL_DAILY_LIMIT, 86400):
                 raise ApiError(503, "O limite diário de envios de e-mail foi atingido. Tente de novo amanhã"
                                + (" ou entre com o código da comunidade." if ACCESS_CODES else "."))
-            email_login.send_async(EMAIL, address, f"{public_url(self)}/#/entrar?t={email_login.link_token(SECRET)}")
-        self.send_json({"ok": True, "message": f"Enviamos um link de acesso para {address}. Ele vale por "
-                        f"{email_login.LINK_TTL // 60} minutos e funciona em qualquer navegador."})
+            email_login.send_async(EMAIL, address, code)
+        self.send_json({"ok": True, "challenge": challenge, "expiresIn": email_login.CODE_TTL,
+                        "message": f"Enviamos um código de 6 dígitos para {address}. Ele vale por "
+                                   f"{email_login.CODE_TTL // 60} minutos."})
 
     def post_access_email_verify(self) -> None:
         if not EMAIL.enabled:
             raise ApiError(404, "Acesso por e-mail desativado.")
         self.limit("access")
-        nonce = email_login.check_link(SECRET, self.read_json().get("token"))
+        body = self.read_json()
+        challenge = body.get("challenge")
+        nonce = email_login.challenge_nonce(challenge)
         if not nonce:
-            raise ApiError(400, "Link inválido ou expirado. Peça um novo.")
+            raise ApiError(400, "Código expirado. Peça um novo.")
+        if not email_login.clean_code(body.get("code")):
+            raise ApiError(400, "Digite os 6 dígitos do código.", fields={"code": ["Digite os 6 dígitos do código."]})
+        # tentativas por desafio, só em memória: 5 chutes em 1.000.000 por e-mail enviado
+        if not limiter.hit("login-try", nonce, email_login.CODE_TRIES, email_login.CODE_TTL):
+            raise ApiError(429, "Tentativas demais com este código. Peça um novo.")
+        if not email_login.check_code(SECRET, challenge, body.get("code")):
+            raise ApiError(400, "Código incorreto ou expirado. Confira o último e-mail recebido.",
+                           fields={"code": ["Código incorreto ou expirado."]})
         now = int(time.time())
         with connect() as conn:
             conn.execute("DELETE FROM used_links WHERE expires_at < ?", (now,))
             try:  # uso único
-                conn.execute("INSERT INTO used_links (nonce, expires_at) VALUES (?, ?)", (nonce, now + email_login.LINK_TTL))
+                conn.execute("INSERT INTO used_links (nonce, expires_at) VALUES (?, ?)", (nonce, now + email_login.CODE_TTL))
             except sqlite3.IntegrityError:
-                raise ApiError(400, "Este link já foi usado. Peça um novo.") from None
+                raise ApiError(400, "Este código já foi usado. Peça um novo.") from None
         self.set_access_cookie(email_login.access_token(SECRET, EMAIL.epoch), email_login.ACCESS_TTL)
         self.send_json({"ok": True})
 
@@ -1506,9 +1513,7 @@ if __name__ == "__main__":
         print("Moderação desativada: defina DCCHUB_ADMIN_TOKEN para habilitar o painel /#/moderacao.")
     if EMAIL.enabled:
         print(f"Acesso por e-mail @{EMAIL.domain} ativo." + ("" if EMAIL.smtp_host else
-              " SMTP não configurado: os links aparecem aqui no terminal (só para desenvolvimento)."))
-        if not EMAIL.public_url:
-            print("Aviso: defina DCCHUB_PUBLIC_URL (ex.: https://seu.dominio) para os links enviados por e-mail.")
+              " SMTP não configurado: os códigos aparecem aqui no terminal (só para desenvolvimento)."))
 
     def stop(*_: object) -> None:
         raise KeyboardInterrupt

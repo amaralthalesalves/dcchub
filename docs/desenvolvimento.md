@@ -21,7 +21,7 @@ flowchart LR
 ```
 
 - **`app.py`** serve os arquivos estáticos e a API, valida e grava avaliações, aplica limites de abuso, código de acesso e cabeçalhos de segurança. Recarrega `data/*.json` sozinho quando os arquivos mudam. Respostas com gzip (~20 KB para carregar o catálogo).
-- **`email_login.py`** valida o domínio, assina os tokens e envia o link por SMTP (numa thread, sem guardar o e-mail).
+- **`email_login.py`** valida o domínio, gera o código e o desafio assinado e envia o código por SMTP (numa thread, sem guardar o e-mail).
 - **`moderation.py`** decide publicar, devolver ou segurar cada comentário. Veja [Moderação](moderacao.md).
 - **`static/`** é a interface: `index.html`, `app.js` (rotas como `#/professor/…`, `#/oferta`), `select.js` (seletores estilizados), `style.css` (tokens de cor com modo claro/escuro), `theme.js` e as fotos.
 - **`scripts/`** geram os dados a partir das páginas públicas. Veja [Dados](dados.md).
@@ -31,7 +31,7 @@ flowchart LR
 ```
 app.py                       servidor HTTP + API JSON
 moderation.py                filtro automático de comentários
-email_login.py               acesso por link enviado ao e-mail @ufmg.br
+email_login.py               acesso por código enviado ao e-mail @ufmg.br
 scripts/
   sync_dcc.py                docentes, disciplinas e ofertas do site do DCC
   audit_catalog.py           confere o catálogo contra todas as ofertas oficiais
@@ -61,11 +61,10 @@ Linguagem visual sóbria e institucional: superfícies neutras, **um** azul de d
 | `DCCHUB_SECRET` | gerado em `secret.key`, ao lado do banco | Chave do HMAC. **Faça backup**: trocá-la desliga as pessoas das próprias avaliações. |
 | `DCCHUB_ADMIN_TOKEN` | — | Ativa o painel de moderação em `/#/moderacao`. |
 | `DCCHUB_ACCESS_CODES` | — (site aberto) | Código(s) de acesso da comunidade, separados por vírgula. Veja [Comunidade e privacidade](comunidade-e-privacidade.md#o-código-de-acesso). |
-| `DCCHUB_EMAIL_LOGIN` | — | `1` libera o acesso por link enviado ao e-mail `@ufmg.br`. Veja [Comunidade e privacidade](comunidade-e-privacidade.md#acesso-pelo-e-mail-ufmgbr). |
-| `DCCHUB_PUBLIC_URL` | `http://localhost:PORT` | Endereço público usado nos links enviados (ex.: `https://dcchub.com.br`). Nunca vem do cabeçalho `Host`. |
-| `DCCHUB_SMTP_HOST` · `_PORT` · `_USER` · `_PASSWORD` · `_FROM` · `_TLS` | porta 587, `starttls` (`ssl` na 465) | Envio dos links. Sem `SMTP_HOST`, o link aparece no terminal (desenvolvimento). |
+| `DCCHUB_EMAIL_LOGIN` | — | `1` libera o acesso por código de 6 dígitos enviado ao e-mail `@ufmg.br`. Veja [Comunidade e privacidade](comunidade-e-privacidade.md#acesso-pelo-e-mail-ufmgbr). |
+| `DCCHUB_SMTP_HOST` · `_PORT` · `_USER` · `_PASSWORD` · `_FROM` · `_TLS` | porta 587, `starttls` (`ssl` na 465) | Envio dos códigos. Sem `SMTP_HOST`, o código aparece no terminal (desenvolvimento). Gmail: `smtp.gmail.com` com senha de app ([Deploy](deploy.md)). |
 | `DCCHUB_EMAIL_EPOCH` | `1` | Trocar o valor revoga todos os acessos feitos por e-mail. |
-| `DCCHUB_EMAIL_DAILY_LIMIT` | `250` | Teto global de links enviados por dia (abaixo da cota do serviço de envio; o Brevo grátis dá 300). Cada conexão pede no máximo 20 por dia. |
+| `DCCHUB_EMAIL_DAILY_LIMIT` | `250` | Teto global de e-mails enviados por dia (abaixo da cota do serviço de envio: Gmail ~500, Brevo grátis 300). Cada conexão pede no máximo 20 por dia. |
 | `DCCHUB_TRUST_PROXY` | — | `1` atrás de um proxy confiável: usa o **último** item de `X-Forwarded-For` (o que o proxy viu; os anteriores podem ser forjados), marca o cookie como `Secure` e envia HSTS. |
 | `HOST` / `PORT` | `0.0.0.0` / `8000` | Endereço de escuta. |
 
@@ -78,7 +77,7 @@ Todas as rotas respondem JSON. Com `DCCHUB_ACCESS_CODES` ou `DCCHUB_EMAIL_LOGIN`
 | Método | Rota | |
 |---|---|---|
 | POST | `/api/access` | Troca um código de acesso pelo cookie |
-| POST | `/api/access/email` · `/api/access/email/verify` | Envia o link para um e-mail `@ufmg.br` · troca o token do link pelo cookie |
+| POST | `/api/access/email` · `/api/access/email/verify` | Envia o código para um e-mail `@ufmg.br` e devolve o desafio · troca desafio + código pelo cookie (5 tentativas por código) |
 | GET | `/api/bootstrap` | Catálogo, estatísticas e definições do formulário |
 | GET | `/api/offerings?term=2026.2` | Turmas do semestre com notas por par docente × disciplina |
 | GET | `/api/professors/{slug}` · `/api/courses/{id}` | Detalhes, resumo, histórico e avaliações |
@@ -91,7 +90,7 @@ Todas as rotas respondem JSON. Com `DCCHUB_ACCESS_CODES` ou `DCCHUB_EMAIL_LOGIN`
 | GET | `/api/provas` · `/api/oportunidades` | Materiais e oportunidades |
 | GET · POST | `/api/admin/queue` · `/api/admin/reviews/{id}` · `/api/admin/class-reports` · `/api/admin/class-reports/delete` | Moderação (`Authorization: Bearer …`) |
 
-Para testar o acesso por e-mail localmente, sem SMTP — o link aparece no terminal:
+Para testar o acesso por e-mail localmente, sem SMTP — o código aparece no terminal:
 
 ```bash
 DCCHUB_EMAIL_LOGIN=1 python3 app.py

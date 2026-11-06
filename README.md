@@ -81,7 +81,7 @@ python3 tests/seed_demo.py /tmp/demo.db
 DCCHUB_DB=/tmp/demo.db python3 app.py
 ```
 
-Com o painel de moderação (`/#/moderacao`) e o acesso restrito à comunidade — por e-mail `@ufmg.br` (sem SMTP configurado, o link aparece no terminal) e/ou por código:
+Com o painel de moderação (`/#/moderacao`) e o acesso restrito à comunidade — por e-mail `@ufmg.br` (sem SMTP configurado, o código aparece no terminal) e/ou por código:
 
 ```bash
 DCCHUB_ADMIN_TOKEN=um-token-longo DCCHUB_EMAIL_LOGIN=1 DCCHUB_ACCESS_CODES=codigo-do-semestre python3 app.py
