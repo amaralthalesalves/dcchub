@@ -889,7 +889,7 @@ async function viewHome() {
           <ul class="meta-row" aria-label="Semestre">
             <li><svg class="ico"><use href="#i-calendar"/></svg>Semestre ${esc(b.currentTerm || '')}</li>
             ${b.offerPublished
-              ? `<li><span class="live-dot" aria-hidden="true"></span>Oferta ${esc(b.latestTerm)} publicada${b.termSources?.[b.latestTerm] === 'SIGAA' ? ' (SIGAA)' : ''}</li>`
+              ? `<li><span class="live-dot" aria-hidden="true"></span>Oferta ${esc(b.latestTerm)} publicada</li>`
               : `<li><span class="live-dot pending" aria-hidden="true"></span><a href="#/sobre#atual">Oferta ${esc(b.currentTerm)} ainda não publicada</a></li>`}
             ${b.totals.reviews ? `<li><svg class="ico ico-fill"><use href="#i-star"/></svg>${plural(b.totals.reviews, 'avaliação', 'avaliações')}</li>` : ''}
           </ul>
