@@ -10,6 +10,7 @@ services:
       DCCHUB_ACCESS_CODES: ${DCCHUB_ACCESS_CODES:-}   # código(s) da comunidade; vazio = sem código
       # acesso por código enviado ao e-mail @ufmg.br (o e-mail não é guardado)
       DCCHUB_EMAIL_LOGIN: ${DCCHUB_EMAIL_LOGIN:-}
+      DCCHUB_DOCENTE_LOGIN: ${DCCHUB_DOCENTE_LOGIN:-}   # modo docente; vazio = desligado
       DCCHUB_SMTP_HOST: ${DCCHUB_SMTP_HOST:-}
       DCCHUB_SMTP_PORT: ${DCCHUB_SMTP_PORT:-587}
       DCCHUB_SMTP_USER: ${DCCHUB_SMTP_USER:-}

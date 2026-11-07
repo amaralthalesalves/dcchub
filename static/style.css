@@ -135,7 +135,9 @@ code, kbd { font-family: var(--mono); font-size: .88em; }
 
 /* ---------- casca: cabeçalho com navegação em pílula flutuante + conteúdo */
 .shell { min-height: 100vh; display: flex; flex-direction: column; }
-.site-header { position: sticky; top: 0; z-index: 40; height: var(--header-h); display: flex; align-items: center; gap: 16px; padding: 0 28px; }
+.site-header { position: sticky; top: 0; z-index: 40; height: var(--header-h); display: flex; align-items: center; gap: 16px; padding: 0 28px;
+  /* fundo que se dissolve na página: ao rolar, o conteúdo some por baixo em vez de embaralhar com a marca e a pílula */
+  background: linear-gradient(to bottom, var(--bg) 0%, var(--bg) 62%, color-mix(in srgb, var(--bg) 0%, transparent) 100%); }
 .brand { display: inline-flex; align-items: center; gap: 10px; color: var(--ink); text-decoration: none; }
 .brand:hover { text-decoration: none; color: var(--ink); }
 .brand-logo { width: 36px; height: 36px; border-radius: 11px; display: grid; place-items: center; flex: none; background: var(--btn); color: var(--btn-ink);

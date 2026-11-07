@@ -82,6 +82,7 @@ Precisa do `pdftotext` (poppler) na máquina que roda o script; o servidor só l
 | `DCCHUB_SMTP_HOST` · `_PORT` · `_USER` · `_PASSWORD` · `_FROM` · `_TLS` | porta 587, `starttls` (`ssl` na 465) | Envio dos códigos. Sem `SMTP_HOST`, o código aparece no terminal (desenvolvimento). Gmail: `smtp.gmail.com` com senha de app ([Deploy](deploy.md)). |
 | `DCCHUB_EMAIL_EPOCH` | `1` | Trocar o valor revoga todos os acessos feitos por e-mail. |
 | `DCCHUB_MOD_EMAIL` | — | E-mail(s) da moderação, separados por vírgula: recebem um aviso quando algo entra na fila de revisão. Usa o SMTP acima. Veja [Moderação](moderacao.md#aviso-por-e-mail-à-moderação). |
+| `DCCHUB_DOCENTE_LOGIN` | — | `1` (com o acesso por e-mail ligado) liga o **modo docente**: o e-mail publicado de um docente recebe um código que abre só a página dele, reduzida. Desligado por padrão; ligar avisa os docentes de que o site existe. Veja [Comunidade e privacidade](comunidade-e-privacidade.md#modo-docente-experimental-desligado-por-padrão). |
 | `DCCHUB_PUBLIC_URL` | — | Endereço do site (ex.: `https://dcchub.com.br`), para o link do painel no aviso à moderação. |
 | `DCCHUB_EMAIL_DAILY_LIMIT` | `250` | Teto global de e-mails enviados por dia (abaixo da cota do serviço de envio: Gmail ~500, Brevo grátis 300). Cada conexão pede no máximo 20 por dia. |
 | `DCCHUB_TRUST_PROXY` | — | `1` atrás de um proxy confiável: usa o **último** item de `X-Forwarded-For` (o que o proxy viu; os anteriores podem ser forjados), marca o cookie como `Secure` e envia HSTS. |
@@ -91,7 +92,7 @@ Os nomes antigos (`AVALIA_DCC_*`) continuam aceitos. O cookie (`avalia_dcc`) e a
 
 ## API
 
-Todas as rotas respondem JSON. Com `DCCHUB_ACCESS_CODES` ou `DCCHUB_EMAIL_LOGIN` definidos, tudo exceto as rotas `/api/access*` responde `401 {"gate": true, "methods": ["email", "code"]}` sem o cookie de acesso.
+Todas as rotas respondem JSON. Com `DCCHUB_ACCESS_CODES` ou `DCCHUB_EMAIL_LOGIN` definidos, tudo exceto as rotas `/api/access*` e `/api/health` responde `401 {"gate": true, "methods": ["email", "code"]}` sem o cookie de acesso.
 
 | Método | Rota | |
 |---|---|---|

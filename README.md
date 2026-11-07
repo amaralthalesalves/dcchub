@@ -26,6 +26,7 @@
 | | |
 |---|---|
 | **Oferta & grade** | Todas as turmas do semestre com a nota do docente *naquela disciplina*, filtros por turno e dia, e uma grade semanal que acusa conflitos (salva no navegador) e exporta para o calendário (`.ics`). |
+| **Grade por curso** | Escolha seu curso e período e a lista começa pelo que você precisa cursar agora, com as obrigatórias de outros períodos e as optativas separadas. Disciplinas de fora do DCC (Cálculo, Probabilidade…) aparecem também, e o horário delas entra na grade à mão. Currículos dos relatórios oficiais da PROGRAD. |
 | **Docentes** | Foto, áreas, sala e links; resumo das notas; nota **por disciplina**; **evolução por semestre** (clique num semestre para ver as avaliações dele); histórico de turmas desde 2020 com planos de ensino; oportunidades abertas que citam o docente. |
 | **Disciplinas** | Turmas do semestre, **comparação de quem já deu a disciplina** (didática, dificuldade para aprender e para passar, carga…), evolução da nota por semestre, histórico de ofertas e materiais. Avaliações filtráveis por semestre. |
 | **Avaliações** | Geral, didática, avaliações justas, dificuldade **para aprender** e **para passar** (separadas: matéria difícil pode ter prova tranquila, e vice-versa) e carga (1–5); "faria de novo?"; conceito; marcadores; comentário. Selo de **turma confirmada** quando a oferta oficial bate. Rankings por média bayesiana. |
@@ -33,11 +34,11 @@
 | **Oportunidades** | Chamadas de IC, bolsas e estágios de [dcc.ufmg.br/oportunidades](https://dcc.ufmg.br/oportunidades/), com filtros por tipo, público e área. |
 | **Moderação automática** | Filtro que publica, devolve para reescrever ou segura para revisão — mostrando o motivo **enquanto a pessoa digita**. [Como funciona →](docs/moderacao.md) |
 | **Anonimato com controle** | Sem cadastro; editar e apagar as próprias avaliações; código de recuperação para trocar de navegador. |
-| **Leve e acessível** | Sem dependências nem build, sem scripts ou fontes de terceiros, modo escuro, mobile e teclado (`/` foca a busca). |
+| **Leve e acessível** | Sem dependências nem build, sem scripts ou fontes de terceiros (a fonte dos títulos é servida pelo próprio site), temas escuro e claro, celular e teclado (`/` abre a busca). |
 
 <table>
   <tr>
-    <td width="50%"><img alt="Oferta do semestre com montador de grade" src="docs/img/oferta.webp"><br><sub><b>Oferta & grade</b> — notas por disciplina e conflitos de horário</sub></td>
+    <td width="50%"><img alt="Grade por curso com montador de horário" src="docs/img/oferta.webp"><br><sub><b>Grade</b> — seu período primeiro, conflitos de horário e disciplinas de fora do DCC</sub></td>
     <td width="50%"><img alt="Página de docente" src="docs/img/professor.webp"><br><sub><b>Docente</b> — perfil, histórico e oportunidades abertas</sub></td>
   </tr>
   <tr>
@@ -48,23 +49,24 @@
     <td><img alt="Materiais" src="docs/img/materiais.webp"><br><sub><b>Materiais</b> — provas antigas por disciplina</sub></td>
     <td><img alt="Oportunidades" src="docs/img/oportunidades.webp"><br><sub><b>Oportunidades</b> — IC, bolsas e estágios</sub></td>
   </tr>
+  <tr>
+    <td><img alt="Busca aberta com resultados" src="docs/img/busca.webp"><br><sub><b>Busca</b> — docentes e disciplinas por nome ou código (<code>/</code>)</sub></td>
+    <td><img alt="Grade no tema claro" src="docs/img/oferta-claro.webp"><br><sub><b>Tema claro</b> — os mesmos componentes, escolhidos no botão do topo</sub></td>
+  </tr>
 </table>
 
 <details>
-<summary><b>Modo escuro e celular</b></summary>
+<summary><b>Tema claro e celular</b></summary>
 <br>
-<table>
-  <tr>
-    <td width="50%"><img alt="Início no modo escuro" src="docs/img/inicio-escuro.webp"></td>
-    <td width="50%"><img alt="Oferta no modo escuro" src="docs/img/oferta-escuro.webp"></td>
-  </tr>
-</table>
+<img alt="Início no tema claro" src="docs/img/inicio-claro.webp" width="100%">
 <p align="center">
-  <img alt="Início no celular" src="docs/img/mobile-claro.webp" width="300">
+  <img alt="Início no celular, tema escuro" src="docs/img/mobile-escuro.webp" width="300">
   &nbsp;&nbsp;
-  <img alt="Disciplina no celular, modo escuro" src="docs/img/mobile-escuro.webp" width="300">
+  <img alt="Grade por curso no celular, tema claro" src="docs/img/mobile-claro.webp" width="300">
 </p>
 </details>
+
+<sub>Capturas com o banco vazio: nenhuma avaliação mostrada aqui é real ou inventada.</sub>
 
 ## Começando
 
