@@ -164,7 +164,11 @@ function setupGlobalSearch() {
   const box = $('#global-results');
   let active = -1;
   let results = [];
+  const layer = $('#search-layer');
   const close = () => { box.hidden = true; input.setAttribute('aria-expanded', 'false'); active = -1; };
+  // a busca abre por cima da página (botão da pílula ou "/") e fecha com Esc, clique fora ou ao escolher um resultado
+  const openLayer = () => { layer.hidden = false; requestAnimationFrame(() => input.focus()); };
+  const closeLayer = () => { input.value = ''; close(); layer.hidden = true; };
   const render = () => {
     if (!results.length) {
       box.innerHTML = input.value.trim() ? '<p class="search-empty">Nada encontrado. Tente o código (ex.: DCC206) ou parte do nome.</p>' : '';
@@ -187,15 +191,17 @@ function setupGlobalSearch() {
     else if (e.key === 'ArrowUp') { e.preventDefault(); active = Math.max(0, active - 1); render(); }
     else if (e.key === 'Enter') {
       const pick = results[active] || results[0];
-      if (pick) { location.hash = pick.href; input.value = ''; close(); input.blur(); }
-      else if (input.value.trim()) { location.hash = `#/professores?q=${encodeURIComponent(input.value.trim())}`; close(); }
-    } else if (e.key === 'Escape') { close(); input.blur(); }
+      if (pick) { location.hash = pick.href; closeLayer(); }
+      else if (input.value.trim()) { location.hash = `#/professores?q=${encodeURIComponent(input.value.trim())}`; closeLayer(); }
+    } else if (e.key === 'Escape') { closeLayer(); $('#search-open')?.focus(); }
   });
   input.addEventListener('focus', () => { if (input.value.trim()) render(); });
-  box.addEventListener('click', () => { input.value = ''; close(); });
-  document.addEventListener('click', (e) => { if (!e.target.closest('.global-search')) close(); });
+  box.addEventListener('click', () => closeLayer());
+  $('#search-open').addEventListener('click', openLayer);
+  layer.addEventListener('click', (e) => { if (e.target === layer) closeLayer(); });
+  window.addEventListener('hashchange', () => { if (!layer.hidden) closeLayer(); });
   document.addEventListener('keydown', (e) => {
-    if (e.key === '/' && !/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)) { e.preventDefault(); input.focus(); }
+    if (e.key === '/' && !/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName) && !document.body.classList.contains('gated')) { e.preventDefault(); openLayer(); }
   });
 }
 
@@ -823,8 +829,14 @@ async function viewHome() {
     <div class="hero">
       <div class="hero-inner">
         <div class="hero-copy">
-          <p class="eyebrow">Departamento de Ciência da Computação · UFMG · semestre ${esc(b.currentTerm || '')}</p>
           <h1>Docentes, disciplinas e oportunidades do DCC em um só lugar</h1>
+          <ul class="meta-row" aria-label="Semestre">
+            <li><svg class="ico"><use href="#i-calendar"/></svg>Semestre ${esc(b.currentTerm || '')}</li>
+            ${b.offerPublished
+              ? `<li><span class="live-dot" aria-hidden="true"></span>Oferta ${esc(b.latestTerm)} publicada${b.termSources?.[b.latestTerm] === 'SIGAA' ? ' (SIGAA)' : ''}</li>`
+              : `<li><span class="live-dot pending" aria-hidden="true"></span><a href="#/sobre#atual">Oferta ${esc(b.currentTerm)} ainda não publicada</a></li>`}
+            <li><svg class="ico ico-fill"><use href="#i-star"/></svg>${plural(b.totals.reviews, 'avaliação', 'avaliações')}</li>
+          </ul>
           <p class="lead">Avaliações anônimas de estudantes, a oferta do semestre com montador de grade, provas antigas e chamadas de pesquisa do Departamento de Ciência da Computação da UFMG.</p>
           <form class="hero-search" id="hero-search" role="search">
             <input type="search" id="hero-q" placeholder="Ex.: Algoritmos I, DCC206, Eduardo…" aria-label="Buscar docente ou disciplina" autocomplete="off">
@@ -950,13 +962,14 @@ async function viewProfessor({ args, isCurrent }) {
   const p = data.professor;
   const boot = state.prof.get(slug) || {};
   setTitle(p.name);
-  const links = [
-    p.room && `<span>Sala ${esc(p.room)}</span>`,
-    p.email && `<a href="${safeHref(`mailto:${p.email}`)}">${esc(p.email)}</a>`,
-    p.homepage && `<a href="${safeHref(p.homepage)}" target="_blank" rel="noreferrer">Página pessoal ↗</a>`,
-    p.lattes && `<a href="${safeHref(p.lattes)}" target="_blank" rel="noreferrer">Lattes ↗</a>`,
-    p.scholar && `<a href="${safeHref(p.scholar)}" target="_blank" rel="noreferrer">Google Scholar ↗</a>`,
-    p.dccUrl && `<a href="${safeHref(p.dccUrl)}" target="_blank" rel="noreferrer">Perfil no DCC ↗</a>`,
+  // contatos e links: cartão de informações ao lado do nome (linhas rótulo → valor)
+  const ext = (href, label) => `<a href="${safeHref(href)}" target="_blank" rel="noreferrer">${label} ↗</a>`;
+  const facts = [
+    p.room && ['Sala', esc(p.room)],
+    p.phone && ['Ramal', esc(p.phone)],
+    p.email && ['E-mail', `<a href="${safeHref(`mailto:${p.email}`)}">${esc(p.email)}</a>`],
+    (p.homepage || p.lattes || p.scholar || p.dccUrl) && ['Links', [p.homepage && ext(p.homepage, 'Página pessoal'), p.lattes && ext(p.lattes, 'Lattes'),
+      p.scholar && ext(p.scholar, 'Scholar'), p.dccUrl && ext(p.dccUrl, 'DCC')].filter(Boolean).join(' ')],
   ].filter(Boolean);
   const terms = [...new Set(data.history.map((h) => h.term))].sort();
   const allTerms = data.termsTaught || terms; // contagem inclui semestres só com disciplinas hoje extintas
@@ -973,15 +986,16 @@ async function viewProfessor({ args, isCurrent }) {
       ${avatar(p, 'xl')}
       <div class="profile-main">
         <h1>${esc(p.name)}</h1>
-        <div class="badges">
-          <span class="badge">${STATUS_LABEL[p.status]}</span>
-          ${boot.teachingNow ? `<span class="badge badge-live">${published ? 'Lecionando em' : 'Na oferta de'} ${esc(state.boot.latestTerm)}</span>` : ''}
-          ${allTerms.length ? `<span class="badge">${plural(allTerms.length, 'semestre', 'semestres')} na oferta (${esc(allTerms[0])}–${esc(allTerms[allTerms.length - 1])})</span>` : ''}
-        </div>
+        <ul class="meta-row">
+          ${data.summary.count ? `<li><svg class="ico ico-fill"><use href="#i-star"/></svg><b>${fmt(data.summary.avg.overall)}</b> de 5 · ${plural(data.summary.count, 'avaliação', 'avaliações')}</li>` : '<li>Ainda sem avaliações</li>'}
+          ${boot.teachingNow ? `<li><span class="live-dot" aria-hidden="true"></span>${published ? 'Lecionando em' : 'Na oferta de'} ${esc(state.boot.latestTerm)}</li>` : ''}
+          ${allTerms.length ? `<li><svg class="ico"><use href="#i-calendar"/></svg>${plural(allTerms.length, 'semestre', 'semestres')} na oferta (${esc(allTerms[0])}–${esc(allTerms[allTerms.length - 1])})</li>` : ''}
+          <li>${STATUS_LABEL[p.status]}</li>
+        </ul>
         ${p.areas?.length ? `<div class="chips">${p.areas.map((a) => `<a class="chip" href="#/professores?area=${encodeURIComponent(a)}&status=todos">${esc(a)}</a>`).join('')}</div>` : ''}
-        ${links.length ? `<p class="profile-links">${links.join('<span aria-hidden="true">·</span>')}</p>` : ''}
+        <div class="profile-cta"><a class="btn btn-lg" href="#/avaliar?professor=${slug}"><svg class="ico"><use href="#i-pen"/></svg>Avaliar ${esc(firstName(p.name))}</a></div>
       </div>
-      <div class="profile-cta"><a class="btn" href="#/avaliar?professor=${slug}">Avaliar ${esc(firstName(p.name))}</a></div>
+      ${facts.length ? `<dl class="facts">${facts.map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join('')}</dl>` : ''}
     </header>
 
     ${summaryBlock(data.summary)}
