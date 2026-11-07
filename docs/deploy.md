@@ -49,6 +49,8 @@ Ubuntu 24.04, 1 vCPU e 1 GB de RAM bastam. Use sua chave SSH pública e anote o 
 ### 3. Domínio
 Crie um registro **A** apontando para o IP da VM. Sem domínio, use `IP-COM-TRACOS.sslip.io` (ex.: `20-1-2-3.sslip.io`) ou um subdomínio do DuckDNS — o Caddy obtém o certificado normalmente.
 
+Com domínio próprio, crie também o **A** de `www` (o Caddy redireciona `www` para o domínio principal). Ao trocar de endereço, ponha o antigo em `REDIRECT_FROM` no `.env`: ele continua com HTTPS e passa a redirecionar para o novo, com o mesmo caminho, e nenhum link quebra. Só troque o `DOMAIN` depois que o DNS novo já responder com o IP da VM: o certificado do domínio novo depende disso.
+
 ### 4. Docker e código
 Na VM:
 ```bash
