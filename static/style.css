@@ -1,5 +1,5 @@
 /* DCCHub — estilos. Fonte de títulos própria (static/fonts), nada externo.
-   Visual "torra": tons de café, superfícies de vidro translúcido sobre um fundo com brilhos quentes e suaves,
+   Visual azul-noite: azul-escuro e preto, superfícies de vidro translúcido sobre um fundo com brilhos quentes e suaves,
    navegação em pílula flutuante, títulos grandes. Cor forte só onde carrega informação (notas, avisos, conflitos);
    o acento latte fica para a navegação e as ações. */
 @font-face {
@@ -9,49 +9,49 @@
   font-display: swap;
 }
 :root {
-  --bg: #f4efe9;
-  --glow-1: rgba(196, 150, 98, .26);
-  --glow-2: rgba(140, 107, 71, .16);
-  --surface: rgba(255, 255, 255, .62);
-  --surface-solid: #fffcf8;
-  --surface-2: rgba(110, 80, 50, .06);
-  --surface-3: rgba(110, 80, 50, .12);
-  --glass: rgba(255, 252, 248, .72);
-  --line: rgba(80, 55, 30, .12);
-  --line-strong: rgba(80, 55, 30, .22);
-  --ink: #1f1813;
-  --ink-2: #463b31;
-  --muted: #736558;
-  --primary: #7a5530;
+  --bg: #f2f4f8;
+  --glow-1: rgba(56, 96, 190, .20);
+  --glow-2: rgba(20, 40, 90, .12);
+  --surface: rgba(255, 255, 255, .66);
+  --surface-solid: #ffffff;
+  --surface-2: rgba(20, 35, 70, .055);
+  --surface-3: rgba(20, 35, 70, .11);
+  --glass: rgba(255, 255, 255, .74);
+  --line: rgba(15, 30, 70, .11);
+  --line-strong: rgba(15, 30, 70, .21);
+  --ink: #0c111c;
+  --ink-2: #2f3a4f;
+  --muted: #5d6880;
+  --primary: #1d4ed8;
   --primary-ink: #ffffff;
-  --primary-hover: #5f4124;
-  --primary-soft: rgba(140, 107, 71, .13);
-  --primary-soft-ink: #5a3d20;
-  --good: #23704a;
-  --good-bg: #e3efe5;
-  --good-fill: #3a8a5f;
+  --primary-hover: #173ea8;
+  --primary-soft: rgba(29, 78, 216, .10);
+  --primary-soft-ink: #163a9c;
+  --good: #1f6f47;
+  --good-bg: #e3f1e8;
+  --good-fill: #2f8a5b;
   --ok: #865500;
-  --ok-bg: #f6ead2;
+  --ok-bg: #f7ecd3;
   --ok-fill: #c99a2e;
   --bad: #a3271d;
-  --bad-bg: #f8e4e1;
+  --bad-bg: #f9e3e1;
   --bad-fill: #c2463b;
-  --neu: #4a4036;
-  --neu-bg: rgba(110, 80, 50, .08);
-  --neu-fill: #85776a;
-  --focus: #8c6b47;
-  --btn: #7d5d3b;
-  --btn-hover: #694c2f;
-  --btn-ink: #fffaf3;
-  --shadow-pop: 0 18px 48px rgba(60, 40, 20, .18), 0 2px 8px rgba(60, 40, 20, .08);
-  --shadow-sm: 0 1px 2px rgba(60, 40, 20, .05);
-  --shadow: 0 1px 2px rgba(60, 40, 20, .04), 0 8px 24px rgba(60, 40, 20, .05);
-  --shadow-hover: 0 2px 4px rgba(60, 40, 20, .06), 0 14px 32px rgba(60, 40, 20, .10);
+  --neu: #33405a;
+  --neu-bg: rgba(20, 35, 70, .07);
+  --neu-fill: #6f7c96;
+  --focus: #1d4ed8;
+  --btn: #14317a;
+  --btn-hover: #0f2660;
+  --btn-ink: #ffffff;
+  --shadow-pop: 0 18px 48px rgba(10, 20, 50, .18), 0 2px 8px rgba(10, 20, 50, .08);
+  --shadow-sm: 0 1px 2px rgba(10, 20, 50, .05);
+  --shadow: 0 1px 2px rgba(10, 20, 50, .04), 0 8px 24px rgba(10, 20, 50, .05);
+  --shadow-hover: 0 2px 4px rgba(10, 20, 50, .06), 0 14px 32px rgba(10, 20, 50, .10);
   --radius-sm: 10px;
   --radius: 14px;
   --radius-lg: 20px;
   --header-h: 76px;
-  --chev: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23736558' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+  --chev: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%235d6880' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
   --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
   --display: "Bricolage", var(--sans);
   --mono: ui-monospace, "SF Mono", "Cascadia Mono", "Roboto Mono", Menlo, Consolas, monospace;
@@ -59,30 +59,30 @@
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #17120e; --glow-1: rgba(184, 128, 70, .40); --glow-2: rgba(128, 86, 50, .34);
-    --surface: rgba(255, 236, 214, .045); --surface-solid: #221b16; --surface-2: rgba(255, 236, 214, .065); --surface-3: rgba(255, 236, 214, .12);
-    --glass: rgba(34, 27, 22, .62); --line: rgba(255, 226, 194, .10); --line-strong: rgba(255, 226, 194, .19);
-    --ink: #f3ece3; --ink-2: #d8ccbd; --muted: #a6978a;
-    --primary: #dcb98d; --primary-ink: #17120e; --primary-hover: #ecd0aa; --primary-soft: rgba(220, 185, 141, .13); --primary-soft-ink: #ecd3b2;
-    --good: #86c79a; --good-bg: rgba(79, 159, 114, .16); --good-fill: #4f9f72; --ok: #e6b85c; --ok-bg: rgba(201, 154, 46, .16); --ok-fill: #c99a2e;
-    --bad: #ef9084; --bad-bg: rgba(201, 85, 74, .17); --bad-fill: #c9554a; --neu: #cbbfb1; --neu-bg: rgba(255, 236, 214, .07); --neu-fill: #8f8173;
-    --focus: #dcb98d; --btn: #8c6b47; --btn-hover: #9d7b55; --btn-ink: #fff8ef;
-    --shadow-sm: 0 1px 2px rgba(0, 0, 0, .3); --shadow: 0 1px 2px rgba(0, 0, 0, .25), 0 10px 30px rgba(0, 0, 0, .18); --shadow-hover: 0 2px 6px rgba(0, 0, 0, .35), 0 16px 40px rgba(0, 0, 0, .3); --shadow-pop: 0 24px 60px rgba(0, 0, 0, .55), 0 2px 8px rgba(0, 0, 0, .35);
-    --chev: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23a6978a' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+    --bg: #05070c; --glow-1: rgba(37, 78, 180, .34); --glow-2: rgba(18, 40, 110, .36);
+    --surface: rgba(170, 195, 255, .045); --surface-solid: #0d1220; --surface-2: rgba(170, 195, 255, .07); --surface-3: rgba(170, 195, 255, .12);
+    --glass: rgba(10, 15, 28, .62); --line: rgba(150, 180, 255, .11); --line-strong: rgba(150, 180, 255, .20);
+    --ink: #eaf0fb; --ink-2: #c3cde0; --muted: #8d99b2;
+    --primary: #8db4ff; --primary-ink: #05070c; --primary-hover: #adc9ff; --primary-soft: rgba(96, 140, 240, .14); --primary-soft-ink: #b9d0ff;
+    --good: #7fcf9c; --good-bg: rgba(70, 160, 110, .16); --good-fill: #47a070; --ok: #e6b85c; --ok-bg: rgba(201, 154, 46, .16); --ok-fill: #c99a2e;
+    --bad: #f08c84; --bad-bg: rgba(201, 85, 74, .17); --bad-fill: #c9554a; --neu: #c3cde0; --neu-bg: rgba(170, 195, 255, .07); --neu-fill: #7584a3;
+    --focus: #8db4ff; --btn: #1f4fb0; --btn-hover: #2a5ec8; --btn-ink: #ffffff;
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, .4); --shadow: 0 1px 2px rgba(0, 0, 0, .35), 0 10px 30px rgba(0, 0, 0, .3); --shadow-hover: 0 2px 6px rgba(0, 0, 0, .45), 0 16px 40px rgba(0, 0, 0, .4); --shadow-pop: 0 24px 60px rgba(0, 0, 0, .7), 0 2px 8px rgba(0, 0, 0, .45);
+    --chev: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%238d99b2' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-  --bg: #17120e; --glow-1: rgba(184, 128, 70, .40); --glow-2: rgba(128, 86, 50, .34);
-    --surface: rgba(255, 236, 214, .045); --surface-solid: #221b16; --surface-2: rgba(255, 236, 214, .065); --surface-3: rgba(255, 236, 214, .12);
-    --glass: rgba(34, 27, 22, .62); --line: rgba(255, 226, 194, .10); --line-strong: rgba(255, 226, 194, .19);
-    --ink: #f3ece3; --ink-2: #d8ccbd; --muted: #a6978a;
-    --primary: #dcb98d; --primary-ink: #17120e; --primary-hover: #ecd0aa; --primary-soft: rgba(220, 185, 141, .13); --primary-soft-ink: #ecd3b2;
-    --good: #86c79a; --good-bg: rgba(79, 159, 114, .16); --good-fill: #4f9f72; --ok: #e6b85c; --ok-bg: rgba(201, 154, 46, .16); --ok-fill: #c99a2e;
-    --bad: #ef9084; --bad-bg: rgba(201, 85, 74, .17); --bad-fill: #c9554a; --neu: #cbbfb1; --neu-bg: rgba(255, 236, 214, .07); --neu-fill: #8f8173;
-    --focus: #dcb98d; --btn: #8c6b47; --btn-hover: #9d7b55; --btn-ink: #fff8ef;
-    --shadow-sm: 0 1px 2px rgba(0, 0, 0, .3); --shadow: 0 1px 2px rgba(0, 0, 0, .25), 0 10px 30px rgba(0, 0, 0, .18); --shadow-hover: 0 2px 6px rgba(0, 0, 0, .35), 0 16px 40px rgba(0, 0, 0, .3); --shadow-pop: 0 24px 60px rgba(0, 0, 0, .55), 0 2px 8px rgba(0, 0, 0, .35);
-    --chev: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23a6978a' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+  --bg: #05070c; --glow-1: rgba(37, 78, 180, .34); --glow-2: rgba(18, 40, 110, .36);
+    --surface: rgba(170, 195, 255, .045); --surface-solid: #0d1220; --surface-2: rgba(170, 195, 255, .07); --surface-3: rgba(170, 195, 255, .12);
+    --glass: rgba(10, 15, 28, .62); --line: rgba(150, 180, 255, .11); --line-strong: rgba(150, 180, 255, .20);
+    --ink: #eaf0fb; --ink-2: #c3cde0; --muted: #8d99b2;
+    --primary: #8db4ff; --primary-ink: #05070c; --primary-hover: #adc9ff; --primary-soft: rgba(96, 140, 240, .14); --primary-soft-ink: #b9d0ff;
+    --good: #7fcf9c; --good-bg: rgba(70, 160, 110, .16); --good-fill: #47a070; --ok: #e6b85c; --ok-bg: rgba(201, 154, 46, .16); --ok-fill: #c99a2e;
+    --bad: #f08c84; --bad-bg: rgba(201, 85, 74, .17); --bad-fill: #c9554a; --neu: #c3cde0; --neu-bg: rgba(170, 195, 255, .07); --neu-fill: #7584a3;
+    --focus: #8db4ff; --btn: #1f4fb0; --btn-hover: #2a5ec8; --btn-ink: #ffffff;
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, .4); --shadow: 0 1px 2px rgba(0, 0, 0, .35), 0 10px 30px rgba(0, 0, 0, .3); --shadow-hover: 0 2px 6px rgba(0, 0, 0, .45), 0 16px 40px rgba(0, 0, 0, .4); --shadow-pop: 0 24px 60px rgba(0, 0, 0, .7), 0 2px 8px rgba(0, 0, 0, .45);
+    --chev: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%238d99b2' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
     color-scheme: dark;
 }
 
