@@ -237,11 +237,34 @@ function setQuery(params, { replace = true } = {}) {
   if (replace) history.replaceState(null, '', url); else location.hash = url;
 }
 
+// ---- transições entre abas: o destaque da pílula desliza até a aba nova e o conteúdo novo entra com um esmaecimento
+// curto. Só quando muda a página (não a cada filtro); "reduzir movimento" do sistema desliga tudo pelo CSS.
+function moveNavIndicator() {
+  const nav = $('#nav'), mark = $('.pill-indicator', nav), active = $('a[aria-current]', nav);
+  if (!mark) return;
+  if (!active || !active.offsetWidth) { mark.style.opacity = '0'; return; }
+  // posição com subpixel (offsetLeft arredonda e deixaria o destaque 1 px fora do lugar)
+  const r = active.getBoundingClientRect(), n = nav.getBoundingClientRect();
+  Object.assign(mark.style, { opacity: '1', width: `${r.width}px`, height: `${r.height}px`,
+    transform: `translate(${r.left - n.left - nav.clientLeft}px, ${r.top - n.top - nav.clientTop}px)` });
+  requestAnimationFrame(() => mark.classList.add('ready')); // a primeira posição não desliza a partir do canto
+}
+window.addEventListener('resize', moveNavIndicator);
+let lastPath = null;
+function enterRoute(path) {
+  if (path === lastPath) return;
+  lastPath = path;
+  main.classList.remove('route-in');
+  void main.offsetWidth; // reinicia a animação
+  main.classList.add('route-in');
+}
+
 let renderToken = 0;
 async function router() {
   const token = ++renderToken;
   const { path, params, anchor } = parseHash();
   $$('#nav a[data-nav]').forEach((a) => a.toggleAttribute('aria-current', a.dataset.nav ? path.startsWith(a.dataset.nav) : path === ''));
+  moveNavIndicator();
   for (const [re, view] of routes) {
     const m = path.match(re);
     if (!m) continue;
@@ -250,6 +273,7 @@ async function router() {
       if (token !== renderToken) return;
       await view({ params, args: m.slice(1).map(decodeURIComponent), anchor, isCurrent: () => token === renderToken });
       if (token !== renderToken) return;
+      enterRoute(path);
       if (anchor) document.getElementById(anchor)?.scrollIntoView();
       else if (!history.state?.keepScroll) window.scrollTo(0, 0);
     } catch (err) {

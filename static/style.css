@@ -156,7 +156,16 @@ code, kbd { font-family: var(--mono); font-size: .88em; }
 .nav-item { display: inline-flex; align-items: center; gap: 7px; padding: 8px 15px; border-radius: 999px; color: var(--ink-2); font-weight: 550; font-size: 14px; transition: background .15s, color .15s; }
 .nav-item .ico { width: 16px; height: 16px; display: none; }
 .nav-item:hover { color: var(--ink); background: var(--surface-2); text-decoration: none; }
-.nav-item[aria-current] { background: var(--btn); color: var(--btn-ink); font-weight: 650; box-shadow: var(--shadow-sm); }
+.nav-item { position: relative; z-index: 1; }
+/* o texto troca de cor junto com a chegada do destaque, não antes (senão some contra o fundo da pílula) */
+.nav-item { transition: background .15s, color .18s ease; }
+.nav-item[aria-current] { transition: background .15s, color .22s ease .16s; }
+.nav-item[aria-current] { color: var(--btn-ink); font-weight: 650; }
+.nav-item[aria-current]:hover { background: transparent; color: var(--btn-ink); }
+.pill-nav { position: relative; }
+/* fundo da aba ativa: um só elemento que desliza (posição e largura vêm do JS) */
+.pill-indicator { position: absolute; top: 0; left: 0; z-index: 0; border-radius: 999px; background: var(--btn); box-shadow: var(--shadow-sm); opacity: 0; pointer-events: none; }
+.pill-indicator.ready { transition: transform .38s cubic-bezier(.3, .8, .2, 1), width .38s cubic-bezier(.3, .8, .2, 1), height .38s, opacity .2s; }
 .nav-item[aria-current] .ico { display: block; }
 .nav-cta-m { display: none; }
 .pill-tools { display: flex; align-items: center; gap: 2px; padding-left: 6px; margin-left: 4px; border-left: 1px solid var(--line); }
@@ -861,3 +870,7 @@ body.gated { padding-bottom: 0; }
   .profile-cta { margin-top: 16px; }
   .filters { border-radius: var(--radius-lg); }
 }
+
+/* conteúdo da aba nova: esmaece e sobe um pouco (só ao trocar de página) */
+@keyframes route-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+main.route-in > * { animation: route-in .32s cubic-bezier(.2, .7, .2, 1) both; }
