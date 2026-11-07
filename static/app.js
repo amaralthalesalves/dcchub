@@ -426,6 +426,17 @@ function errorBlock(err) {
 function setTitle(title) { document.title = title ? `${title} · DCCHub` : 'DCCHub — avaliações, oferta, materiais e oportunidades do DCC/UFMG'; }
 
 // ---------------------------------------------------------------- componentes
+// cartão alto da fileira de destaques: posição em número grande, foto grande, nota
+function rankCard(p, rank) {
+  const s = p.stats;
+  return `<li class="rank-card"><a href="#/professor/${p.slug}">
+    <span class="rank-num" aria-hidden="true">${rank}</span>
+    <span class="rank-photo">${p.photo ? `<img src="${esc(p.photo)}" alt="" loading="lazy" decoding="async">` : `<span class="rank-initials">${esc(initials(p.name))}</span>`}</span>
+    <span class="rank-body"><b>${esc(p.name)}</b><small>${esc(p.areas[0] || STATUS_LABEL[p.status])}</small>
+      <span class="rank-score">${pill(s.overall)} ${plural(s.count, 'avaliação', 'avaliações')}</span></span>
+  </a></li>`;
+}
+
 function profCard(p) {
   const s = p.stats;
   return `<a class="card prof-card" href="#/professor/${p.slug}">
@@ -843,11 +854,17 @@ async function viewHome() {
   const b = state.boot;
   const recent = await api('/api/reviews?sort=recent&limit=6').then((d) => d.reviews).catch(() => []);
   const rated = b.professors.filter((p) => p.stats && p.stats.count >= 2 && (p.status === 'ativo' || p.status === 'voluntario'))
-    .sort((x, y) => y.stats.score - x.stats.score).slice(0, 6);
+    .sort((x, y) => y.stats.score - x.stats.score).slice(0, 10);
   const live = b.courses.filter((c) => c.offeredNow && c.kind === 'regular');
-  const mostReviewed = b.courses.filter((c) => c.stats).sort((x, y) => y.stats.count - x.stats.count).slice(0, 6);
-  const featuredCourses = mostReviewed.length >= 3 ? mostReviewed : live.sort((x, y) => y.terms.length - x.terms.length || x.name.localeCompare(y.name)).slice(0, 6);
+  const mostReviewed = b.courses.filter((c) => c.stats).sort((x, y) => y.stats.count - x.stats.count).slice(0, 10);
+  const featuredCourses = mostReviewed.length >= 3 ? mostReviewed : [...live].sort((x, y) => y.terms.length - x.terms.length || x.name.localeCompare(y.name)).slice(0, 10);
   const activeCount = b.professors.filter((p) => p.status === 'ativo' || p.status === 'voluntario').length;
+  const teachingNow = b.professors.filter((p) => p.teachingNow).length;
+  // disciplinas da oferta atual com mais avaliações (o que os colegas mais comentam entre o que dá para cursar agora)
+  const spotCourses = live.filter((c) => c.stats).sort((x, y) => y.stats.count - x.stats.count).slice(0, 4);
+  // a seção de baixo não repete o que já está no painel
+  const spotIds = new Set(spotCourses.map((c) => c.id));
+  const moreCourses = featuredCourses.filter((c) => !spotIds.has(c.id)).slice(0, 6);
   main.innerHTML = `
   <section class="page">
     <div class="hero">
@@ -869,38 +886,54 @@ async function viewHome() {
           </form>
           <div class="hero-actions"><a href="#/professores?sort=score">Docentes por avaliação</a><a href="#/disciplinas?now=1">Disciplinas de ${esc(b.latestTerm || '')}</a><a href="#/sobre">Como funciona</a></div>
         </div>
-        <aside class="hero-card" aria-label="Números">
-          <div class="stat"><b>${b.totals.reviews}</b><span>${b.totals.reviews === 1 ? 'avaliação publicada' : 'avaliações publicadas'}</span></div>
-          <div class="stat"><b>${activeCount}</b><span>docentes em atividade</span></div>
-          <div class="stat"><b>${b.courses.filter((c) => c.active).length}</b><span>disciplinas e tópicos em oferta (${esc(b.activeTerms?.[0] || '')}–${esc(b.latestTerm || '')})</span></div>
-          <div class="stat"><b>${b.terms.length}</b><span>semestres de oferta oficial</span></div>
+        <aside class="spotlight" aria-labelledby="spot-term">
+          <p class="spot-label">${b.offerPublished ? 'Oferta do semestre' : 'Última oferta oficial'}</p>
+          <p class="spot-term" id="spot-term">${esc(b.latestTerm || '')}</p>
+          <ul class="spot-facts">
+            <li><b>${live.length}</b> disciplinas</li>
+            <li><b>${teachingNow}</b> docentes lecionando</li>
+            <li><b>${activeCount}</b> em atividade no DCC</li>
+          </ul>
+          ${spotCourses.length ? `<p class="spot-sub">Mais avaliadas nesta oferta</p>
+          <ol class="spot-list">${spotCourses.map((c) => `<li><a href="#/disciplina/${encodeURIComponent(c.id)}"><span><b>${esc(c.name)}</b><small>${esc(courseCode(c))} · ${plural(c.stats.count, 'avaliação', 'avaliações')}</small></span>${pill(c.stats.overall)}</a></li>`).join('')}</ol>` : ''}
+          <a class="btn btn-lg spot-cta" href="#/oferta"><svg class="ico"><use href="#i-calendar"/></svg>Montar minha grade</a>
         </aside>
       </div>
     </div>
     <nav class="quick" aria-label="Atalhos">
-      <a href="#/oferta"><span class="q-ico"><svg class="ico"><use href="#i-calendar"/></svg></span><span><b>Montar minha grade</b><small>Oferta ${esc(b.latestTerm || '')} com notas e conflitos</small></span></a>
       <a href="#/avaliar"><span class="q-ico"><svg class="ico"><use href="#i-pen"/></svg></span><span><b>Avaliar uma turma</b><small>Anônimo, sem cadastro</small></span></a>
       <a href="#/disciplinas"><span class="q-ico"><svg class="ico"><use href="#i-book"/></svg></span><span><b>Comparar docentes</b><small>Quem já deu cada disciplina</small></span></a>
       <a href="#/materiais"><span class="q-ico"><svg class="ico"><use href="#i-archive"/></svg></span><span><b>Materiais</b><small>Provas e listas de semestres anteriores</small></span></a>
       <a href="#/oportunidades"><span class="q-ico"><svg class="ico"><use href="#i-briefcase"/></svg></span><span><b>Oportunidades</b><small>Bolsas de IC, pesquisa e estágios</small></span></a>
     </nav>
-    ${rated.length ? `<div class="section-head"><div><p class="eyebrow">Destaques</p><h2>Docentes mais bem avaliados</h2></div><a href="#/professores?sort=score">Ver todos →</a></div>
-      <div class="grid grid-3">${rated.map(profCard).join('')}</div>` : ''}
+    ${rated.length ? `<div class="section-head"><h2>Docentes mais bem avaliados</h2>
+        <div class="rail-nav"><a href="#/professores?sort=score">Ver todos</a>
+          <button class="pill-icon" type="button" data-rail="-1" aria-label="Anteriores">‹</button><button class="pill-icon" type="button" data-rail="1" aria-label="Próximos">›</button></div></div>
+      <ol class="rail" id="rail-top">${rated.map((p, i) => rankCard(p, i + 1)).join('')}</ol>` : ''}
 
     <div class="section-head"><div><p class="eyebrow">${mostReviewed.length >= 3 ? 'Mais comentadas' : `Oferta ${esc(b.latestTerm || '')}`}</p><h2>${mostReviewed.length >= 3 ? 'Disciplinas mais avaliadas' : b.offerPublished ? 'Disciplinas deste semestre' : `Disciplinas da oferta ${esc(b.latestTerm || '')}`}</h2></div><a href="#/disciplinas">Todas as disciplinas →</a></div>
-    <div class="grid grid-2">${featuredCourses.map(courseRow).join('')}</div>
+    <div class="grid grid-2">${moreCourses.map(courseRow).join('')}</div>
 
     <div class="section-head"><div><p class="eyebrow">Comunidade</p><h2>Avaliações recentes</h2></div>${recent.length ? '' : ''}</div>
     ${recent.length ? `<div class="review-grid">${recent.map((r) => reviewCard(r, { show: 'both' })).join('')}</div>`
       : `<div class="empty-state callout"><h3>Ainda não há avaliações publicadas</h3><p>As avaliações aparecem aqui assim que forem publicadas. São anônimas e não exigem cadastro.</p><a class="btn" href="#/avaliar">Avaliar uma turma</a></div>`}
 
-    <div class="how">
-      <article><b>01</b><h3>Anonimato</h3><p>Sem conta, nome, e-mail ou matrícula. Seu navegador guarda um identificador aleatório; o servidor só conhece um hash dele.</p></article>
-      <article><b>02</b><h3>Ligado à oferta oficial</h3><p>Docentes, disciplinas e horários vêm do site do DCC. Avaliações de turmas que constam na oferta ganham o selo “turma confirmada”.</p></article>
-      <article><b>03</b><h3>Moderação</h3><p>Várias dimensões (didática, avaliações, dificuldade, carga), marcadores e comentários. Ataques pessoais não são publicados.</p></article>
-    </div>
+    <section class="band" aria-labelledby="band-title">
+      <h2 id="band-title">Ninguém sabe quem escreveu. Nem a gente.</h2>
+      <div class="band-points">
+        <p><b>Sem conta.</b> Nada de nome, e-mail ou matrícula. Seu navegador guarda um identificador aleatório, e o servidor só conhece um hash dele.</p>
+        <p><b>Ligado à oferta oficial.</b> Docentes, disciplinas e horários vêm do site do DCC. Turmas que constam na oferta ganham o selo “turma confirmada”.</p>
+        <p><b>Moderado.</b> Críticas à disciplina são bem-vindas; ataques pessoais não são publicados.</p>
+      </div>
+      <a class="btn btn-lg" href="#/avaliar"><svg class="ico"><use href="#i-pen"/></svg>Avaliar uma turma</a>
+    </section>
   </section>`;
   setupInlineSearch($('#hero-q'), $('#hero-results'), $('#hero-search'));
+  // setas da fileira: rolam uma "página" de cartões
+  $$('[data-rail]').forEach((btn) => btn.addEventListener('click', () => {
+    const rail = $('#rail-top');
+    rail.scrollBy({ left: Number(btn.dataset.rail) * rail.clientWidth * 0.85, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+  }));
 }
 
 function setupInlineSearch(input, box, form) {
