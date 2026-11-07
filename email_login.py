@@ -19,6 +19,10 @@ O que NÃO existe aqui, de propósito:
 
 `@dcc.ufmg.br` (e qualquer outro subdomínio) é recusado: é o domínio que os docentes do DCC divulgam. Assim, digitar
 o endereço público de um docente não dispara e-mail nenhum para ele.
+
+Modo docente (opcional, DCCHUB_DOCENTE_LOGIN=1): o e-mail publicado de um docente no site do DCC recebe um código que
+dá acesso SÓ à página dele, em versão reduzida. O desafio e o cookie levam o slug do docente (`<token>:<slug>`), que
+entra na assinatura — trocar o slug invalida o token.
 """
 from __future__ import annotations
 
@@ -41,6 +45,8 @@ CODE_TRIES = 5
 # códigos pedidos em seguida continuam valendo (até este número): com e-mail lento, a pessoa pede outro e o primeiro chega
 CODE_PENDING = 3
 ACCESS_TTL = 180 * 86400
+DOCENTE_TTL = 30 * 86400
+SLUG = re.compile(r"[a-z0-9]+(?:-[a-z0-9]+)*")
 EMAIL = re.compile(r"[a-z0-9](?:[a-z0-9._%+-]{0,62}[a-z0-9])?@([a-z0-9.-]+)")
 TOKEN = re.compile(r"[a-z]\d\.\d{10}\.[A-Za-z0-9_-]{22}\.[0-9a-f]{40}")
 CODE = re.compile(r"\d{6}")
@@ -105,10 +111,26 @@ def new_code(secret: str) -> tuple[str, str]:
     return code, _token("c1", secret, CODE_TTL, code)
 
 
+def new_docente_code(secret: str, slug: str) -> tuple[str, str]:
+    """Como new_code, mas o desafio só vale para a página deste docente."""
+    code = f"{secrets.randbelow(10 ** 6):06d}"
+    return code, f"{_token('c2', secret, CODE_TTL, code, slug)}:{slug}"
+
+
+def _split_slug(token: object) -> tuple[str, str | None]:
+    """'<token>:<slug>' → (token, slug); sem slug → (token, None)."""
+    if isinstance(token, str) and ":" in token:
+        token, slug = token.split(":", 1)
+        return token, slug if SLUG.fullmatch(slug) else ""
+    return token, None  # type: ignore[return-value]
+
+
 def challenge_nonce(challenge: object) -> str | None:
     """Nonce de um desafio bem formado (sem checar a assinatura): chave do limite de tentativas."""
-    if isinstance(challenge, str) and TOKEN.fullmatch(challenge) and challenge.startswith("c1."):
-        return challenge.split(".")[2]
+    token, slug = _split_slug(challenge)
+    kind = "c2." if slug else "c1."
+    if isinstance(token, str) and TOKEN.fullmatch(token) and token.startswith(kind):
+        return token.split(".")[2]
     return None
 
 
@@ -126,6 +148,31 @@ def check_code(secret: str, challenge: object, code: object) -> str | None:
     return _check("c1", secret, challenge, code) if code else None
 
 
+def check_any_code(secret: str, challenge: object, code: object) -> tuple[str, str | None] | None:
+    """(nonce, slug do docente ou None) se o código confere com um desafio de estudante ou de docente."""
+    code = clean_code(code)
+    if not code:
+        return None
+    token, slug = _split_slug(challenge)
+    if slug is None:
+        nonce = _check("c1", secret, token, code)
+        return (nonce, None) if nonce else None
+    nonce = _check("c2", secret, token, code, slug) if slug else None
+    return (nonce, slug) if nonce else None
+
+
+def docente_token(secret: str, epoch: str, slug: str) -> str:
+    return f"{_token('d1', secret, DOCENTE_TTL, epoch, slug)}:{slug}"
+
+
+def check_docente(secret: str, epoch: str, token: object) -> str | None:
+    """Slug do docente se o cookie de docente é válido."""
+    token, slug = _split_slug(token)
+    if not slug or not isinstance(token, str) or not token.startswith("d1."):
+        return None
+    return slug if _check("d1", secret, token, epoch, slug) else None
+
+
 def access_token(secret: str, epoch: str) -> str:
     return _token("e1", secret, ACCESS_TTL, epoch)
 
@@ -134,7 +181,7 @@ def check_access(secret: str, epoch: str, token: object) -> bool:
     return _check("e1", secret, token, epoch) is not None
 
 
-def message(cfg: Config, to: str, code: str) -> EmailMessage:
+def message(cfg: Config, to: str, code: str, access_days: int = ACCESS_TTL // 86400) -> EmailMessage:
     """E-mail neutro: não fala em avaliações nem em docentes. O código vai no assunto para aparecer na notificação."""
     msg = EmailMessage()
     msg["Subject"] = f"{code} é seu código de acesso ao DCCHub"
@@ -147,7 +194,7 @@ def message(cfg: Config, to: str, code: str) -> EmailMessage:
         "Seu código de acesso é:\n\n"
         f"    {code[:3]} {code[3:]}\n\n"
         f"Digite-o na página onde você pediu o código. Ele vale por {CODE_TTL // 60} minutos e só funciona uma vez. "
-        f"Depois de entrar, o navegador continua com acesso por {ACCESS_TTL // 86400} dias.\n\n"
+        f"Depois de entrar, o navegador continua com acesso por {access_days} dias.\n\n"
         "Ninguém do DCCHub vai pedir este código. Se você não pediu, é só ignorar este e-mail.\n\n"
         "— DCCHub\n"
     )
@@ -169,13 +216,13 @@ def smtp_send(cfg: Config, msg: EmailMessage) -> None:
         server.send_message(msg)
 
 
-def deliver(cfg: Config, to: str, code: str) -> None:
+def deliver(cfg: Config, to: str, code: str, access_days: int = ACCESS_TTL // 86400) -> None:
     """Envia o e-mail (chamado numa thread). Sem SMTP configurado, mostra o código no terminal (desenvolvimento)."""
     if not cfg.smtp_host:
         print(f"[login] SMTP não configurado; código de acesso (desenvolvimento): {code}", file=sys.stderr, flush=True)
         return
     try:
-        smtp_send(cfg, message(cfg, to, code))
+        smtp_send(cfg, message(cfg, to, code, access_days))
     except Exception as exc:  # noqa: BLE001
         print(f"[login] falha ao enviar e-mail: {describe_error(exc)}", file=sys.stderr, flush=True)
 
@@ -200,5 +247,5 @@ def describe_error(exc: BaseException) -> str:
     return type(exc).__name__ + (f" (código {code})" if code is not None else "")
 
 
-def send_async(cfg: Config, to: str, code: str) -> None:
-    threading.Thread(target=deliver, args=(cfg, to, code), daemon=True).start()
+def send_async(cfg: Config, to: str, code: str, access_days: int = ACCESS_TTL // 86400) -> None:
+    threading.Thread(target=deliver, args=(cfg, to, code, access_days), daemon=True).start()

@@ -636,6 +636,111 @@ class ServerTest(unittest.TestCase):
         finally:
             app.ACCESS_CODES, app.EMAIL.enabled = original
 
+    @contextmanager
+    def docente_mode(self, enabled=True):
+        """Acesso por e-mail ligado, modo docente ligado/desligado e e-mail publicado para ana-silva."""
+        prof = app.CATALOG.professors["ana-silva"]
+        original = (app.ACCESS_CODES, app.EMAIL.enabled, app.DOCENTE_LOGIN, app.email_login.send_async, prof.get("email"))
+        sent = []
+        app.ACCESS_CODES, app.EMAIL.enabled, app.DOCENTE_LOGIN = [], True, enabled
+        app.email_login.send_async = lambda cfg, to, code, *a: sent.append((to, code))
+        prof["email"] = "Ana.Silva@dcc.ufmg.br"
+        app._docente_emails = ("", {})
+        try:
+            yield sent
+        finally:
+            app.ACCESS_CODES, app.EMAIL.enabled, app.DOCENTE_LOGIN, app.email_login.send_async, email = original
+            if email is None:
+                prof.pop("email", None)
+            else:
+                prof["email"] = email
+            app._docente_emails = ("", {})
+
+    def docente_client(self, sent):
+        c = self.client()
+        status, data, _ = c.post("/api/access/email", {"email": "ana.silva@dcc.ufmg.br"})
+        self.assertEqual(status, 200, data)
+        self.assertTrue(data["challenge"].endswith(":ana-silva"))
+        status, data, _ = c.post("/api/access/email/verify", {"challenges": [data["challenge"]], "code": sent[-1][1]})
+        self.assertEqual((status, data.get("docente")), (200, True), data)
+        return c
+
+    def test_docente_mode_off_by_default(self):
+        with self.docente_mode(enabled=False) as sent:
+            status, _, _ = self.client().post("/api/access/email", {"email": "ana.silva@dcc.ufmg.br"})
+            self.assertEqual(status, 400)
+            self.assertEqual(sent, [], "sem o modo docente, o e-mail do docente não recebe nada")
+
+    def test_docente_sees_only_own_reduced_page(self):
+        posts = [review(term=f"202{i}.1", grade="A", comment=f"Aulas claras e listas boas, avaliação número {i}.") for i in range(3)]
+        posts += [review(course="DCC011", term="2025.2", comment="Única avaliação desta disciplina com a docente."),
+                  review(professor="bruno-costa", term="2025.2", comment="Avaliação de outro docente, não pode vazar.")]
+        for body in posts:  # 3 de DCC206 (aparecem), 1 de DCC011 (abaixo do mínimo: só a contagem) e 1 de outro docente
+            app.limiter.events.clear()
+            status, data, _ = self.client().post("/api/reviews", body)
+            self.assertEqual((status, data.get("status")), (201, "published"), data)
+        with self.docente_mode() as sent:
+            c = self.docente_client(sent)
+            self.assertEqual(sent[-1][0], "ana.silva@dcc.ufmg.br")
+            for path in ("/api/bootstrap", "/api/professors/ana-silva", "/api/professors/bruno-costa", "/api/reviews",
+                         "/api/courses/DCC206", "/api/me", "/api/offerings"):
+                status, data, _ = c.get(path)
+                self.assertEqual((status, data.get("docente")), (403, "ana-silva"), path)
+            self.assertEqual(c.post("/api/reviews", review(professor="bruno-costa"))[0], 403)
+            status, data, _ = c.get("/api/docente")
+            self.assertEqual(status, 200)
+            self.assertEqual(data["professor"]["name"], "Ana Silva")
+            self.assertEqual(data["total"], 4)
+            by_id = {x["id"]: x for x in data["courses"]}
+            self.assertEqual(len(by_id["DCC206"]["reviews"]), 3)
+            self.assertEqual((by_id["DCC011"]["count"], "reviews" in by_id["DCC011"], "summary" in by_id["DCC011"]), (1, False, False))
+            for r in by_id["DCC206"]["reviews"]:
+                self.assertEqual(set(r), {"id", "ratings", "wouldRetake", "tags", "comment"}, "sem semestre, conceito, data ou votos")
+            for summary in (data["summary"], by_id["DCC206"]["summary"]):
+                self.assertNotIn("byTerm", summary)
+                self.assertNotIn("grades", summary)
+            self.assertEqual(data["summary"]["count"], 3, "o resumo geral só usa disciplinas acima do mínimo")
+            text = json.dumps(data, ensure_ascii=False)
+            for leak in ("2020.1", "2021.1", "outro docente", "Única avaliação", '"A"'):
+                self.assertNotIn(leak, text)
+            # cookie com o slug trocado não vale
+            token = c.cookie.split("=", 1)[1]
+            forged = self.client()
+            forged.cookie = f"{app.ACCESS_COOKIE}={token.rsplit(':', 1)[0]}:bruno-costa"
+            self.assertEqual(forged.get("/api/docente")[0], 401)
+            self.assertEqual(forged.get("/api/bootstrap")[0], 401)
+            # sair
+            c.post("/api/access/logout")
+            self.assertEqual(c.get("/api/docente")[0], 401)
+            self.assertTrue(c.get("/api/bootstrap")[1].get("gate"))
+
+    def test_docente_report_goes_to_queue_but_never_hides(self):
+        status, mine, _ = self.client().post("/api/reviews", review())
+        self.assertEqual(status, 201)
+        _, other, _ = self.client().post("/api/reviews", review(professor="bruno-costa", term="2025.2",
+                                                                comment="Outro docente, outro texto, nada a ver com a Ana."))
+        with self.docente_mode() as sent:
+            c = self.docente_client(sent)
+            body = {"reason": app.REPORT_REASONS[0], "detail": "Isso não aconteceu."}
+            self.assertEqual(c.post(f"/api/docente/reviews/{other['id']}/report", body)[0], 404, "só as próprias")
+            self.assertEqual(c.post(f"/api/docente/reviews/{mine['id']}/report", {"reason": "x"})[0], 400)
+            for _ in range(5):
+                self.assertEqual(c.post(f"/api/docente/reviews/{mine['id']}/report", body)[0], 201)
+        with app.connect() as conn:
+            self.assertEqual(conn.execute("SELECT status FROM reviews WHERE id=?", (mine["id"],)).fetchone()[0], "published")
+            rows = conn.execute("SELECT detail FROM reports WHERE review_id=?", (mine["id"],)).fetchall()
+        self.assertEqual([r[0] for r in rows], ["[pelo docente] Isso não aconteceu."], "uma denúncia só, marcada")
+        queue = self.client().get("/api/admin/queue", headers={"Authorization": "Bearer admin-teste"})[1]["queue"]
+        self.assertEqual([q["id"] for q in queue], [mine["id"]])
+
+    def test_ufmg_address_of_docente_goes_to_docente_mode(self):
+        with self.docente_mode() as sent:
+            app.CATALOG.professors["ana-silva"]["email"] = "anasilva@ufmg.br"
+            app._docente_emails = ("", {})
+            c = self.client()
+            _, data, _ = c.post("/api/access/email", {"email": "anasilva@ufmg.br"})
+            self.assertTrue(data["challenge"].endswith(":ana-silva"), "e-mail publicado do docente nunca vira acesso de estudante")
+
     def test_email_login_disabled_by_default(self):
         self.assertEqual(self.client().post("/api/access/email", {"email": "a@ufmg.br"})[0], 404)
         self.assertEqual(self.client().post("/api/access/email/verify", {"challenge": "x", "code": "123456"})[0], 404)

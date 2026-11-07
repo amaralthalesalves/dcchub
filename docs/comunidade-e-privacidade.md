@@ -43,6 +43,25 @@ sequenceDiagram
 > [!NOTE]
 > O serviço de envio (Gmail, Brevo…) registra para quem enviou cada e-mail e quando — isso fica fora do DCCHub. Como o acesso não tem ligação com as avaliações, esse registro mostra quem *entrou* no site, não o que cada pessoa escreveu. Para dificultar o cruzamento por horário ("código às 14:02, avaliação às 14:05"), o banco guarda a data das avaliações **só com precisão de dia**. Num dia com pouquíssimo movimento, o cruzamento por dia ainda seria possível para quem tivesse o log do serviço *e* o banco — por isso, os dois ficam só com quem mantém o site.
 
+### Modo docente (experimental, desligado por padrão)
+
+Com `DCCHUB_DOCENTE_LOGIN=1`, o e-mail que um docente publica no site do DCC (a lista vem do catálogo; inclusive os
+poucos que são `@ufmg.br`) também recebe um código. Ele não dá acesso ao site: o docente vê **só a própria página, em
+versão reduzida**, por 30 dias. Todo o resto da API responde 403 para esse acesso, então não depende do front-end.
+
+O que é cortado, e por quê: quem dá aula sabe quem cursou cada turma e com que nota. Por isso cada avaliação aparece
+**sem semestre, conceito, data, edição e votos**, sem a evolução por semestre e sem a distribuição de conceitos, e
+disciplinas com **menos de 3 avaliações** mostram só quantas há (nota e texto de uma avaliação única apontariam a
+pessoa). Dentro de cada disciplina a ordem é a dos ids, que são aleatórios.
+
+O docente pode **denunciar** uma avaliação da própria página. A denúncia vai para a fila da moderação marcada como
+"[pelo docente]", mas **nunca tira a avaliação do ar sozinha**: não conta como rede diferente, senão bastaria denunciar
+de casa, do celular e do campus.
+
+O custo, e o motivo de vir desligado: com o modo ligado, qualquer pessoa que digitar o e-mail público de um docente faz
+chegar a ele um código do DCCHub — ou seja, o docente fica sabendo que o site existe. Ligar é uma decisão sobre a relação
+do projeto com os docentes, não só técnica.
+
 ### O código de acesso
 - Divulgue **só nos canais dos estudantes** (grupos de turma, DA, Discord…).
 - Aceita vários códigos separados por vírgula — por exemplo, um por semestre.
