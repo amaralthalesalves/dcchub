@@ -1,3 +1,9 @@
+# Site no domínio principal; HTTPS automático (Let's Encrypt).
 {$DOMAIN} {
 	reverse_proxy app:8000
+}
+
+# www e endereços antigos (REDIRECT_FROM, separados por espaço) levam ao domínio principal: links antigos não quebram.
+www.{$DOMAIN} {$REDIRECT_FROM} {
+	redir https://{$DOMAIN}{uri} permanent
 }
