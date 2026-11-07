@@ -426,11 +426,10 @@ function errorBlock(err) {
 function setTitle(title) { document.title = title ? `${title} · DCCHub` : 'DCCHub — avaliações, oferta, materiais e oportunidades do DCC/UFMG'; }
 
 // ---------------------------------------------------------------- componentes
-// cartão alto da fileira de destaques: posição em número grande, foto grande, nota
-function rankCard(p, rank) {
+// cartão alto do carrossel de destaques: foto grande, nome, área e nota
+function rankCard(p) {
   const s = p.stats;
   return `<li class="rank-card"><a href="#/professor/${p.slug}">
-    <span class="rank-num" aria-hidden="true">${rank}</span>
     <span class="rank-photo">${p.photo ? `<img src="${esc(p.photo)}" alt="" loading="lazy" decoding="async">` : `<span class="rank-initials">${esc(initials(p.name))}</span>`}</span>
     <span class="rank-body"><b>${esc(p.name)}</b><small>${esc(p.areas[0] || STATUS_LABEL[p.status])}</small>
       <span class="rank-score">${pill(s.overall)} ${plural(s.count, 'avaliação', 'avaliações')}</span></span>
@@ -906,10 +905,13 @@ async function viewHome() {
       <a href="#/materiais"><span class="q-ico"><svg class="ico"><use href="#i-archive"/></svg></span><span><b>Materiais</b><small>Provas e listas de semestres anteriores</small></span></a>
       <a href="#/oportunidades"><span class="q-ico"><svg class="ico"><use href="#i-briefcase"/></svg></span><span><b>Oportunidades</b><small>Bolsas de IC, pesquisa e estágios</small></span></a>
     </nav>
-    ${rated.length ? `<div class="section-head"><h2>Docentes mais bem avaliados</h2>
-        <div class="rail-nav"><a href="#/professores?sort=score">Ver todos</a>
-          <button class="pill-icon" type="button" data-rail="-1" aria-label="Anteriores">‹</button><button class="pill-icon" type="button" data-rail="1" aria-label="Próximos">›</button></div></div>
-      <ol class="rail" id="rail-top">${rated.map((p, i) => rankCard(p, i + 1)).join('')}</ol>` : ''}
+    ${rated.length ? `<section class="carousel" id="carousel-top" aria-roledescription="carrossel" aria-labelledby="carousel-top-title">
+      <div class="section-head"><h2 id="carousel-top-title">Docentes mais bem avaliados</h2>
+        <div class="carousel-nav"><a href="#/professores?sort=score">Ver todos</a>
+          <button class="pill-icon" type="button" data-step="-1" aria-label="Página anterior">‹</button><button class="pill-icon" type="button" data-step="1" aria-label="Próxima página">›</button></div></div>
+      <ol class="carousel-track">${rated.map((p) => rankCard(p)).join('')}</ol>
+      <div class="carousel-dots" role="group" aria-label="Páginas"></div>
+    </section>` : ''}
 
     <div class="section-head"><div><p class="eyebrow">${mostReviewed.length >= 3 ? 'Mais comentadas' : `Oferta ${esc(b.latestTerm || '')}`}</p><h2>${mostReviewed.length >= 3 ? 'Disciplinas mais avaliadas' : b.offerPublished ? 'Disciplinas deste semestre' : `Disciplinas da oferta ${esc(b.latestTerm || '')}`}</h2></div><a href="#/disciplinas">Todas as disciplinas →</a></div>
     <div class="grid grid-2">${moreCourses.map(courseRow).join('')}</div>
@@ -929,11 +931,44 @@ async function viewHome() {
     </section>
   </section>`;
   setupInlineSearch($('#hero-q'), $('#hero-results'), $('#hero-search'));
-  // setas da fileira: rolam uma "página" de cartões
-  $$('[data-rail]').forEach((btn) => btn.addEventListener('click', () => {
-    const rail = $('#rail-top');
-    rail.scrollBy({ left: Number(btn.dataset.rail) * rail.clientWidth * 0.85, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
-  }));
+  setupCarousel($('#carousel-top'));
+}
+
+// Carrossel: a trilha rola por páginas (setas, pontos ou arrastando no celular). Sem rolagem automática: quem lê
+// decide quando passar. As setas dão a volta (da última página para a primeira e vice-versa).
+function setupCarousel(root) {
+  if (!root) return;
+  const track = $('.carousel-track', root), dots = $('.carousel-dots', root);
+  const smooth = () => (matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth');
+  // páginas contadas em cartões: com 6 cartões e 5 por página são 2 páginas (a última, parcial, mostra os 5 finais)
+  const step = () => { const a = track.children[0], b = track.children[1]; return a && b ? b.offsetLeft - a.offsetLeft : track.clientWidth; };
+  const perPage = () => Math.max(1, Math.round((track.clientWidth + 1) / step()));
+  const pages = () => Math.max(1, Math.ceil(track.children.length / perPage()));
+  const current = () => {
+    const max = track.scrollWidth - track.clientWidth;
+    if (max > 0 && track.scrollLeft >= max - 2) return pages() - 1; // chegou ao fim: é a última página, mesmo parcial
+    return Math.min(pages() - 1, Math.round(track.scrollLeft / (perPage() * step())));
+  };
+  const go = (i) => track.scrollTo({ left: ((i + pages()) % pages()) * perPage() * step(), behavior: smooth() });
+  const render = () => {
+    const n = pages(), at = current();
+    dots.hidden = n < 2;
+    $$('[data-step]', root).forEach((b) => { b.hidden = n < 2; });
+    if (dots.children.length !== n) {
+      dots.innerHTML = Array.from({ length: n }, (_, i) => `<button type="button" data-page="${i}" aria-label="Página ${i + 1} de ${n}"></button>`).join('');
+    }
+    [...dots.children].forEach((d, i) => d.toggleAttribute('aria-current', i === at));
+  };
+  $$('[data-step]', root).forEach((b) => b.addEventListener('click', () => go(current() + Number(b.dataset.step))));
+  dots.addEventListener('click', (e) => { const d = e.target.closest('[data-page]'); if (d) go(Number(d.dataset.page)); });
+  let t;
+  track.addEventListener('scroll', () => { clearTimeout(t); t = setTimeout(render, 60); }, { passive: true });
+  // teclado: setas esquerda/direita com o foco dentro do carrossel
+  root.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { e.preventDefault(); go(current() + (e.key === 'ArrowRight' ? 1 : -1)); }
+  });
+  new ResizeObserver(render).observe(track);
+  render();
 }
 
 function setupInlineSearch(input, box, form) {
