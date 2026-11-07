@@ -432,7 +432,7 @@ function rankCard(p) {
   return `<li class="rank-card"><a href="#/professor/${p.slug}">
     <span class="rank-photo">${p.photo ? `<img src="${esc(p.photo)}" alt="" loading="lazy" decoding="async">` : `<span class="rank-initials">${esc(initials(p.name))}</span>`}</span>
     <span class="rank-body"><b>${esc(p.name)}</b><small>${esc(p.areas[0] || STATUS_LABEL[p.status])}</small>
-      <span class="rank-score">${pill(s.overall)} ${plural(s.count, 'avaliação', 'avaliações')}</span></span>
+      <span class="rank-score">${s ? `${pill(s.overall)} ${plural(s.count, 'avaliação', 'avaliações')}` : '<span class="muted">Sem avaliações ainda</span>'}</span></span>
   </a></li>`;
 }
 
@@ -852,8 +852,21 @@ async function viewHome() {
   setTitle('');
   const b = state.boot;
   const recent = await api('/api/reviews?sort=recent&limit=6').then((d) => d.reviews).catch(() => []);
-  const rated = b.professors.filter((p) => p.stats && p.stats.count >= 2 && (p.status === 'ativo' || p.status === 'voluntario'))
-    .sort((x, y) => y.stats.score - x.stats.score).slice(0, 10);
+  // carrossel com 10 docentes: os mais bem avaliados (2+ avaliações); se faltar, quem tem 1; se ainda faltar, quem está
+  // lecionando agora, mesmo sem avaliações (aí o título deixa de dizer "mais bem avaliados")
+  const CAROUSEL_SIZE = 10;
+  const inDept = (p) => p.status === 'ativo' || p.status === 'voluntario';
+  const byScore = (x, y) => y.stats.score - x.stats.score;
+  const rated = [
+    ...b.professors.filter((p) => inDept(p) && p.stats?.count >= 2).sort(byScore),
+    ...b.professors.filter((p) => inDept(p) && p.stats?.count === 1).sort(byScore),
+  ].slice(0, CAROUSEL_SIZE);
+  const allRated = rated.length >= CAROUSEL_SIZE;
+  if (!allRated) {
+    const taken = new Set(rated.map((p) => p.slug));
+    rated.push(...b.professors.filter((p) => p.teachingNow && inDept(p) && !taken.has(p.slug))
+      .sort((x, y) => Number(!!y.photo) - Number(!!x.photo) || x.name.localeCompare(y.name)).slice(0, CAROUSEL_SIZE - rated.length));
+  }
   const live = b.courses.filter((c) => c.offeredNow && c.kind === 'regular');
   const mostReviewed = b.courses.filter((c) => c.stats).sort((x, y) => y.stats.count - x.stats.count).slice(0, 10);
   const featuredCourses = mostReviewed.length >= 3 ? mostReviewed : [...live].sort((x, y) => y.terms.length - x.terms.length || x.name.localeCompare(y.name)).slice(0, 10);
@@ -906,7 +919,7 @@ async function viewHome() {
       <a href="#/oportunidades"><span class="q-ico"><svg class="ico"><use href="#i-briefcase"/></svg></span><span><b>Oportunidades</b><small>Bolsas de IC, pesquisa e estágios</small></span></a>
     </nav>
     ${rated.length ? `<section class="carousel" id="carousel-top" aria-roledescription="carrossel" aria-labelledby="carousel-top-title">
-      <div class="section-head"><h2 id="carousel-top-title">Docentes mais bem avaliados</h2>
+      <div class="section-head"><h2 id="carousel-top-title">${allRated ? 'Docentes mais bem avaliados' : 'Docentes em destaque'}</h2>
         <div class="carousel-nav"><a href="#/professores?sort=score">Ver todos</a>
           <button class="pill-icon" type="button" data-step="-1" aria-label="Página anterior">‹</button><button class="pill-icon" type="button" data-step="1" aria-label="Próxima página">›</button></div></div>
       <ol class="carousel-track">${rated.map((p) => rankCard(p)).join('')}</ol>
