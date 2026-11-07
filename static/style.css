@@ -1,5 +1,5 @@
 /* DCCHub — estilos. Fonte de títulos própria (static/fonts), nada externo.
-   Visual azul-noite: azul-escuro e preto, superfícies de vidro translúcido sobre um fundo com brilhos quentes e suaves,
+   Visual azul-noite: azul-escuro e preto, fundo liso, superfícies sólidas e vidro só no que flutua (navegação, filtros, busca),
    navegação em pílula flutuante, títulos grandes. Cor forte só onde carrega informação (notas, avisos, conflitos);
    o acento latte fica para a navegação e as ações. */
 @font-face {
@@ -10,13 +10,11 @@
 }
 :root {
   --bg: #f2f4f8;
-  --glow-1: rgba(56, 96, 190, .20);
-  --glow-2: rgba(20, 40, 90, .12);
-  --surface: rgba(255, 255, 255, .66);
+  --surface: #ffffff;
   --surface-solid: #ffffff;
   --surface-2: rgba(20, 35, 70, .055);
   --surface-3: rgba(20, 35, 70, .11);
-  --glass: rgba(255, 255, 255, .74);
+  --glass: rgba(255, 255, 255, .85);
   --line: rgba(15, 30, 70, .11);
   --line-strong: rgba(15, 30, 70, .21);
   --ink: #0c111c;
@@ -59,9 +57,9 @@
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #05070c; --glow-1: rgba(37, 78, 180, .34); --glow-2: rgba(18, 40, 110, .36);
-    --surface: rgba(170, 195, 255, .045); --surface-solid: #0d1220; --surface-2: rgba(170, 195, 255, .07); --surface-3: rgba(170, 195, 255, .12);
-    --glass: rgba(10, 15, 28, .62); --line: rgba(150, 180, 255, .11); --line-strong: rgba(150, 180, 255, .20);
+    --bg: #05070c;
+    --surface: #0b0f19; --surface-solid: #0d1220; --surface-2: rgba(170, 195, 255, .07); --surface-3: rgba(170, 195, 255, .12);
+    --glass: rgba(11, 15, 25, .82); --line: rgba(150, 180, 255, .11); --line-strong: rgba(150, 180, 255, .20);
     --ink: #eaf0fb; --ink-2: #c3cde0; --muted: #8d99b2;
     --primary: #8db4ff; --primary-ink: #05070c; --primary-hover: #adc9ff; --primary-soft: rgba(96, 140, 240, .14); --primary-soft-ink: #b9d0ff;
     --good: #7fcf9c; --good-bg: rgba(70, 160, 110, .16); --good-fill: #47a070; --ok: #e6b85c; --ok-bg: rgba(201, 154, 46, .16); --ok-fill: #c99a2e;
@@ -73,9 +71,9 @@
   }
 }
 :root[data-theme="dark"] {
-  --bg: #05070c; --glow-1: rgba(37, 78, 180, .34); --glow-2: rgba(18, 40, 110, .36);
-    --surface: rgba(170, 195, 255, .045); --surface-solid: #0d1220; --surface-2: rgba(170, 195, 255, .07); --surface-3: rgba(170, 195, 255, .12);
-    --glass: rgba(10, 15, 28, .62); --line: rgba(150, 180, 255, .11); --line-strong: rgba(150, 180, 255, .20);
+  --bg: #05070c;
+    --surface: #0b0f19; --surface-solid: #0d1220; --surface-2: rgba(170, 195, 255, .07); --surface-3: rgba(170, 195, 255, .12);
+    --glass: rgba(11, 15, 25, .82); --line: rgba(150, 180, 255, .11); --line-strong: rgba(150, 180, 255, .20);
     --ink: #eaf0fb; --ink-2: #c3cde0; --muted: #8d99b2;
     --primary: #8db4ff; --primary-ink: #05070c; --primary-hover: #adc9ff; --primary-soft: rgba(96, 140, 240, .14); --primary-soft-ink: #b9d0ff;
     --good: #7fcf9c; --good-bg: rgba(70, 160, 110, .16); --good-fill: #47a070; --ok: #e6b85c; --ok-bg: rgba(201, 154, 46, .16); --ok-fill: #c99a2e;
@@ -91,11 +89,6 @@
 html { -webkit-text-size-adjust: 100%; }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; animation: none !important; } }
 body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.55 var(--sans); min-height: 100vh; -webkit-font-smoothing: antialiased; }
-/* brilhos quentes e fixos no lugar das fotos das referências: dão profundidade ao vidro sem competir com o conteúdo */
-.ambient { position: fixed; inset: 0; z-index: -1; pointer-events: none; background:
-  radial-gradient(60vw 50vh at 85% -5%, var(--glow-1), transparent 70%),
-  radial-gradient(50vw 60vh at -10% 35%, var(--glow-2), transparent 70%),
-  radial-gradient(40vw 40vh at 70% 110%, var(--glow-2), transparent 70%); }
 main { outline: none; min-height: 60vh; }
 a { color: var(--primary); text-decoration: none; }
 a:hover { text-decoration: underline; text-underline-offset: 2px; }
