@@ -40,11 +40,15 @@ scripts/
   import_sigaa.py            oferta pelo mapa do SIGAA (PDF)
   sync_oportunidades.py      chamadas de dcc.ufmg.br/oportunidades
   sync_provas.py             índice do acervo de materiais (Google Drive)
+  sync_curriculos.py         currículos dos cursos (relatórios da PROGRAD + transcrições)
+  send_backup.py             envia o backup cifrado por e-mail (usado pelo deploy/backup.sh)
 data/
   catalog.json               catálogo gerado (versionado)
   catalog-arquivo.json       disciplinas extintas
   ofertas-sigaa/             ofertas importadas do SIGAA (só campos mínimos)
   oportunidades.json, provas.json
+  curriculos.json            currículos por curso/período (gerado; formato em docs/curriculos-formato.md)
+  curriculos_manual.json     currículos que só existem em imagem, transcritos à mão
 static/                      SPA sem build + fotos
 tests/                       unitários, integração, moderação, seed de demonstração, e2e
 deploy/                      docker compose, Caddy, cron, backup
@@ -53,7 +57,18 @@ docs/                        esta documentação
 
 ### Design da interface
 
-Linguagem visual sóbria e institucional: superfícies neutras, **um** azul de destaque (`#1f56a0`), bordas finas em vez de sombras pesadas, sem gradientes, e cor só onde carrega informação (notas, avisos, conflitos). Todas as cores são variáveis em `:root` no `style.css`, redefinidas para o modo escuro. Fontes do sistema — nada é carregado de terceiros.
+Azul-escuro e preto, fundo liso e superfícies sólidas; vidro translúcido só no que flutua (navegação em pílula, filtros, busca). Títulos grandes na Bricolage Grotesque (OFL, servida de `static/fonts/`), texto corrido na fonte do sistema — nada é carregado de terceiros. Cor forte só onde carrega informação (notas, avisos, conflitos). Todas as cores são variáveis em `:root` no `style.css`, redefinidas para o modo escuro.
+
+### Currículos (grade por curso)
+
+A grade pode começar pelas disciplinas do período da pessoa (curso, currículo e período ficam só no navegador). Os dados vêm de `data/curriculos.json`, gerado por:
+
+```bash
+python3 scripts/sync_curriculos.py            # baixa os relatórios oficiais da PROGRAD e junta data/curriculos_manual.json
+python3 scripts/sync_curriculos.py --dry-run  # só mostra o resumo
+```
+
+Precisa do `pdftotext` (poppler) na máquina que roda o script; o servidor só lê o JSON. Currículos que só existem como imagem (Ciência da Computação 2024, Sistemas de Informação, Engenharia de Computação) ficam em `data/curriculos_manual.json`, no mesmo formato, e precisam ser revistos à mão quando o colegiado publicar uma nova versão. Disciplinas de fora do DCC aparecem na lista do período sem turmas; a pessoa pode pôr o horário dela à mão na grade.
 
 ## Configuração
 

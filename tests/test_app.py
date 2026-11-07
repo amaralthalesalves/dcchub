@@ -78,6 +78,18 @@ OPPS = {"generatedAt": "2026-11-05T00:00:00+00:00", "source": "https://dcc.ufmg.
      "professors": ["bruno-costa"]}]}
 (Path(TMP.name) / "oportunidades.json").write_text(json.dumps(OPPS))
 app.OPPORTUNITIES = app.Opportunities(Path(TMP.name) / "oportunidades.json")
+CURRICULOS = {"generatedAt": "2026-11-07T00:00:00+00:00", "curriculos": [
+    {"id": "cc-teste", "curso": "Ciência da Computação", "versao": "2024", "rotulo": "Ciência da Computação — currículo 2024",
+     "fonte": {"tipo": "imagem", "url": None}, "avisos": [],
+     "periodos": [{"n": 1, "optativasCh": 0, "disciplinas": [
+         {"codigo": "DCC206", "nome": "Algoritmos I", "natureza": "OB", "ch": 60, "depto": "DCC", "prereq": []},
+         {"codigo": "MAT001", "nome": "Cálculo Diferencial e Integral I", "natureza": "OB", "ch": 90, "depto": "MAT", "prereq": []}]},
+         {"n": 2, "optativasCh": 60, "disciplinas": [
+         {"codigo": "DCC205", "nome": "Estruturas de Dados", "natureza": "OB", "ch": 60, "depto": "DCC", "prereq": ["DCC206"]},
+         {"codigo": None, "nome": "Disciplina sem código", "natureza": "OB", "ch": 60, "depto": "INU", "prereq": []}]}],
+     "optativas": [{"codigo": "DCC011", "nome": "Introdução a Banco de Dados", "ch": 60, "depto": "DCC", "prereq": []}]}]}
+(Path(TMP.name) / "curriculos.json").write_text(json.dumps(CURRICULOS))
+app.CURRICULA = app.Curricula(Path(TMP.name) / "curriculos.json")
 
 app.CATALOG = app.Catalog(CATALOG_PATH)
 
@@ -599,6 +611,17 @@ class ServerTest(unittest.TestCase):
         self.assertFalse(app.notifier.enabled)
         self.client().post("/api/reviews", review(comment="Ele é machista: só chama os meninos para responder no quadro."))
         self.assertIsNone(app.notifier.timer)
+
+    def test_curriculos_link_codes_to_catalog(self):
+        """Cada disciplina do currículo aponta para a disciplina do catálogo; código antigo vira o atual e o que não está
+        no catálogo (outros departamentos, código a definir) fica sem ligação."""
+        status, data, _ = self.client().get("/api/curriculos")
+        self.assertEqual(status, 200)
+        [cur] = data["curriculos"]
+        links = {d["nome"]: d["disciplina"] for per in cur["periodos"] for d in per["disciplinas"]}
+        self.assertEqual(links, {"Algoritmos I": "DCC206", "Cálculo Diferencial e Integral I": None,
+                                 "Estruturas de Dados": "DCC221", "Disciplina sem código": None})
+        self.assertEqual(cur["optativas"][0]["disciplina"], "DCC011")
 
     def test_health_is_open_and_says_nothing(self):
         """O monitor de disponibilidade consulta /api/health sem acesso da comunidade; a resposta é só "ok"."""

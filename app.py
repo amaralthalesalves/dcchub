@@ -305,6 +305,43 @@ class Opportunities:
 OPPORTUNITIES = Opportunities(DATA / "oportunidades.json")
 
 
+class Curricula:
+    """Currículos dos cursos (data/curriculos.json, gerado por scripts/sync_curriculos.py; formato em
+    docs/curriculos-formato.md). Cada disciplina ganha `disciplina`: o id dela no catálogo, para a grade achar as turmas."""
+
+    def __init__(self, path: Path):
+        self.path, self.mtime, self.data, self.catalog_version = path, -1.0, None, -1
+
+    def refresh(self) -> None:
+        try:
+            mtime = self.path.stat().st_mtime
+        except FileNotFoundError:
+            self.data, self.mtime = None, -1.0
+            return
+        if mtime != self.mtime or self.catalog_version != CATALOG.version:
+            data = json.loads(self.path.read_text())
+            for c in data.get("curriculos", []):
+                for item in [d for per in c.get("periodos", []) for d in per.get("disciplinas", [])] + c.get("optativas", []):
+                    item["disciplina"] = self.resolve(item.get("codigo"))
+            self.data, self.mtime, self.catalog_version = data, mtime, CATALOG.version
+
+    @staticmethod
+    def resolve(code: str | None) -> str | None:
+        """Código do currículo → id da disciplina no catálogo. Código antigo vira a disciplina atual (DCC205 → DCC221);
+        código usado por várias disciplinas (tópicos especiais, ex. DCC030) não aponta para nenhuma."""
+        if not code:
+            return None
+        if code in CATALOG.courses:
+            return code
+        if code in CATALOG.alias:
+            return CATALOG.alias[code]
+        owners = [cid for cid, c in CATALOG.courses.items() if code in c.get("codes", [])]
+        return owners[0] if len(owners) == 1 else None
+
+
+CURRICULA = Curricula(DATA / "curriculos.json")
+
+
 # --------------------------------------------------------------------------- banco de dados
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS reviews (
@@ -804,6 +841,7 @@ class App(BaseHTTPRequestHandler):
         ("GET", r"/api/provas", "get_provas"),
         ("POST", r"/api/moderation/check", "post_moderation_check"),
         ("GET", r"/api/oportunidades", "get_oportunidades"),
+        ("GET", r"/api/curriculos", "get_curriculos"),
         ("POST", r"/api/reviews", "post_review"),
         ("PUT", r"/api/reviews/(\d+)", "put_review"),
         ("DELETE", r"/api/reviews/(\d+)", "delete_review"),
@@ -1088,6 +1126,12 @@ class App(BaseHTTPRequestHandler):
                                           or e.get("course") in CATALOG.alias else None} for e in sec["courses"]]}
                     for sec in data["sections"]]
         self.send_json({**data, "sections": sections})
+
+    def get_curriculos(self) -> None:
+        CURRICULA.refresh()
+        if not CURRICULA.data:
+            raise ApiError(404, "Os currículos ainda não foram gerados (rode scripts/sync_curriculos.py).")
+        self.send_json(CURRICULA.data)
 
     def get_oportunidades(self) -> None:
         if not OPPORTUNITIES.data:

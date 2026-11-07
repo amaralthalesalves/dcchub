@@ -1316,13 +1316,27 @@ const SLOTS = ['07:30', '09:25', '11:10', '13:00', '14:55', '17:00', '19:00', '2
 const shiftOf = (start) => (start < '12:00' ? 'manha' : start < '18:50' ? 'tarde' : 'noite');
 const toMin = (t) => { const [h, m] = t.split(':').map(Number); return h * 60 + m; };
 
+// currículos dos cursos (data/curriculos.json): carregados uma vez; sem o arquivo, a grade funciona como antes
+async function loadCurricula() {
+  if (!state.curricula) state.curricula = await api('/api/curriculos').then((d) => d.curriculos || []).catch(() => []);
+  return state.curricula;
+}
+const ordinal = (n) => `${n}º`;
+
 async function viewOffer({ params, isCurrent }) {
   const b = state.boot;
   const term = b.terms.includes(params.get('term')) ? params.get('term') : b.latestTerm;
   setTitle(`Oferta ${term}`);
   main.innerHTML = '<div class="loading-screen"><span class="spinner"></span></div>';
-  const data = await api(`/api/offerings?term=${encodeURIComponent(term)}`);
+  const [data, curricula] = await Promise.all([api(`/api/offerings?term=${encodeURIComponent(term)}`), loadCurricula()]);
   if (!isCurrent()) return;
+  // curso e período da pessoa: só neste navegador, nunca enviados ao servidor nem ligados às avaliações
+  const profileKey = 'dcchub-curso';
+  let profile = store.get(profileKey, null);
+  if (profile && !curricula.some((c) => c.id === profile.id)) profile = null;
+  // horários adicionados à mão (disciplinas sem turma do DCC, como as de outros departamentos)
+  const extraKey = `avalie-grade-extra-${term}`;
+  let extras = store.get(extraKey, []);
   const key = `avalie-grade-${term}`;
   let picked = new Set(store.get(key, []));
   const icsKey = `avalie-aulas-${term}`; // datas de início/fim das aulas, só neste navegador
@@ -1337,6 +1351,7 @@ async function viewOffer({ params, isCurrent }) {
     ${term === b.latestTerm ? staleNotice('Use esta grade como referência e confira no SIGA.') : ''}
     ${viaSigaa(term) ? `<div class="notice notice-old" role="note"><svg class="ico" aria-hidden="true"><use href="#i-info"/></svg><div><b>Oferta de ${esc(term)} obtida do mapa de oferta do SIGAA.</b> O DCC ainda não publicou a página deste semestre; quando publicar, ela passa a ser a fonte. Confirme sala e vagas no SIGA.</div></div>` : ''}
     ${data.offerings.length && data.offerings.every((o) => !o.professors.length && !o.unresolved?.length) ? `<div class="notice notice-old" role="note"><svg class="ico" aria-hidden="true"><use href="#i-info"/></svg><div><b>A oferta oficial de ${esc(term)} não lista docentes.</b> A página publicada pelo DCC para este semestre traz só disciplina, turma e horário.</div></div>` : ''}
+    ${curricula.length ? '<section class="my-course" id="my-course" aria-label="Meu curso"></section>' : ''}
     <form class="filters" id="filters" role="search">
       <label class="field"><span class="sr-only">Semestre</span><select name="term">${b.terms.slice().reverse().map((t) => `<option ${t === term ? 'selected' : ''}>${esc(t)}</option>`).join('')}</select></label>
       <label class="field grow"><span class="sr-only">Buscar</span><input type="search" name="q" placeholder="Disciplina, código ou docente…" value="${esc(params.get('q') || '')}"></label>
@@ -1357,10 +1372,12 @@ async function viewOffer({ params, isCurrent }) {
   </section>`;
   const form = $('#filters');
   const pickedOfferings = () => offerings.filter((o) => picked.has(o.key));
+  const extraItems = () => extras.map((e) => ({ key: `x:${e.id}`, course: `x:${e.id}`, extra: e, schedule: e.schedule, professors: [] }));
+  const allChosen = () => [...pickedOfferings(), ...extraItems()];
   const conflicts = (o, list) => list.filter((p) => p.key !== o.key && p.schedule.some((a) => o.schedule.some((x) => x.day === a.day && toMin(x.start) < toMin(a.end) && toMin(a.start) < toMin(x.end))));
 
   const drawPlanner = () => {
-    const list = pickedOfferings();
+    const list = allChosen();
     const box = $('#planner');
     if (!list.length) { box.innerHTML = '<p class="muted small">Clique em “+ grade” nas turmas para montar seu horário. A grade fica salva só neste navegador.</p>'; return; }
     const days = [1, 2, 3, 4, 5, ...(list.some((o) => o.schedule.some((s) => s.day === 6)) ? [6] : [])];
@@ -1373,11 +1390,12 @@ async function viewOffer({ params, isCurrent }) {
       <div></div>${days.map((d) => `<div class="week-day">${DAYS[d]}</div>`).join('')}
       ${rows.map((t) => `<div class="week-time">${t}</div>${days.map((d) => {
         const here = list.filter((o) => o.schedule.some((s) => s.day === d && s.start <= t && t < s.end));
-        return `<div class="week-cell ${here.length > 1 ? 'clash' : ''}">${here.map((o) => `<span class="week-item" style="--h:${hue.get(o.course)}" title="${esc(state.course.get(o.course)?.name || '')}">${esc(shortCourse(o))}</span>`).join('')}</div>`;
+        return `<div class="week-cell ${here.length > 1 ? 'clash' : ''}">${here.map((o) => `<span class="week-item" style="--h:${hue.get(o.course)}" title="${esc(o.extra ? o.extra.title : state.course.get(o.course)?.name || '')}">${esc(shortCourse(o))}</span>`).join('')}</div>`;
       }).join('')}`).join('')}
     </div>
     ${hasConflict ? '<p class="warn small">⚠ Há turmas com horários sobrepostos (em vermelho).</p>' : ''}
-    <ul class="planner-list">${list.map((o) => { const c = state.course.get(o.course); return `<li><span class="dot" style="--h:${hue.get(o.course)}"></span><a href="#/disciplina/${encodeURIComponent(o.course)}">${esc(c?.name || o.course)}</a> <span class="muted small">${esc(o.professors.map((s) => firstNameLast(state.prof.get(s)?.name || s)).join(', '))}</span><button class="link-btn unpick" data-unpick="${esc(o.key)}" aria-label="Remover">✕</button></li>`; }).join('')}</ul>
+    <ul class="planner-list">${list.map((o) => { if (o.extra) return `<li><span class="dot" style="--h:${hue.get(o.course)}"></span><span class="planner-extra">${esc(o.extra.title)}</span> <span class="muted small">horário manual</span><button class="link-btn unpick" data-unextra="${esc(o.extra.id)}" aria-label="Remover">✕</button></li>`;
+      const c = state.course.get(o.course); return `<li><span class="dot" style="--h:${hue.get(o.course)}"></span><a href="#/disciplina/${encodeURIComponent(o.course)}">${esc(c?.name || o.course)}</a> <span class="muted small">${esc(o.professors.map((s) => firstNameLast(state.prof.get(s)?.name || s)).join(', '))}</span><button class="link-btn unpick" data-unpick="${esc(o.key)}" aria-label="Remover">✕</button></li>`; }).join('')}</ul>
     <p class="small muted">${plural(list.length, 'disciplina', 'disciplinas')} · ${list.reduce((a, o) => a + o.schedule.reduce((x, s) => x + (toMin(s.end) - toMin(s.start)), 0), 0) / 60 | 0}h/semana em sala</p>
     <details class="ics-export" id="ics-export" ${icsOpen ? 'open' : ''}><summary>Exportar para o calendário (.ics)</summary>
       <form id="ics-form" class="ics-form">
@@ -1408,7 +1426,7 @@ async function viewOffer({ params, isCurrent }) {
         const profs = o.professors.map((s) => state.prof.get(s)?.name || s).join(', ');
         return {
           uid: `${term}-${o.key}`,
-          title: c ? `${c.codes[0]} — ${c.name}` : o.course,
+          title: o.extra ? (o.extra.code ? `${o.extra.code} — ${o.extra.title}` : o.extra.title) : c ? `${c.codes[0]} — ${c.name}` : o.course,
           description: [o.class && `Turma ${o.class}`, profs && `Docentes: ${profs}`, `Oferta ${term} (DCCHub). Confira a sala no SIGA.`].filter(Boolean).join('\n'),
           schedule: o.schedule,
         };
@@ -1432,7 +1450,7 @@ async function viewOffer({ params, isCurrent }) {
     const shift = fd.get('shift');
     const day = Number(fd.get('day'));
     const fits = fd.get('fits');
-    const chosen = pickedOfferings();
+    const chosen = allChosen();
     const list = offerings.filter((o) => {
       const c = state.course.get(o.course);
       const hay = fold(`${c?.name} ${o.codes.join(' ')} ${o.professors.map((s) => state.prof.get(s)?.name).join(' ')}`);
@@ -1448,11 +1466,10 @@ async function viewOffer({ params, isCurrent }) {
       const ca = state.course.get(a); const cb = state.course.get(b2);
       return (ca.kind === cb.kind ? 0 : ca.kind === 'regular' ? -1 : 1) || (ca.kind === 'regular' ? a.localeCompare(b2) : ca.name.localeCompare(cb.name));
     });
-    $('#result-count').textContent = `${plural(list.length, 'turma', 'turmas')} em ${plural(groups.size, 'disciplina', 'disciplinas')}`;
-    $('#offer-list').innerHTML = sorted.map(([cid, items]) => {
+    const courseCard = ([cid, items], tag = '') => {
       const c = state.course.get(cid);
       return `<article class="offer-course">
-        <header><a href="#/disciplina/${encodeURIComponent(cid)}"><span class="code">${esc(courseCode(c))}</span><h3>${esc(c.name)}</h3></a>${c.stats ? `<span class="small muted">disciplina: ${pill(c.stats.overall)} (${c.stats.count})</span>` : ''}</header>
+        <header><a href="#/disciplina/${encodeURIComponent(cid)}"><span class="code">${esc(courseCode(c))}${tag ? ` <span class="offer-tag">${esc(tag)}</span>` : ''}</span><h3>${esc(c.name)}</h3></a>${c.stats ? `<span class="small muted">disciplina: ${pill(c.stats.overall)} (${c.stats.count})</span>` : ''}</header>
         <ul>${items.map((o) => {
           const clash = conflicts(o, chosen);
           const on = picked.has(o.key);
@@ -1464,8 +1481,110 @@ async function viewOffer({ params, isCurrent }) {
             ${clash.length && !on ? `<p class="clash-note small">Conflita com ${esc(clash.map((x) => shortCourse(x)).join(', '))}</p>` : ''}
           </li>`;
         }).join('')}</ul></article>`;
-    }).join('') || '<div class="empty-state"><p>Nenhuma turma com esses filtros.</p></div>';
+    };
+    const cur = profile && curricula.find((c) => c.id === profile.id);
+    let html;
+    let shown = sorted;
+    if (!cur) {
+      html = sorted.map((g) => courseCard(g)).join('');
+    } else {
+      // papel de cada disciplina no currículo escolhido: do período da pessoa, obrigatória de outro período ou optativa
+      const role = new Map();
+      cur.periodos.forEach((per) => per.disciplinas.forEach((d) => {
+        if (!d.disciplina) return;
+        const mine = per.n === profile.periodo;
+        if (!role.has(d.disciplina) || mine) role.set(d.disciplina, { kind: d.natureza === 'OP' ? 'op' : mine ? 'now' : 'ob', periodo: per.n });
+      }));
+      cur.optativas.forEach((d) => { if (d.disciplina && !role.has(d.disciplina)) role.set(d.disciplina, { kind: 'op' }); });
+      const part = (kind) => sorted.filter(([cid]) => role.get(cid)?.kind === kind);
+      const now = part('now');
+      const ob = part('ob').sort(([a], [b2]) => role.get(a).periodo - role.get(b2).periodo);
+      const op = part('op');
+      const rest = sorted.filter(([cid]) => !role.has(cid));
+      // disciplinas do período sem turma do DCC neste semestre (outros departamentos, ou não ofertadas): só sem filtros
+      const filtering = q || shift || day || fits;
+      const period = cur.periodos.find((per) => per.n === profile.periodo);
+      const missing = filtering || !period ? [] : period.disciplinas.filter((d) => !d.disciplina || !groups.has(d.disciplina));
+      const section = (title, body, count, note = '') => (body ? `<section class="offer-section"><h2>${title} <span class="count">${count}</span></h2>${note}${body}</section>` : '');
+      const missingCard = (d, i) => {
+        const outside = d.depto && d.depto !== 'DCC';
+        const has = extras.some((e) => e.ref === `${cur.id}:${d.codigo || d.nome}`);
+        return `<article class="offer-course offer-missing">
+          <header><div><span class="code">${esc(d.codigo || 'código a definir')}</span><h3>${esc(d.nome)}</h3></div>
+            <span class="small muted">${outside ? `fora do DCC (${esc(d.depto)}) · horário no SIGA` : `sem turma do DCC em ${esc(term)}`}</span></header>
+          <div class="offer-missing-actions">${has ? '<span class="small muted">✓ na grade (horário manual)</span>'
+            : `<button type="button" class="btn btn-sm btn-ghost" data-extra-add="${i}">+ horário</button><span class="small muted">Adicione o horário da sua turma para ver conflitos.</span>`}</div>
+        </article>`;
+      };
+      html = section(`Do seu ${ordinal(profile.periodo)} período`, now.map((g) => courseCard(g)).join('') + missing.map(missingCard).join(''), now.length + missing.length,
+        missing.length ? '' : '')
+        + section('Obrigatórias de outros períodos', ob.map((g) => courseCard(g, `${ordinal(role.get(g[0]).periodo)} período`)).join(''), ob.length)
+        + section('Optativas do seu curso', op.map((g) => courseCard(g, 'optativa')).join(''), op.length)
+        + (profile.only ? '' : section('Outras disciplinas', rest.map((g) => courseCard(g)).join(''), rest.length));
+      shown = profile.only ? [...now, ...ob, ...op] : sorted;
+      view.missing = missing;
+    }
+    const turmas = shown.reduce((a, [, items]) => a + items.length, 0);
+    $('#result-count').textContent = `${plural(turmas, 'turma', 'turmas')} em ${plural(shown.length, 'disciplina', 'disciplinas')}`;
+    $('#offer-list').innerHTML = html || '<div class="empty-state"><p>Nenhuma turma com esses filtros.</p></div>';
     drawPlanner();
+  };
+  const view = { missing: [] };
+
+  // ---- "Meu curso": curso/currículo, período e "só do meu curso" (salvo só neste navegador)
+  const drawProfile = () => {
+    const box = $('#my-course');
+    if (!box) return;
+    const cur = profile && curricula.find((c) => c.id === profile.id);
+    const byCourse = new Map();
+    curricula.forEach((c) => byCourse.set(c.curso, [...(byCourse.get(c.curso) || []), c]));
+    box.innerHTML = `<div class="my-course-row">
+      <label class="field grow"><span>Meu curso</span><select id="mc-curso">
+        <option value="">Escolha seu curso e currículo…</option>
+        ${[...byCourse].map(([curso, list]) => `<optgroup label="${esc(curso)}">${list.map((c) => `<option value="${esc(c.id)}" ${cur?.id === c.id ? 'selected' : ''}>${esc(c.rotulo)}${c.percurso ? ` — ${esc(c.percurso)}` : ''}</option>`).join('')}</optgroup>`).join('')}
+      </select></label>
+      ${cur ? `<label class="field"><span>Período</span><select id="mc-periodo">${cur.periodos.map((per) => `<option value="${per.n}" ${per.n === profile.periodo ? 'selected' : ''}>${ordinal(per.n)} período</option>`).join('')}</select></label>
+      <label class="check"><input type="checkbox" id="mc-only" ${profile.only ? 'checked' : ''}> Só do meu curso</label>` : ''}
+    </div>
+    <p class="small muted my-course-note">${cur ? `${cur.nota ? `${esc(cur.nota)} ` : ''}Confira sempre no SIGA. ` : 'Com o curso e o período, a lista começa pelas disciplinas que você precisa cursar agora. '}Fica salvo só neste navegador.</p>
+    ${cur ? `<details class="my-course-about"><summary>Sobre estes dados</summary>
+      <p class="small muted">${cur.fonte?.tipo === 'imagem' ? 'Transcrito à mão da grade publicada pelo colegiado' : `Do relatório oficial da Pró-reitoria de Graduação (versão ${esc(cur.fonte?.versaoOficial || cur.versao)})`}${cur.fonte?.url ? ` — <a href="${safeHref(cur.fonte.url)}" target="_blank" rel="noreferrer">fonte ↗</a>` : ''}.</p>
+      ${(cur.avisos || []).length ? `<ul class="small muted">${cur.avisos.map((a) => `<li>${esc(a)}</li>`).join('')}</ul>` : ''}</details>` : ''}`;
+    $('#mc-curso').addEventListener('change', (e) => {
+      const c = curricula.find((x) => x.id === e.target.value);
+      profile = c ? { id: c.id, periodo: Math.min(profile?.periodo || 1, c.periodos.length), only: !!profile?.only } : null;
+      store.set(profileKey, profile); drawProfile(); draw();
+    });
+    $('#mc-periodo')?.addEventListener('change', (e) => { profile = { ...profile, periodo: Number(e.target.value) }; store.set(profileKey, profile); draw(); });
+    $('#mc-only')?.addEventListener('change', (e) => { profile = { ...profile, only: e.target.checked }; store.set(profileKey, profile); draw(); });
+  };
+
+  // ---- horário manual para disciplina sem turma do DCC
+  const saveExtras = () => store.set(extraKey, extras);
+  const openExtraDialog = (d) => {
+    const cur = curricula.find((c) => c.id === profile.id);
+    const dlg = $('#dialog');
+    const row = (i) => `<div class="extra-slot"><label class="field"><span>Dia</span><select name="day${i}"><option value="">—</option>${[1, 2, 3, 4, 5, 6].map((n) => `<option value="${n}">${DAYS[n]}</option>`).join('')}</select></label>
+      <label class="field"><span>Início</span><input type="time" name="start${i}" step="300"></label><label class="field"><span>Fim</span><input type="time" name="end${i}" step="300"></label></div>`;
+    dlg.innerHTML = `<form method="dialog" class="dialog-body" id="extra-form">
+      <h2>Horário de ${esc(d.nome)}</h2>
+      <p class="muted">Copie do SIGA o horário da sua turma. Ele entra na sua grade e na checagem de conflitos, e fica salvo só neste navegador.</p>
+      ${row(0)}${row(1)}${row(2)}
+      <p class="warn small" id="extra-err" role="alert"></p>
+      <div class="row-gap end"><button class="btn btn-ghost" value="cancel" formnovalidate>Cancelar</button><button class="btn" value="save">Pôr na grade</button></div>
+    </form>`;
+    dlg.showModal();
+    $('#extra-form').addEventListener('submit', (ev) => {
+      if (ev.submitter?.value !== 'save') return;
+      ev.preventDefault();
+      const fd = new FormData(ev.target);
+      const schedule = [0, 1, 2].map((i) => ({ day: Number(fd.get(`day${i}`)), start: fd.get(`start${i}`), end: fd.get(`end${i}`) }))
+        .filter((x) => x.day || x.start || x.end);
+      const bad = schedule.find((x) => !x.day || !x.start || !x.end || x.start >= x.end);
+      if (!schedule.length || bad) { $('#extra-err').textContent = 'Preencha dia, início e fim (o fim depois do início) de cada horário.'; return; }
+      extras = [...extras, { id: Math.random().toString(36).slice(2, 10), ref: `${cur.id}:${d.codigo || d.nome}`, code: d.codigo || '', title: d.nome, schedule }];
+      saveExtras(); dlg.close(); draw();
+    });
   };
   const save = () => store.set(key, [...picked]);
   if (offerClick) main.removeEventListener('click', offerClick);
@@ -1475,14 +1594,20 @@ async function viewOffer({ params, isCurrent }) {
     const unpick = e.target.closest('[data-unpick]');
     if (pick) { const k = pick.dataset.pick; if (picked.has(k)) picked.delete(k); else picked.add(k); save(); draw(); }
     if (unpick) { picked.delete(unpick.dataset.unpick); save(); draw(); }
-    if (e.target.id === 'clear-grade' && picked.size && confirm('Limpar a grade deste semestre?')) { picked = new Set(); save(); draw(); }
+    const addExtra = e.target.closest('[data-extra-add]');
+    if (addExtra) openExtraDialog(view.missing[Number(addExtra.dataset.extraAdd)]);
+    const unextra = e.target.closest('[data-unextra]');
+    if (unextra) { extras = extras.filter((x) => x.id !== unextra.dataset.unextra); saveExtras(); draw(); }
+    if (e.target.id === 'clear-grade' && (picked.size || extras.length) && confirm('Limpar a grade deste semestre?')) { picked = new Set(); extras = []; save(); saveExtras(); draw(); }
   };
   main.addEventListener('click', offerClick);
   form.addEventListener('input', draw);
   form.addEventListener('submit', (e) => e.preventDefault());
+  drawProfile();
   draw();
 }
 function shortCourse(o) {
+  if (o.extra) return o.extra.code || (o.extra.title.length > 14 ? `${o.extra.title.slice(0, 12)}…` : o.extra.title);
   const c = state.course.get(o.course);
   if (!c) return o.course;
   if (c.kind === 'topico') return c.name.length > 18 ? `${c.name.slice(0, 16)}…` : c.name;

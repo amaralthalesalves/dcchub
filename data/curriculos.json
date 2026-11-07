@@ -1,0 +1,7101 @@
+{
+ "generatedAt": "2026-11-07T18:47:21+00:00",
+ "curriculos": [
+  {
+   "id": "cc-2019",
+   "curso": "Ciência da Computação",
+   "versao": "2019",
+   "percurso": "Bacharelado (núcleo avançado + núcleo geral)",
+   "rotulo": "Ciência da Computação — currículo 2019",
+   "nota": "Para quem entrou antes de 2024.",
+   "fonte": {
+    "tipo": "prograd",
+    "url": "https://dcc.ufmg.br/wp-content/uploads/versao_curricular_bcc_20241208.pdf",
+    "versaoOficial": "D-20192",
+    "data": "2024-12-08"
+   },
+   "periodos": [
+    {
+     "n": 1,
+     "disciplinas": [
+      {
+       "codigo": "CAD011",
+       "nome": "Administração",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "CAD",
+       "prereq": []
+      },
+      {
+       "codigo": "DCC050",
+       "nome": "Introdução a Ciência da Computação",
+       "natureza": "OB",
+       "ch": 30,
+       "depto": "DCC",
+       "prereq": []
+      },
+      {
+       "codigo": "DCC203",
+       "nome": "Programação e Desenvolvimento de Software I",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": []
+      },
+      {
+       "codigo": "DCC638",
+       "nome": "Introdução à Lógica Computacional",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": []
+      },
+      {
+       "codigo": "MAT038",
+       "nome": "Geometria Analitica e Álgebra Linear",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "MAT",
+       "prereq": []
+      }
+     ],
+     "optativasCh": 0
+    },
+    {
+     "n": 2,
+     "disciplinas": [
+      {
+       "codigo": "DCC204",
+       "nome": "Programação e Desenvolvimento de Software II",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "DCC203"
+       ]
+      },
+      {
+       "codigo": "DCC216",
+       "nome": "Matemática Discreta",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "DCC638"
+       ]
+      },
+      {
+       "codigo": "DCC639",
+       "nome": "Álgebra Linear Computacional",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "MAT038"
+       ]
+      },
+      {
+       "codigo": "ECN140",
+       "nome": "Introdução à Economia",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "ECN",
+       "prereq": []
+      },
+      {
+       "codigo": "MAT001",
+       "nome": "Cálculo Diferencial e Integral I",
+       "natureza": "OB",
+       "ch": 90,
+       "depto": "MAT",
+       "prereq": []
+      }
+     ],
+     "optativasCh": 0
+    },
+    {
+     "n": 3,
+     "disciplinas": [
+      {
+       "codigo": "DCC011",
+       "nome": "Introdução a Banco de Dados",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "DCC203"
+       ]
+      },
+      {
+       "codigo": "DCC114",
+       "nome": "Introdução aos Sistemas Lógicos",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "DCC638"
+       ]
+      },
+      {
+       "codigo": "DCC205",
+       "nome": "Estruturas de Dados",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "DCC204"
+       ]
+      },
+      {
+       "codigo": "EST032",
+       "nome": "Probabilidade",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "EST",
+       "prereq": []
+      },
+      {
+       "codigo": "MAT039",
+       "nome": "Cálculo Diferencial e Integral II",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "MAT",
+       "prereq": [
+        "MAT001",
+        "MAT038"
+       ]
+      }
+     ],
+     "optativasCh": 0
+    },
+    {
+     "n": 4,
+     "disciplinas": [
+      {
+       "codigo": "DCC006",
+       "nome": "Organização de Computadores I",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "DCC114"
+       ]
+      },
+      {
+       "codigo": "DCC129",
+       "nome": "Fundamentos da Teoria da Computação",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "DCC638"
+       ]
+      },
+      {
+       "codigo": "DCC206",
+       "nome": "Algoritmos I",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "DCC205"
+       ]
+      },
+      {
+       "codigo": "DCC212",
+       "nome": "Introdução à Ciência dos Dados",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "MAT001",
+        "DCC216",
+        "DCC639",
+        "EST032"
+       ]
+      },
+      {
+       "codigo": "MAT034",
+       "nome": "Álgebra A",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "MAT",
+       "prereq": []
+      }
+     ],
+     "optativasCh": 60
+    },
+    {
+     "n": 5,
+     "disciplinas": [
+      {
+       "codigo": "DCC024",
+       "nome": "Linguagens de Programação",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "DCC205"
+       ]
+      },
+      {
+       "codigo": "DCC035",
+       "nome": "Pesquisa Operacional",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": []
+      },
+      {
+       "codigo": "DCC207",
+       "nome": "Algoritmos II",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "DCC206"
+       ]
+      },
+      {
+       "codigo": "MAT040",
+       "nome": "Equações Diferenciais C",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "MAT",
+       "prereq": [
+        "MAT039"
+       ]
+      }
+     ],
+     "optativasCh": 120
+    },
+    {
+     "n": 6,
+     "disciplinas": [
+      {
+       "codigo": "DCC053",
+       "nome": "Compiladores I",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "DCC129"
+       ]
+      },
+      {
+       "codigo": "DCC603",
+       "nome": "Engenharia de Software",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "DCC011",
+        "DCC204"
+       ]
+      },
+      {
+       "codigo": "DCC605",
+       "nome": "Sistemas Operacionais",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "DCC006"
+       ]
+      },
+      {
+       "codigo": "FIS156",
+       "nome": "Introdução à Física Estatística Computacional",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "FIS",
+       "prereq": []
+      }
+     ],
+     "optativasCh": 120
+    },
+    {
+     "n": 7,
+     "disciplinas": [
+      {
+       "codigo": "DCC023",
+       "nome": "Redes de Computadores",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": []
+      },
+      {
+       "codigo": "DCC636",
+       "nome": "Ética na Computação",
+       "natureza": "OB",
+       "ch": 30,
+       "depto": "DCC",
+       "prereq": []
+      },
+      {
+       "codigo": "DCC641",
+       "nome": "Fundamentos de Sistemas Paralelos e Distribuídos",
+       "natureza": "OB",
+       "ch": 30,
+       "depto": "DCC",
+       "prereq": []
+      },
+      {
+       "codigo": "DCC642",
+       "nome": "Introdução à Inteligência Artificial",
+       "natureza": "OB",
+       "ch": 30,
+       "depto": "DCC",
+       "prereq": [
+        "DCC205"
+       ]
+      }
+     ],
+     "optativasCh": 180
+    },
+    {
+     "n": 8,
+     "disciplinas": [
+      {
+       "codigo": "DCC637",
+       "nome": "Computação e Sociedade",
+       "natureza": "OB",
+       "ch": 30,
+       "depto": "DCC",
+       "prereq": [
+        "DCC636"
+       ]
+      }
+     ],
+     "optativasCh": 300
+    },
+    {
+     "n": 9,
+     "disciplinas": [
+      {
+       "codigo": "DCC604",
+       "nome": "Projeto Orientado em Computação I",
+       "natureza": "OB",
+       "ch": 90,
+       "depto": "DCC",
+       "prereq": []
+      }
+     ],
+     "optativasCh": 240
+    },
+    {
+     "n": 10,
+     "disciplinas": [
+      {
+       "codigo": "DCC009",
+       "nome": "Projeto Orientado em Computação II",
+       "natureza": "OB",
+       "ch": 90,
+       "depto": "DCC",
+       "prereq": [
+        "DCC604"
+       ]
+      }
+     ],
+     "optativasCh": 180
+    }
+   ],
+   "optativas": [
+    {
+     "codigo": "DCC007",
+     "nome": "Organização de Computadores II",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": [
+      "DCC006"
+     ]
+    },
+    {
+     "codigo": "DCC008",
+     "nome": "Software Basico",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": [
+      "DCC006"
+     ]
+    },
+    {
+     "codigo": "DCC014",
+     "nome": "Sistema de Tempo Real",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC027",
+     "nome": "Computação Gráfica",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC028",
+     "nome": "Inteligência Artificial",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC029",
+     "nome": "Processamentos Digital de Imagens",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC030",
+     "nome": "Tópicos em Ciência da Computação",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC039",
+     "nome": "Robótica",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC041",
+     "nome": "Introdução à Robótica",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC042",
+     "nome": "Robótica Móvel",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC043",
+     "nome": "Visao Computacional",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC054",
+     "nome": "Compiladores II",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": [
+      "DCC053"
+     ]
+    },
+    {
+     "codigo": "DCC055",
+     "nome": "Empreendimentos em Informática",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC056",
+     "nome": "Engenharia de Aplicacao em Rede",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": [
+      "DCC023"
+     ]
+    },
+    {
+     "codigo": "DCC057",
+     "nome": "Mineração de Dados",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC058",
+     "nome": "Projetos e Conceitos de Sistemas Paralelos e Distribuídos",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC059",
+     "nome": "Semantica Formal",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC072",
+     "nome": "Engenharia de Software II",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": [
+      "DCC603"
+     ]
+    },
+    {
+     "codigo": "DCC186",
+     "nome": "Algoritmos para Bioinformática I",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC187",
+     "nome": "Algoritmos para Bioinformática II",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC188",
+     "nome": "Análise e Modelagem de Desemp. Sist.Comp",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC189",
+     "nome": "Armazéns de Dados",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC190",
+     "nome": "Bibliotecas Digitais",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC191",
+     "nome": "Computação Natural",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC192",
+     "nome": "Desenvolvimento de Jogos Digitais",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC193",
+     "nome": "Engenharia de Usabilidade",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC194",
+     "nome": "Interação Humano-Computador",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC195",
+     "nome": "Métodos Quantit. de Pesq. Experimental em Ciência Computação",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC196",
+     "nome": "Modelagem de Processos de Negocio",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC197",
+     "nome": "Processamento Digital de Som e Video",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC198",
+     "nome": "Redes Complexas em Comp.: Modelagem, Algoritmos e Aplicações",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC213",
+     "nome": "Tópicos em Formação Avançada I",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC214",
+     "nome": "Tópicos em Formação Avançada II",
+     "ch": 30,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC215",
+     "nome": "Heurísticas e Metaheurísticas",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "FIS065",
+     "nome": "Fundamentos de Mecânica",
+     "ch": 60,
+     "depto": "FIS",
+     "prereq": []
+    },
+    {
+     "codigo": "FIS069",
+     "nome": "Fundamentos de Eletromagnetismo",
+     "ch": 60,
+     "depto": "FIS",
+     "prereq": [
+      "FIS065",
+      "MAT039"
+     ]
+    },
+    {
+     "codigo": "FIS086",
+     "nome": "Fundamentos de Oscilações,Ondas e Óptica",
+     "ch": 60,
+     "depto": "FIS",
+     "prereq": [
+      "FIS069"
+     ]
+    },
+    {
+     "codigo": "FIS087",
+     "nome": "Fundamentos de Oscilações e Ondas",
+     "ch": 30,
+     "depto": "FIS",
+     "prereq": [
+      "FIS069"
+     ]
+    },
+    {
+     "codigo": "FIS088",
+     "nome": "Fundamentos de Física Quântica",
+     "ch": 30,
+     "depto": "FIS",
+     "prereq": []
+    },
+    {
+     "codigo": "FIS151",
+     "nome": "Física Experimental Básica: Mecânica",
+     "ch": 30,
+     "depto": "FIS",
+     "prereq": []
+    },
+    {
+     "codigo": "FIS152",
+     "nome": "Fundamentos de Mecânica dos Fluidos e Termodinâmica",
+     "ch": 30,
+     "depto": "FIS",
+     "prereq": [
+      "FIS065",
+      "MAT001"
+     ]
+    },
+    {
+     "codigo": "FIS153",
+     "nome": "Física Experimental Básica: Eletromagnetismo",
+     "ch": 30,
+     "depto": "FIS",
+     "prereq": [
+      "FIS151",
+      "FIS065"
+     ]
+    },
+    {
+     "codigo": "FIS154",
+     "nome": "Física Experimental Básica: Termodinâmica",
+     "ch": 30,
+     "depto": "FIS",
+     "prereq": [
+      "FIS151",
+      "FIS065"
+     ]
+    },
+    {
+     "codigo": "FIS155",
+     "nome": "Física Experimental Básica - Ondas e Óptica",
+     "ch": 30,
+     "depto": "FIS",
+     "prereq": [
+      "FIS151",
+      "FIS065"
+     ]
+    },
+    {
+     "codigo": "LET223",
+     "nome": "Fundamentos de Libras",
+     "ch": 60,
+     "depto": "LET",
+     "prereq": []
+    },
+    {
+     "codigo": "MAT002",
+     "nome": "Cálculo Diferencial e Integral III",
+     "ch": 60,
+     "depto": "MAT",
+     "prereq": [
+      "MAT039"
+     ]
+    },
+    {
+     "codigo": "MAT008",
+     "nome": "Álgebra II",
+     "ch": 90,
+     "depto": "MAT",
+     "prereq": []
+    }
+   ],
+   "avisos": [
+    "A carga de optativas de cada período soma toda a carga horária adicional sugerida nele para o percurso (optativas, núcleo avançado, núcleo geral/formação livre etc.)."
+   ]
+  },
+  {
+   "id": "cc-2024",
+   "curso": "Ciência da Computação",
+   "versao": "2024",
+   "rotulo": "Ciência da Computação — currículo 2024",
+   "nota": "Para quem entrou a partir de 2024.",
+   "fonte": {
+    "tipo": "imagem",
+    "url": null,
+    "versaoOficial": null,
+    "data": null
+   },
+   "periodos": [
+    {
+     "n": 1,
+     "disciplinas": [
+      {
+       "codigo": "DCC203",
+       "nome": "Programação e Desenvolvimento de Software I",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": []
+      },
+      {
+       "codigo": "DCC638",
+       "nome": "Introdução à Lógica Computacional",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": []
+      },
+      {
+       "codigo": "DCC096",
+       "nome": "Introdução à Computação",
+       "natureza": "OB",
+       "ch": 30,
+       "depto": "DCC",
+       "prereq": []
+      },
+      {
+       "codigo": "MAT038",
+       "nome": "Geometria Analítica e Álgebra Linear",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "MAT",
+       "prereq": []
+      },
+      {
+       "codigo": "ECN140",
+       "nome": "Introdução à Economia",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "ECN",
+       "prereq": []
+      }
+     ],
+     "optativasCh": 0
+    },
+    {
+     "n": 2,
+     "disciplinas": [
+      {
+       "codigo": "DCC219",
+       "nome": "Programação e Desenvolvimento de Software II",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "DCC203"
+       ]
+      },
+      {
+       "codigo": "DCC114",
+       "nome": "Introdução a Sistemas Lógicos",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "DCC638"
+       ]
+      },
+      {
+       "codigo": "DCC216",
+       "nome": "Matemática Discreta",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "DCC638"
+       ]
+      },
+      {
+       "codigo": "MAT001",
+       "nome": "Cálculo Diferencial e Integral I",
+       "natureza": "OB",
+       "ch": 90,
+       "depto": "MAT",
+       "prereq": []
+      },
+      {
+       "codigo": "CAD103",
+       "nome": "Administração TGA (EAD)",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "CAD",
+       "prereq": []
+      }
+     ],
+     "optativasCh": 0
+    },
+    {
+     "n": 3,
+     "disciplinas": [
+      {
+       "codigo": "DCC221",
+       "nome": "Estruturas de Dados",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "DCC219"
+       ]
+      },
+      {
+       "codigo": "DCC222",
+       "nome": "Introdução a Bancos de Dados",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": []
+      },
+      {
+       "codigo": "DCC639",
+       "nome": "Álgebra Linear Computacional",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "MAT038",
+        "MAT001"
+       ]
+      },
+      {
+       "codigo": "MAT039",
+       "nome": "Cálculo Diferencial e Integral II",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "MAT",
+       "prereq": [
+        "MAT001"
+       ]
+      },
+      {
+       "codigo": "EST032",
+       "nome": "Probabilidade",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "EST",
+       "prereq": []
+      }
+     ],
+     "optativasCh": 0
+    },
+    {
+     "n": 4,
+     "disciplinas": [
+      {
+       "codigo": "DCC206",
+       "nome": "Algoritmos I",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "DCC221"
+       ]
+      },
+      {
+       "codigo": "DCC006",
+       "nome": "Organização de Computadores I",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "DCC114"
+       ]
+      },
+      {
+       "codigo": "DCC129",
+       "nome": "Fundamentos da Teoria da Computação",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": []
+      },
+      {
+       "codigo": "MAT034",
+       "nome": "Álgebra A",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "MAT",
+       "prereq": []
+      },
+      {
+       "codigo": "DCC212",
+       "nome": "Introdução à Ciência dos Dados",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "DCC216",
+        "DCC639",
+        "MAT001",
+        "EST032"
+       ]
+      }
+     ],
+     "optativasCh": 0
+    },
+    {
+     "n": 5,
+     "disciplinas": [
+      {
+       "codigo": "DCC207",
+       "nome": "Algoritmos II",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "DCC206"
+       ]
+      },
+      {
+       "codigo": "DCC024",
+       "nome": "Linguagens de Programação",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "DCC221"
+       ]
+      },
+      {
+       "codigo": "DCC035",
+       "nome": "Pesquisa Operacional",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": []
+      },
+      {
+       "codigo": "MAT040",
+       "nome": "Equações Diferenciais C",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "MAT",
+       "prereq": [
+        "MAT039"
+       ]
+      }
+     ],
+     "optativasCh": 0
+    },
+    {
+     "n": 6,
+     "disciplinas": [
+      {
+       "codigo": "DCC094",
+       "nome": "Engenharia de Software",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": []
+      },
+      {
+       "codigo": "DCC605",
+       "nome": "Sistemas Operacionais",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "DCC006"
+       ]
+      },
+      {
+       "codigo": "DCC053",
+       "nome": "Compiladores I",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "DCC129"
+       ]
+      }
+     ],
+     "optativasCh": 0
+    },
+    {
+     "n": 7,
+     "disciplinas": [
+      {
+       "codigo": "DCC636",
+       "nome": "Ética na Computação",
+       "natureza": "OB",
+       "ch": 30,
+       "depto": "DCC",
+       "prereq": []
+      },
+      {
+       "codigo": "DCC095",
+       "nome": "Redes de Computadores",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": []
+      },
+      {
+       "codigo": "DCC641",
+       "nome": "Fundamentos de Sistemas Paralelos e Distribuídos",
+       "natureza": "OB",
+       "ch": 30,
+       "depto": "DCC",
+       "prereq": []
+      },
+      {
+       "codigo": "DCC642",
+       "nome": "Introdução à Inteligência Artificial",
+       "natureza": "OB",
+       "ch": 30,
+       "depto": "DCC",
+       "prereq": []
+      }
+     ],
+     "optativasCh": 0
+    },
+    {
+     "n": 8,
+     "disciplinas": [
+      {
+       "codigo": "DCC637",
+       "nome": "Computação e Sociedade",
+       "natureza": "OB",
+       "ch": 30,
+       "depto": "DCC",
+       "prereq": []
+      }
+     ],
+     "optativasCh": 0
+    },
+    {
+     "n": 9,
+     "disciplinas": [
+      {
+       "codigo": "DCC604",
+       "nome": "Projeto Orientado em Computação I",
+       "natureza": "OB",
+       "ch": 90,
+       "depto": "DCC",
+       "prereq": []
+      }
+     ],
+     "optativasCh": 0
+    },
+    {
+     "n": 10,
+     "disciplinas": [
+      {
+       "codigo": "DCC009",
+       "nome": "Projeto Orientado em Computação II",
+       "natureza": "OB",
+       "ch": 90,
+       "depto": "DCC",
+       "prereq": [
+        "DCC604"
+       ]
+      }
+     ],
+     "optativasCh": 0
+    }
+   ],
+   "optativas": [],
+   "avisos": [
+    "Transcrito à mão de uma imagem da grade (Versão 2024, carga horária total de 3.210 horas).",
+    "Códigos provisórios (DCCXXX) da imagem substituídos pelos do catálogo, pelo nome: Introdução à Computação → DCC096, Engenharia de Software → DCC094, Redes de Computadores → DCC095.",
+    "A imagem traz \"DCC0641\" para Fundamentos de Sistemas Paralelos e Distribuídos; usado DCC641.",
+    "A grade em imagem não indica em que períodos cursar as optativas, por isso nenhum período mostra carga de optativas.",
+    "A lista de optativas não consta da grade em imagem."
+   ]
+  },
+  {
+   "id": "cd-2024",
+   "curso": "Ciência de Dados",
+   "versao": "2024",
+   "rotulo": "Ciência de Dados — currículo 2024",
+   "fonte": {
+    "tipo": "prograd",
+    "url": "https://dcc.ufmg.br/wp-content/uploads/versao_curricular_BCD_2025.pdf",
+    "versaoOficial": "V-20241",
+    "data": "2025-02-26"
+   },
+   "periodos": [
+    {
+     "n": 1,
+     "disciplinas": [
+      {
+       "codigo": "CAD103",
+       "nome": "Administração TGA",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "CAD",
+       "prereq": []
+      },
+      {
+       "codigo": "DCC203",
+       "nome": "Programação e Desenvolvimento de Software I",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": []
+      },
+      {
+       "codigo": "DCC638",
+       "nome": "Introdução à Lógica Computacional",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": []
+      },
+      {
+       "codigo": "ICE071",
+       "nome": "Fundamentos de Ciência de Dados",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "ICE",
+       "prereq": []
+      },
+      {
+       "codigo": "MAT001",
+       "nome": "Cálculo Diferencial e Integral I",
+       "natureza": "OB",
+       "ch": 90,
+       "depto": "MAT",
+       "prereq": []
+      }
+     ],
+     "optativasCh": 0
+    },
+    {
+     "n": 2,
+     "disciplinas": [
+      {
+       "codigo": "DCC204",
+       "nome": "Programação e Desenvolvimento de Software II",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "DCC203"
+       ]
+      },
+      {
+       "codigo": "DCC216",
+       "nome": "Matemática Discreta",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "DCC638"
+       ]
+      },
+      {
+       "codigo": "EST229",
+       "nome": "Estatística Básica",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "EST",
+       "prereq": [
+        "ICE071"
+       ]
+      },
+      {
+       "codigo": "MAT038",
+       "nome": "Geometria Analitica e Álgebra Linear",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "MAT",
+       "prereq": []
+      },
+      {
+       "codigo": "MAT039",
+       "nome": "Cálculo Diferencial e Integral II",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "MAT",
+       "prereq": [
+        "MAT001"
+       ]
+      }
+     ],
+     "optativasCh": 0
+    },
+    {
+     "n": 3,
+     "disciplinas": [
+      {
+       "codigo": "DCC011",
+       "nome": "Introdução a Banco de Dados",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "DCC204",
+        "DCC638"
+       ]
+      },
+      {
+       "codigo": "DCC205",
+       "nome": "Estruturas de Dados",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "DCC204"
+       ]
+      },
+      {
+       "codigo": "DCC639",
+       "nome": "Álgebra Linear Computacional",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "MAT001",
+        "MAT038"
+       ]
+      },
+      {
+       "codigo": "ECN140",
+       "nome": "Introdução à Economia",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "ECN",
+       "prereq": []
+      },
+      {
+       "codigo": "EST230",
+       "nome": "Probabilidade",
+       "natureza": "OB",
+       "ch": 90,
+       "depto": "EST",
+       "prereq": [
+        "MAT039"
+       ]
+      }
+     ],
+     "optativasCh": 0
+    },
+    {
+     "n": 4,
+     "disciplinas": [
+      {
+       "codigo": "DCC194",
+       "nome": "Interação Humano-Computador",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": []
+      },
+      {
+       "codigo": "DCC206",
+       "nome": "Algoritmos I",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "DCC205"
+       ]
+      },
+      {
+       "codigo": "EST035",
+       "nome": "Análise de Regressão",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "EST",
+       "prereq": [
+        "EST229"
+       ]
+      },
+      {
+       "codigo": "EST231",
+       "nome": "Inferência Clássica",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "EST",
+       "prereq": [
+        "EST230"
+       ]
+      },
+      {
+       "codigo": "ICE072",
+       "nome": "Introdução à Ciência de Dados",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "ICE",
+       "prereq": [
+        "DCC639",
+        "EST230"
+       ]
+      }
+     ],
+     "optativasCh": 0
+    },
+    {
+     "n": 5,
+     "disciplinas": [
+      {
+       "codigo": "DCC074",
+       "nome": "Fundamentos de Arquitetura de Computadores",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": []
+      },
+      {
+       "codigo": "DCC603",
+       "nome": "Engenharia de Software",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "DCC205"
+       ]
+      },
+      {
+       "codigo": "DCC642",
+       "nome": "Introdução à Inteligência Artificial",
+       "natureza": "OB",
+       "ch": 30,
+       "depto": "DCC",
+       "prereq": []
+      },
+      {
+       "codigo": "EST079",
+       "nome": "Modelos Lineares Generalizados",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "EST",
+       "prereq": [
+        "EST035",
+        "EST231"
+       ]
+      },
+      {
+       "codigo": "EST088",
+       "nome": "Inferência Estatística com Abordagem Bayesiana",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "EST",
+       "prereq": [
+        "EST230",
+        "EST231"
+       ]
+      },
+      {
+       "codigo": "ICE144",
+       "nome": "Mineração de Dados",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "ICE",
+       "prereq": [
+        "ICE072"
+       ]
+      }
+     ],
+     "optativasCh": 0
+    },
+    {
+     "n": 6,
+     "disciplinas": [
+      {
+       "codigo": "DCC075",
+       "nome": "Fundamentos de Sistemas Computacionais",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "DCC074"
+       ]
+      },
+      {
+       "codigo": "EST011",
+       "nome": "Estatística Multivariada",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "EST",
+       "prereq": [
+        "EST035",
+        "MAT038",
+        "EST231"
+       ]
+      },
+      {
+       "codigo": "EST080",
+       "nome": "Estatística Não Paramétrica",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "EST",
+       "prereq": [
+        "EST231"
+       ]
+      },
+      {
+       "codigo": "ICE145",
+       "nome": "Ciência de Dados e Sociedade",
+       "natureza": "OB",
+       "ch": 30,
+       "depto": "ICE",
+       "prereq": [
+        "ICE072"
+       ]
+      },
+      {
+       "codigo": "ICE146",
+       "nome": "Ética e Ciência de Dados",
+       "natureza": "OB",
+       "ch": 30,
+       "depto": "ICE",
+       "prereq": [
+        "ICE072"
+       ]
+      },
+      {
+       "codigo": "ICE147",
+       "nome": "Aprendizado de Máquina Supervisionado",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "ICE",
+       "prereq": [
+        "ICE144"
+       ]
+      }
+     ],
+     "optativasCh": 0
+    },
+    {
+     "n": 7,
+     "disciplinas": [
+      {
+       "codigo": "DCC076",
+       "nome": "Recuperação de Informação",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "DCC206"
+       ]
+      },
+      {
+       "codigo": "DCC077",
+       "nome": "Introdução à Computação Visual",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "MAT038"
+       ]
+      },
+      {
+       "codigo": "EST038",
+       "nome": "Métodos Estatísticos de Previsão",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "EST",
+       "prereq": [
+        "EST231"
+       ]
+      },
+      {
+       "codigo": "EST090",
+       "nome": "Análise de Sobrevivência",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "EST",
+       "prereq": [
+        "EST035",
+        "EST231"
+       ]
+      },
+      {
+       "codigo": "ICE148",
+       "nome": "Aprendizado de Máquina Não Supervisionado",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "ICE",
+       "prereq": [
+        "ICE147"
+       ]
+      }
+     ],
+     "optativasCh": 60
+    },
+    {
+     "n": 8,
+     "disciplinas": [
+      {
+       "codigo": "ICE149",
+       "nome": "Monografia I",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "ICE",
+       "prereq": []
+      }
+     ],
+     "optativasCh": 300
+    },
+    {
+     "n": 9,
+     "disciplinas": [
+      {
+       "codigo": "ICE150",
+       "nome": "Monografia II",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "ICE",
+       "prereq": [
+        "ICE149"
+       ]
+      }
+     ],
+     "optativasCh": 330
+    }
+   ],
+   "optativas": [
+    {
+     "codigo": "CAD004",
+     "nome": "Administração da Produção",
+     "ch": 60,
+     "depto": "CAD",
+     "prereq": []
+    },
+    {
+     "codigo": "CAD153",
+     "nome": "Administração de Custos",
+     "ch": 60,
+     "depto": "CAD",
+     "prereq": []
+    },
+    {
+     "codigo": "CAD163",
+     "nome": "Administração de Recursos Humanos",
+     "ch": 60,
+     "depto": "CAD",
+     "prereq": []
+    },
+    {
+     "codigo": "CAD164",
+     "nome": "Administração Mercadológica",
+     "ch": 60,
+     "depto": "CAD",
+     "prereq": []
+    },
+    {
+     "codigo": "CAD167",
+     "nome": "Administração Financeira",
+     "ch": 60,
+     "depto": "CAD",
+     "prereq": []
+    },
+    {
+     "codigo": "CIC010",
+     "nome": "Introdução à Contabilidade",
+     "ch": 60,
+     "depto": "CIC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC006",
+     "nome": "Organização de Computadores I",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC007",
+     "nome": "Organização de Computadores II",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC023",
+     "nome": "Redes de Computadores",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC027",
+     "nome": "Computação Gráfica",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC035",
+     "nome": "Pesquisa Operacional",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC041",
+     "nome": "Introdução à Robótica",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC042",
+     "nome": "Robótica Móvel",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC053",
+     "nome": "Compiladores I",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC055",
+     "nome": "Empreendimentos em Informática",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC068",
+     "nome": "Tópicos Especiais em Informática I",
+     "ch": 15,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC069",
+     "nome": "Tópicos Especiais em Informática II",
+     "ch": 30,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC070",
+     "nome": "Tópicos Especiais em Informática III",
+     "ch": 45,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC071",
+     "nome": "Tópicos Especiais em Informática IV",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC078",
+     "nome": "Bancos de Dados Geográficos",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC079",
+     "nome": "Bioinformática",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC080",
+     "nome": "Cibersegurança",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC081",
+     "nome": "Fundamentos Estatísticos de Ciência dos Dados A",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC082",
+     "nome": "Fundamentos Estatísticos de Ciência dos Dados B",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC083",
+     "nome": "Gestão de Equipes",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC084",
+     "nome": "Programação Competitiva",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC085",
+     "nome": "Prática de Desenvolvimento de Software",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC086",
+     "nome": "Redes Complexas",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC087",
+     "nome": "Métodos Qualitativos Aplicados em Computação",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC088",
+     "nome": "Sistemas em Redes",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC089",
+     "nome": "Teste de Software",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC090",
+     "nome": "Teoria da Informação",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC091",
+     "nome": "Fluxo de Informação Quantitativo",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC092",
+     "nome": "Métodos Formais",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC093",
+     "nome": "Sistemas de Recomendação",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC114",
+     "nome": "Introdução aos Sistemas Lógicos",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC129",
+     "nome": "Fundamentos da Teoria da Computação",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC186",
+     "nome": "Algoritmos para Bioinformática I",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC189",
+     "nome": "Armazéns de Dados",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC190",
+     "nome": "Bibliotecas Digitais",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC191",
+     "nome": "Computação Natural",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC192",
+     "nome": "Desenvolvimento de Jogos Digitais",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC193",
+     "nome": "Engenharia de Usabilidade",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC195",
+     "nome": "Métodos Quantit. de Pesq. Experimental em Ciência Computação",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC198",
+     "nome": "Redes Complexas em Comp.: Modelagem, Algoritmos e Aplicações",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC199",
+     "nome": "Teoria dos Grafos",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC207",
+     "nome": "Algoritmos II",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC215",
+     "nome": "Heurísticas e Metaheurísticas",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC605",
+     "nome": "Sistemas Operacionais",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC641",
+     "nome": "Fundamentos de Sistemas Paralelos e Distribuídos",
+     "ch": 30,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "EST010",
+     "nome": "Controle de Qualidade",
+     "ch": 60,
+     "depto": "EST",
+     "prereq": [
+      "EST035",
+      "EST231"
+     ]
+    },
+    {
+     "codigo": "EST014",
+     "nome": "Aspectos Estatísticos da Economia",
+     "ch": 60,
+     "depto": "EST",
+     "prereq": [
+      "EST035",
+      "EST231"
+     ]
+    },
+    {
+     "codigo": "EST017",
+     "nome": "Planejamento de Experimentos Industriais",
+     "ch": 60,
+     "depto": "EST",
+     "prereq": [
+      "EST035",
+      "EST231"
+     ]
+    },
+    {
+     "codigo": "EST019",
+     "nome": "Aplicações de Amostragem",
+     "ch": 60,
+     "depto": "EST",
+     "prereq": [
+      "EST037",
+      "EST231"
+     ]
+    },
+    {
+     "codigo": "EST028",
+     "nome": "Probabilidade II",
+     "ch": 90,
+     "depto": "EST",
+     "prereq": [
+      "EST232",
+      "MAT039"
+     ]
+    },
+    {
+     "codigo": "EST036",
+     "nome": "Planejamento de Experimentos",
+     "ch": 60,
+     "depto": "EST",
+     "prereq": [
+      "EST035",
+      "EST231"
+     ]
+    },
+    {
+     "codigo": "EST037",
+     "nome": "Amostragem",
+     "ch": 60,
+     "depto": "EST",
+     "prereq": [
+      "EST231"
+     ]
+    },
+    {
+     "codigo": "EST039",
+     "nome": "Processos Estocásticos",
+     "ch": 60,
+     "depto": "EST",
+     "prereq": [
+      "EST230"
+     ]
+    },
+    {
+     "codigo": "EST046",
+     "nome": "Introdução ao Seguro e Previdência",
+     "ch": 60,
+     "depto": "EST",
+     "prereq": []
+    },
+    {
+     "codigo": "EST047",
+     "nome": "Técnicas Atuariais I",
+     "ch": 60,
+     "depto": "EST",
+     "prereq": [
+      "EST230"
+     ]
+    },
+    {
+     "codigo": "EST049",
+     "nome": "Técnicas Atuariais II",
+     "ch": 60,
+     "depto": "EST",
+     "prereq": [
+      "EST230"
+     ]
+    },
+    {
+     "codigo": "EST050",
+     "nome": "Teoria do Risco",
+     "ch": 60,
+     "depto": "EST",
+     "prereq": [
+      "EST230"
+     ]
+    },
+    {
+     "codigo": "EST060",
+     "nome": "Pesquisa de Opinião e Mercado",
+     "ch": 60,
+     "depto": "EST",
+     "prereq": [
+      "EST037",
+      "EST231"
+     ]
+    },
+    {
+     "codigo": "EST061",
+     "nome": "Amostragem Industrial",
+     "ch": 60,
+     "depto": "EST",
+     "prereq": [
+      "EST037",
+      "EST231"
+     ]
+    },
+    {
+     "codigo": "EST067",
+     "nome": "Análise de Dados Longitudinais e em Conglomerados",
+     "ch": 60,
+     "depto": "EST",
+     "prereq": [
+      "EST035",
+      "EST231"
+     ]
+    },
+    {
+     "codigo": "EST089",
+     "nome": "Análise de Dados Categóricos",
+     "ch": 60,
+     "depto": "EST",
+     "prereq": [
+      "EST035",
+      "EST231"
+     ]
+    },
+    {
+     "codigo": "EST093",
+     "nome": "Estatística e Sociedade",
+     "ch": 60,
+     "depto": "EST",
+     "prereq": []
+    },
+    {
+     "codigo": "EST169",
+     "nome": "Análise de Dados Discretos",
+     "ch": 60,
+     "depto": "EST",
+     "prereq": [
+      "EST035",
+      "EST231"
+     ]
+    },
+    {
+     "codigo": "EST232",
+     "nome": "Probabilidade I",
+     "ch": 90,
+     "depto": "EST",
+     "prereq": [
+      "MAT001",
+      "EST230"
+     ]
+    },
+    {
+     "codigo": "EST233",
+     "nome": "Métodos Computacionais para Ciência de Dados I",
+     "ch": 60,
+     "depto": "EST",
+     "prereq": []
+    },
+    {
+     "codigo": "EST234",
+     "nome": "Introdução à Inferência Estatística",
+     "ch": 90,
+     "depto": "EST",
+     "prereq": [
+      "EST232"
+     ]
+    },
+    {
+     "codigo": "EST235",
+     "nome": "Inferência I",
+     "ch": 60,
+     "depto": "EST",
+     "prereq": [
+      "EST230",
+      "EST231"
+     ]
+    },
+    {
+     "codigo": "EST236",
+     "nome": "Inferência II",
+     "ch": 60,
+     "depto": "EST",
+     "prereq": [
+      "EST235"
+     ]
+    },
+    {
+     "codigo": "EST238",
+     "nome": "Métodos Computacionais para Ciência de Dados II",
+     "ch": 60,
+     "depto": "EST",
+     "prereq": [
+      "EST231"
+     ]
+    },
+    {
+     "codigo": "EST239",
+     "nome": "Laboratório de Estatística I",
+     "ch": 90,
+     "depto": "EST",
+     "prereq": [
+      "EST079"
+     ]
+    },
+    {
+     "codigo": "EST240",
+     "nome": "Estatística Espacial",
+     "ch": 60,
+     "depto": "EST",
+     "prereq": [
+      "EST035",
+      "EST231"
+     ]
+    },
+    {
+     "codigo": "ICE160",
+     "nome": "Formação Avançada I",
+     "ch": 15,
+     "depto": "ICE",
+     "prereq": []
+    },
+    {
+     "codigo": "ICE161",
+     "nome": "Formação Avançada II",
+     "ch": 30,
+     "depto": "ICE",
+     "prereq": []
+    },
+    {
+     "codigo": "ICE162",
+     "nome": "Formação Avançada III",
+     "ch": 45,
+     "depto": "ICE",
+     "prereq": []
+    },
+    {
+     "codigo": "ICE163",
+     "nome": "Formação Avançada IV",
+     "ch": 60,
+     "depto": "ICE",
+     "prereq": []
+    },
+    {
+     "codigo": "ICE169",
+     "nome": "Tópicos em Ciência de Dados I",
+     "ch": 15,
+     "depto": "ICE",
+     "prereq": []
+    },
+    {
+     "codigo": "ICE170",
+     "nome": "Tópicos em Ciência de Dados II",
+     "ch": 30,
+     "depto": "ICE",
+     "prereq": []
+    },
+    {
+     "codigo": "ICE171",
+     "nome": "Tópicos em Ciência de Dados III",
+     "ch": 45,
+     "depto": "ICE",
+     "prereq": []
+    },
+    {
+     "codigo": "ICE172",
+     "nome": "Tópicos em Ciência de Dados IV",
+     "ch": 60,
+     "depto": "ICE",
+     "prereq": []
+    },
+    {
+     "codigo": "LET223",
+     "nome": "Fundamentos de Libras",
+     "ch": 60,
+     "depto": "LET",
+     "prereq": []
+    },
+    {
+     "codigo": "MAT015",
+     "nome": "Equações Diferenciais A",
+     "ch": 60,
+     "depto": "MAT",
+     "prereq": [
+      "MAT039"
+     ]
+    },
+    {
+     "codigo": "MAT034",
+     "nome": "Álgebra A",
+     "ch": 60,
+     "depto": "MAT",
+     "prereq": []
+    },
+    {
+     "codigo": "MAT047",
+     "nome": "Análise Combinatória",
+     "ch": 60,
+     "depto": "MAT",
+     "prereq": []
+    },
+    {
+     "codigo": "MAT048",
+     "nome": "Álgebra Linear I",
+     "ch": 60,
+     "depto": "MAT",
+     "prereq": [
+      "MAT038"
+     ]
+    },
+    {
+     "codigo": "OTI071",
+     "nome": "Organização e Tratamento da Informação",
+     "ch": 60,
+     "depto": "OTI",
+     "prereq": []
+    },
+    {
+     "codigo": "TGI004",
+     "nome": "Usuários da Informação",
+     "ch": 60,
+     "depto": "TGI",
+     "prereq": []
+    }
+   ],
+   "avisos": [
+    "A carga de optativas de cada período soma toda a carga horária adicional sugerida nele para o percurso (optativas, núcleo avançado, núcleo geral/formação livre etc.)."
+   ]
+  },
+  {
+   "id": "cd-2026",
+   "curso": "Ciência de Dados",
+   "versao": "2026",
+   "percurso": "Bacharelado (núcleo avançado + núcleo geral)",
+   "rotulo": "Ciência de Dados — currículo 2026",
+   "fonte": {
+    "tipo": "prograd",
+    "url": "https://dcc.ufmg.br/wp-content/uploads/BCD-versao-V2026-1-1.pdf",
+    "versaoOficial": "V-20261",
+    "data": "2025-12-02"
+   },
+   "periodos": [
+    {
+     "n": 1,
+     "disciplinas": [
+      {
+       "codigo": "DCC203",
+       "nome": "Programação e Desenvolvimento de Software I",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": []
+      },
+      {
+       "codigo": "DCC638",
+       "nome": "Introdução à Lógica Computacional",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": []
+      },
+      {
+       "codigo": "ICE071",
+       "nome": "Fundamentos de Ciência de Dados",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "ICE",
+       "prereq": []
+      },
+      {
+       "codigo": "MAT001",
+       "nome": "Cálculo Diferencial e Integral I",
+       "natureza": "OB",
+       "ch": 90,
+       "depto": "MAT",
+       "prereq": []
+      },
+      {
+       "codigo": "MAT038",
+       "nome": "Geometria Analitica e Álgebra Linear",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "MAT",
+       "prereq": []
+      }
+     ],
+     "optativasCh": 0
+    },
+    {
+     "n": 2,
+     "disciplinas": [
+      {
+       "codigo": "CAD103",
+       "nome": "Administração TGA",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "CAD",
+       "prereq": []
+      },
+      {
+       "codigo": "DCC216",
+       "nome": "Matemática Discreta",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "DCC638"
+       ]
+      },
+      {
+       "codigo": "DCC219",
+       "nome": "Programação e Desenvolvimento de Software II",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "DCC203"
+       ]
+      },
+      {
+       "codigo": "ECN140",
+       "nome": "Introdução à Economia",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "ECN",
+       "prereq": []
+      },
+      {
+       "codigo": "EST229",
+       "nome": "Estatística Básica",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "EST",
+       "prereq": [
+        "ICE071"
+       ]
+      },
+      {
+       "codigo": "MAT039",
+       "nome": "Cálculo Diferencial e Integral II",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "MAT",
+       "prereq": [
+        "MAT001"
+       ]
+      }
+     ],
+     "optativasCh": 0
+    },
+    {
+     "n": 3,
+     "disciplinas": [
+      {
+       "codigo": "DCC221",
+       "nome": "Estruturas de Dados",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "DCC219"
+       ]
+      },
+      {
+       "codigo": "DCC222",
+       "nome": "Introdução a Bancos de Dados",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "DCC219",
+        "DCC638"
+       ]
+      },
+      {
+       "codigo": "DCC639",
+       "nome": "Álgebra Linear Computacional",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "MAT001",
+        "MAT038"
+       ]
+      },
+      {
+       "codigo": "EST241",
+       "nome": "Probabilidade",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "EST",
+       "prereq": [
+        "EST229"
+       ]
+      },
+      {
+       "codigo": "MAT002",
+       "nome": "Cálculo Diferencial e Integral III",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "MAT",
+       "prereq": [
+        "MAT039"
+       ]
+      }
+     ],
+     "optativasCh": 0
+    },
+    {
+     "n": 4,
+     "disciplinas": [
+      {
+       "codigo": "DCC194",
+       "nome": "Interação Humano-Computador",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": []
+      },
+      {
+       "codigo": "DCC206",
+       "nome": "Algoritmos I",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "DCC221"
+       ]
+      },
+      {
+       "codigo": "EST035",
+       "nome": "Análise de Regressão",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "EST",
+       "prereq": [
+        "EST229"
+       ]
+      },
+      {
+       "codigo": "EST231",
+       "nome": "Inferência Clássica",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "EST",
+       "prereq": [
+        "EST241"
+       ]
+      },
+      {
+       "codigo": "ICE072",
+       "nome": "Introdução à Ciência de Dados",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "ICE",
+       "prereq": [
+        "DCC639",
+        "EST241"
+       ]
+      }
+     ],
+     "optativasCh": 0
+    },
+    {
+     "n": 5,
+     "disciplinas": [
+      {
+       "codigo": "DCC074",
+       "nome": "Fundamentos de Arquitetura de Computadores",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": []
+      },
+      {
+       "codigo": "DCC094",
+       "nome": "Engenharia de Software",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "DCC221"
+       ]
+      },
+      {
+       "codigo": "DCC642",
+       "nome": "Introdução à Inteligência Artificial",
+       "natureza": "OB",
+       "ch": 30,
+       "depto": "DCC",
+       "prereq": []
+      },
+      {
+       "codigo": "EST079",
+       "nome": "Modelos Lineares Generalizados",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "EST",
+       "prereq": [
+        "EST035",
+        "EST231"
+       ]
+      },
+      {
+       "codigo": "EST088",
+       "nome": "Inferência Estatística com Abordagem Bayesiana",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "EST",
+       "prereq": [
+        "EST231"
+       ]
+      },
+      {
+       "codigo": "ICE144",
+       "nome": "Mineração de Dados",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "ICE",
+       "prereq": [
+        "ICE072"
+       ]
+      }
+     ],
+     "optativasCh": 0
+    },
+    {
+     "n": 6,
+     "disciplinas": [
+      {
+       "codigo": "DCC075",
+       "nome": "Fundamentos de Sistemas Computacionais",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "DCC074"
+       ]
+      },
+      {
+       "codigo": "EST011",
+       "nome": "Estatística Multivariada",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "EST",
+       "prereq": [
+        "EST035",
+        "MAT038",
+        "EST231"
+       ]
+      },
+      {
+       "codigo": "EST080",
+       "nome": "Estatística Não Paramétrica",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "EST",
+       "prereq": [
+        "EST231"
+       ]
+      },
+      {
+       "codigo": "ICE145",
+       "nome": "Ciência de Dados e Sociedade",
+       "natureza": "OB",
+       "ch": 30,
+       "depto": "ICE",
+       "prereq": [
+        "ICE072"
+       ]
+      },
+      {
+       "codigo": "ICE146",
+       "nome": "Ética e Ciência de Dados",
+       "natureza": "OB",
+       "ch": 30,
+       "depto": "ICE",
+       "prereq": [
+        "ICE072"
+       ]
+      },
+      {
+       "codigo": "ICE181",
+       "nome": "Aprendizado de Máquina A",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "ICE",
+       "prereq": [
+        "ICE072"
+       ]
+      }
+     ],
+     "optativasCh": 0
+    },
+    {
+     "n": 7,
+     "disciplinas": [
+      {
+       "codigo": "DCC076",
+       "nome": "Recuperação de Informação",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "DCC206"
+       ]
+      },
+      {
+       "codigo": "DCC077",
+       "nome": "Introdução à Computação Visual",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "MAT038"
+       ]
+      },
+      {
+       "codigo": "EST038",
+       "nome": "Métodos Estatísticos de Previsão",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "EST",
+       "prereq": [
+        "EST231"
+       ]
+      },
+      {
+       "codigo": "EST090",
+       "nome": "Análise de Sobrevivência",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "EST",
+       "prereq": [
+        "EST035",
+        "EST231"
+       ]
+      },
+      {
+       "codigo": "ICE182",
+       "nome": "Aprendizado de Máquina B",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "ICE",
+       "prereq": [
+        "ICE072"
+       ]
+      }
+     ],
+     "optativasCh": 60
+    },
+    {
+     "n": 8,
+     "disciplinas": [
+      {
+       "codigo": "ICE149",
+       "nome": "Monografia I",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "ICE",
+       "prereq": []
+      }
+     ],
+     "optativasCh": 300
+    },
+    {
+     "n": 9,
+     "disciplinas": [
+      {
+       "codigo": "ICE150",
+       "nome": "Monografia II",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "ICE",
+       "prereq": [
+        "ICE149"
+       ]
+      }
+     ],
+     "optativasCh": 300
+    }
+   ],
+   "optativas": [
+    {
+     "codigo": "CAD004",
+     "nome": "Administração da Produção",
+     "ch": 60,
+     "depto": "CAD",
+     "prereq": []
+    },
+    {
+     "codigo": "CAD153",
+     "nome": "Administração de Custos",
+     "ch": 60,
+     "depto": "CAD",
+     "prereq": []
+    },
+    {
+     "codigo": "CAD163",
+     "nome": "Administração de Recursos Humanos",
+     "ch": 60,
+     "depto": "CAD",
+     "prereq": []
+    },
+    {
+     "codigo": "CAD164",
+     "nome": "Administração Mercadológica",
+     "ch": 60,
+     "depto": "CAD",
+     "prereq": []
+    },
+    {
+     "codigo": "CAD167",
+     "nome": "Administração Financeira",
+     "ch": 60,
+     "depto": "CAD",
+     "prereq": []
+    },
+    {
+     "codigo": "CIC010",
+     "nome": "Introdução à Contabilidade",
+     "ch": 60,
+     "depto": "CIC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC006",
+     "nome": "Organização de Computadores I",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC007",
+     "nome": "Organização de Computadores II",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC023",
+     "nome": "Redes de Computadores",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC027",
+     "nome": "Computação Gráfica",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC035",
+     "nome": "Pesquisa Operacional",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC041",
+     "nome": "Introdução à Robótica",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC042",
+     "nome": "Robótica Móvel",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC053",
+     "nome": "Compiladores I",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC055",
+     "nome": "Empreendimentos em Informática",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC068",
+     "nome": "Tópicos Especiais em Informática I",
+     "ch": 15,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC069",
+     "nome": "Tópicos Especiais em Informática II",
+     "ch": 30,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC070",
+     "nome": "Tópicos Especiais em Informática III",
+     "ch": 45,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC071",
+     "nome": "Tópicos Especiais em Informática IV",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC078",
+     "nome": "Bancos de Dados Geográficos",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC079",
+     "nome": "Bioinformática",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC080",
+     "nome": "Cibersegurança",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC081",
+     "nome": "Fundamentos Estatísticos de Ciência dos Dados A",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC082",
+     "nome": "Fundamentos Estatísticos de Ciência dos Dados B",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC083",
+     "nome": "Gestão de Equipes",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC084",
+     "nome": "Programação Competitiva",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC085",
+     "nome": "Prática de Desenvolvimento de Software",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC086",
+     "nome": "Redes Complexas",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC087",
+     "nome": "Métodos Qualitativos Aplicados em Computação",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC088",
+     "nome": "Sistemas em Redes",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC089",
+     "nome": "Teste de Software",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC090",
+     "nome": "Teoria da Informação",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC091",
+     "nome": "Fluxo de Informação Quantitativo",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC092",
+     "nome": "Métodos Formais",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC093",
+     "nome": "Sistemas de Recomendação",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC114",
+     "nome": "Introdução aos Sistemas Lógicos",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC129",
+     "nome": "Fundamentos da Teoria da Computação",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC186",
+     "nome": "Algoritmos para Bioinformática I",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC189",
+     "nome": "Armazéns de Dados",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC190",
+     "nome": "Bibliotecas Digitais",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC191",
+     "nome": "Computação Natural",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC192",
+     "nome": "Desenvolvimento de Jogos Digitais",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC193",
+     "nome": "Engenharia de Usabilidade",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC195",
+     "nome": "Métodos Quantit. de Pesq. Experimental em Ciência Computação",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC198",
+     "nome": "Redes Complexas em Comp.: Modelagem, Algoritmos e Aplicações",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC199",
+     "nome": "Teoria dos Grafos",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC207",
+     "nome": "Algoritmos II",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC215",
+     "nome": "Heurísticas e Metaheurísticas",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC605",
+     "nome": "Sistemas Operacionais",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC641",
+     "nome": "Fundamentos de Sistemas Paralelos e Distribuídos",
+     "ch": 30,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "EST010",
+     "nome": "Controle de Qualidade",
+     "ch": 60,
+     "depto": "EST",
+     "prereq": [
+      "EST035",
+      "EST231"
+     ]
+    },
+    {
+     "codigo": "EST014",
+     "nome": "Aspectos Estatísticos da Economia",
+     "ch": 60,
+     "depto": "EST",
+     "prereq": [
+      "EST035",
+      "EST231"
+     ]
+    },
+    {
+     "codigo": "EST017",
+     "nome": "Planejamento de Experimentos Industriais",
+     "ch": 60,
+     "depto": "EST",
+     "prereq": [
+      "EST035",
+      "EST231"
+     ]
+    },
+    {
+     "codigo": "EST019",
+     "nome": "Aplicações de Amostragem",
+     "ch": 60,
+     "depto": "EST",
+     "prereq": [
+      "EST037",
+      "EST231"
+     ]
+    },
+    {
+     "codigo": "EST028",
+     "nome": "Probabilidade II",
+     "ch": 90,
+     "depto": "EST",
+     "prereq": [
+      "EST232",
+      "MAT039"
+     ]
+    },
+    {
+     "codigo": "EST036",
+     "nome": "Planejamento de Experimentos",
+     "ch": 60,
+     "depto": "EST",
+     "prereq": [
+      "EST035",
+      "EST231"
+     ]
+    },
+    {
+     "codigo": "EST037",
+     "nome": "Amostragem",
+     "ch": 60,
+     "depto": "EST",
+     "prereq": [
+      "EST231"
+     ]
+    },
+    {
+     "codigo": "EST039",
+     "nome": "Processos Estocásticos",
+     "ch": 60,
+     "depto": "EST",
+     "prereq": [
+      "EST241"
+     ]
+    },
+    {
+     "codigo": "EST046",
+     "nome": "Introdução ao Seguro e Previdência",
+     "ch": 60,
+     "depto": "EST",
+     "prereq": []
+    },
+    {
+     "codigo": "EST047",
+     "nome": "Técnicas Atuariais I",
+     "ch": 60,
+     "depto": "EST",
+     "prereq": [
+      "EST241"
+     ]
+    },
+    {
+     "codigo": "EST049",
+     "nome": "Técnicas Atuariais II",
+     "ch": 60,
+     "depto": "EST",
+     "prereq": [
+      "EST241"
+     ]
+    },
+    {
+     "codigo": "EST050",
+     "nome": "Teoria do Risco",
+     "ch": 60,
+     "depto": "EST",
+     "prereq": [
+      "EST241"
+     ]
+    },
+    {
+     "codigo": "EST060",
+     "nome": "Pesquisa de Opinião e Mercado",
+     "ch": 60,
+     "depto": "EST",
+     "prereq": [
+      "EST037",
+      "EST231"
+     ]
+    },
+    {
+     "codigo": "EST061",
+     "nome": "Amostragem Industrial",
+     "ch": 60,
+     "depto": "EST",
+     "prereq": [
+      "EST037",
+      "EST231"
+     ]
+    },
+    {
+     "codigo": "EST067",
+     "nome": "Análise de Dados Longitudinais e em Conglomerados",
+     "ch": 60,
+     "depto": "EST",
+     "prereq": [
+      "EST035",
+      "EST231"
+     ]
+    },
+    {
+     "codigo": "EST089",
+     "nome": "Análise de Dados Categóricos",
+     "ch": 60,
+     "depto": "EST",
+     "prereq": [
+      "EST035",
+      "EST231"
+     ]
+    },
+    {
+     "codigo": "EST093",
+     "nome": "Estatística e Sociedade",
+     "ch": 60,
+     "depto": "EST",
+     "prereq": []
+    },
+    {
+     "codigo": "EST169",
+     "nome": "Análise de Dados Discretos",
+     "ch": 60,
+     "depto": "EST",
+     "prereq": [
+      "EST035",
+      "EST231"
+     ]
+    },
+    {
+     "codigo": "EST232",
+     "nome": "Probabilidade I",
+     "ch": 90,
+     "depto": "EST",
+     "prereq": [
+      "MAT001",
+      "EST241"
+     ]
+    },
+    {
+     "codigo": "EST233",
+     "nome": "Métodos Computacionais para Ciência de Dados I",
+     "ch": 60,
+     "depto": "EST",
+     "prereq": []
+    },
+    {
+     "codigo": "EST234",
+     "nome": "Introdução à Inferência Estatística",
+     "ch": 90,
+     "depto": "EST",
+     "prereq": [
+      "EST232"
+     ]
+    },
+    {
+     "codigo": "EST235",
+     "nome": "Inferência I",
+     "ch": 60,
+     "depto": "EST",
+     "prereq": [
+      "EST241",
+      "EST231"
+     ]
+    },
+    {
+     "codigo": "EST236",
+     "nome": "Inferência II",
+     "ch": 60,
+     "depto": "EST",
+     "prereq": [
+      "EST235"
+     ]
+    },
+    {
+     "codigo": "EST238",
+     "nome": "Métodos Computacionais para Ciência de Dados II",
+     "ch": 60,
+     "depto": "EST",
+     "prereq": [
+      "EST231"
+     ]
+    },
+    {
+     "codigo": "EST239",
+     "nome": "Laboratório de Estatística I",
+     "ch": 90,
+     "depto": "EST",
+     "prereq": [
+      "EST079"
+     ]
+    },
+    {
+     "codigo": "EST240",
+     "nome": "Estatística Espacial",
+     "ch": 60,
+     "depto": "EST",
+     "prereq": [
+      "EST035",
+      "EST231"
+     ]
+    },
+    {
+     "codigo": "ICE160",
+     "nome": "Formação Avançada I",
+     "ch": 15,
+     "depto": "ICE",
+     "prereq": []
+    },
+    {
+     "codigo": "ICE161",
+     "nome": "Formação Avançada II",
+     "ch": 30,
+     "depto": "ICE",
+     "prereq": []
+    },
+    {
+     "codigo": "ICE162",
+     "nome": "Formação Avançada III",
+     "ch": 45,
+     "depto": "ICE",
+     "prereq": []
+    },
+    {
+     "codigo": "ICE163",
+     "nome": "Formação Avançada IV",
+     "ch": 60,
+     "depto": "ICE",
+     "prereq": []
+    },
+    {
+     "codigo": "ICE169",
+     "nome": "Tópicos em Ciência de Dados I",
+     "ch": 15,
+     "depto": "ICE",
+     "prereq": []
+    },
+    {
+     "codigo": "ICE170",
+     "nome": "Tópicos em Ciência de Dados II",
+     "ch": 30,
+     "depto": "ICE",
+     "prereq": []
+    },
+    {
+     "codigo": "ICE171",
+     "nome": "Tópicos em Ciência de Dados III",
+     "ch": 45,
+     "depto": "ICE",
+     "prereq": []
+    },
+    {
+     "codigo": "ICE172",
+     "nome": "Tópicos em Ciência de Dados IV",
+     "ch": 60,
+     "depto": "ICE",
+     "prereq": []
+    },
+    {
+     "codigo": "LET223",
+     "nome": "Fundamentos de Libras",
+     "ch": 60,
+     "depto": "LET",
+     "prereq": []
+    },
+    {
+     "codigo": "MAT015",
+     "nome": "Equações Diferenciais A",
+     "ch": 60,
+     "depto": "MAT",
+     "prereq": [
+      "MAT039"
+     ]
+    },
+    {
+     "codigo": "MAT034",
+     "nome": "Álgebra A",
+     "ch": 60,
+     "depto": "MAT",
+     "prereq": []
+    },
+    {
+     "codigo": "MAT047",
+     "nome": "Análise Combinatória",
+     "ch": 60,
+     "depto": "MAT",
+     "prereq": []
+    },
+    {
+     "codigo": "MAT048",
+     "nome": "Álgebra Linear I",
+     "ch": 60,
+     "depto": "MAT",
+     "prereq": [
+      "MAT038"
+     ]
+    },
+    {
+     "codigo": "OTI071",
+     "nome": "Organização e Tratamento da Informação",
+     "ch": 60,
+     "depto": "OTI",
+     "prereq": []
+    },
+    {
+     "codigo": "TGI004",
+     "nome": "Usuários da Informação",
+     "ch": 60,
+     "depto": "TGI",
+     "prereq": []
+    }
+   ],
+   "avisos": [
+    "A carga de optativas de cada período soma toda a carga horária adicional sugerida nele para o percurso (optativas, núcleo avançado, núcleo geral/formação livre etc.).",
+    "Versão com situação \"Em análise\" na PROGRAD: pode mudar até ser liberada."
+   ]
+  },
+  {
+   "id": "ec-atual",
+   "curso": "Engenharia de Computação",
+   "versao": "atual",
+   "rotulo": "Engenharia de Computação — grade atual",
+   "fonte": {
+    "tipo": "imagem",
+    "url": null,
+    "versaoOficial": null,
+    "data": null
+   },
+   "periodos": [
+    {
+     "n": 1,
+     "disciplinas": [
+      {
+       "codigo": "DCC203",
+       "nome": "Programação e Desenvolvimento de Software I",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": []
+      },
+      {
+       "codigo": "DCC638",
+       "nome": "Introdução à Lógica Computacional",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": []
+      },
+      {
+       "codigo": "MAT001",
+       "nome": "Cálculo Diferencial e Integral 1",
+       "natureza": "OB",
+       "ch": 90,
+       "depto": "MAT",
+       "prereq": []
+      },
+      {
+       "codigo": "MAT038",
+       "nome": "Geometria Analítica e Álgebra Linear",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "MAT",
+       "prereq": []
+      },
+      {
+       "codigo": "FIS151",
+       "nome": "Física Experimental Básica - Mecânica",
+       "natureza": "OB",
+       "ch": 30,
+       "depto": "FIS",
+       "prereq": []
+      },
+      {
+       "codigo": "INU034",
+       "nome": "Intro Engenharia Computação",
+       "natureza": "OB",
+       "ch": 45,
+       "depto": "INU",
+       "prereq": []
+      }
+     ],
+     "optativasCh": 0
+    },
+    {
+     "n": 2,
+     "disciplinas": [
+      {
+       "codigo": "DCC204",
+       "nome": "Programação e Desenvolvimento de Software II",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "DCC203"
+       ]
+      },
+      {
+       "codigo": "DCC216",
+       "nome": "Matemática Discreta",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "DCC638"
+       ]
+      },
+      {
+       "codigo": "MAT042",
+       "nome": "Cálculo de Várias Variáveis",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "MAT",
+       "prereq": [
+        "MAT001"
+       ]
+      },
+      {
+       "codigo": "FIS065",
+       "nome": "Fundamentos de Mecânica",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "FIS",
+       "prereq": [
+        "MAT001"
+       ]
+      },
+      {
+       "codigo": "DCC220",
+       "nome": "Fund. Interação Humano Computador",
+       "natureza": "OB",
+       "ch": 30,
+       "depto": "DCC",
+       "prereq": []
+      },
+      {
+       "codigo": "ELE064",
+       "nome": "Análise de Circuitos Elétricos I",
+       "natureza": "OB",
+       "ch": 30,
+       "depto": "ELE",
+       "prereq": []
+      },
+      {
+       "codigo": "FIS069",
+       "nome": "Fundamentos de Eletromagnetismo",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "FIS",
+       "prereq": [
+        "MAT001"
+       ]
+      }
+     ],
+     "optativasCh": 0
+    },
+    {
+     "n": 3,
+     "disciplinas": [
+      {
+       "codigo": "DCC205",
+       "nome": "Estruturas de Dados",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "DCC204"
+       ]
+      },
+      {
+       "codigo": "DCC639",
+       "nome": "Álgebra Linear Computacional",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "DCC203",
+        "MAT038"
+       ]
+      },
+      {
+       "codigo": "MAT015",
+       "nome": "Equações Diferenciais A",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "MAT",
+       "prereq": [
+        "MAT042"
+       ]
+      },
+      {
+       "codigo": null,
+       "nome": "Fundamentos de Estatística e Ciência de Dados",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "EST",
+       "prereq": [
+        "MAT001"
+       ]
+      },
+      {
+       "codigo": "ELE028",
+       "nome": "Laboratório de Circuitos Elétricos I",
+       "natureza": "OB",
+       "ch": 30,
+       "depto": "ELE",
+       "prereq": [
+        "ELE064"
+       ]
+      },
+      {
+       "codigo": "ELE065",
+       "nome": "Análise de Circuitos Elétricos II",
+       "natureza": "OB",
+       "ch": 30,
+       "depto": "ELE",
+       "prereq": [
+        "ELE064",
+        "FIS069"
+       ]
+      },
+      {
+       "codigo": "ELT124",
+       "nome": "Sistemas Digitais",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "ELT",
+       "prereq": [
+        "ELE064"
+       ]
+      }
+     ],
+     "optativasCh": 0
+    },
+    {
+     "n": 4,
+     "disciplinas": [
+      {
+       "codigo": "DCC206",
+       "nome": "Algoritmos I",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "DCC205"
+       ]
+      },
+      {
+       "codigo": "DCC011",
+       "nome": "Introdução a Bancos de Dados",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "DCC204",
+        "DCC216"
+       ]
+      },
+      {
+       "codigo": "DCC641",
+       "nome": "Fund Sistemas Paralelos Distribuídos",
+       "natureza": "OB",
+       "ch": 30,
+       "depto": "DCC",
+       "prereq": [
+        "DCC205"
+       ]
+      },
+      {
+       "codigo": "INU035",
+       "nome": "Arquitetura e Organização de Computadores I",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "INU",
+       "prereq": [
+        "ELT124"
+       ]
+      },
+      {
+       "codigo": "ELT088",
+       "nome": "Análise de Sistemas Dinâmicos Lineares",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "ELT",
+       "prereq": [
+        "MAT015"
+       ]
+      },
+      {
+       "codigo": "QUI628",
+       "nome": "Química Geral E",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "QUI",
+       "prereq": []
+      },
+      {
+       "codigo": "ELT029",
+       "nome": "Laboratório de Sistemas Digitais",
+       "natureza": "OB",
+       "ch": 30,
+       "depto": "ELT",
+       "prereq": [
+        "ELT124"
+       ]
+      }
+     ],
+     "optativasCh": 0
+    },
+    {
+     "n": 5,
+     "disciplinas": [
+      {
+       "codigo": "DCC129",
+       "nome": "Fundamentos de Teoria da Computação",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "DCC216"
+       ]
+      },
+      {
+       "codigo": null,
+       "nome": "Arquitetura e Organização de Computadores II",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "INU",
+       "prereq": [
+        "INU035"
+       ]
+      },
+      {
+       "codigo": null,
+       "nome": "Laboratório de Projetos I",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "INU",
+       "prereq": [
+        "INU035"
+       ]
+      },
+      {
+       "codigo": "ELT084",
+       "nome": "Dispositivos e Circuitos Eletrônicos Básicos",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "ELT",
+       "prereq": [
+        "ELT088"
+       ]
+      },
+      {
+       "codigo": null,
+       "nome": "Processamento Digital de Sinais",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "ELE",
+       "prereq": [
+        "ELT088"
+       ]
+      },
+      {
+       "codigo": null,
+       "nome": "Projetos de Sistemas Embarcados",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "EEE",
+       "prereq": [
+        "ELT029"
+       ]
+      }
+     ],
+     "optativasCh": 0
+    },
+    {
+     "n": 6,
+     "disciplinas": [
+      {
+       "codigo": "DCC024",
+       "nome": "Linguagens de Programação",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "DCC205"
+       ]
+      },
+      {
+       "codigo": "DCC605",
+       "nome": "Sistemas Operacionais",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "DCC641"
+       ]
+      },
+      {
+       "codigo": "DCC603",
+       "nome": "Engenharia de Software",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "DCC011"
+       ]
+      },
+      {
+       "codigo": null,
+       "nome": "Laboratórios de Projetos II",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "INU",
+       "prereq": []
+      },
+      {
+       "codigo": null,
+       "nome": "Pesquisa Operacional",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "INU",
+       "prereq": []
+      },
+      {
+       "codigo": "ELT089",
+       "nome": "Laboratório de Circuitos Eletrônicos I",
+       "natureza": "OB",
+       "ch": 30,
+       "depto": "ELT",
+       "prereq": [
+        "ELT084"
+       ]
+      },
+      {
+       "codigo": null,
+       "nome": "Fundamentos de Inteligência Artificial",
+       "natureza": "OB",
+       "ch": 30,
+       "depto": "INU",
+       "prereq": []
+      }
+     ],
+     "optativasCh": 0
+    },
+    {
+     "n": 7,
+     "disciplinas": [
+      {
+       "codigo": null,
+       "nome": "Redes de Computadores",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "INU",
+       "prereq": [
+        "DCC605"
+       ]
+      },
+      {
+       "codigo": null,
+       "nome": "Laboratórios de Projetos III",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "INU",
+       "prereq": []
+      },
+      {
+       "codigo": "ENG157",
+       "nome": "Fenômenos de Transporte",
+       "natureza": "OB",
+       "ch": 30,
+       "depto": "ENG",
+       "prereq": []
+      },
+      {
+       "codigo": null,
+       "nome": "Concepção de Circuitos Integrados",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "ELE",
+       "prereq": [
+        "ELT084",
+        "ELT029"
+       ]
+      },
+      {
+       "codigo": null,
+       "nome": "Ciências do Ambiente",
+       "natureza": "OB",
+       "ch": 30,
+       "depto": "ESA",
+       "prereq": []
+      }
+     ],
+     "optativasCh": 120
+    },
+    {
+     "n": 8,
+     "disciplinas": [
+      {
+       "codigo": null,
+       "nome": "Introdução Segurança Computacional",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": []
+      },
+      {
+       "codigo": "ELE032",
+       "nome": "Teoria dos Materiais",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "ELE",
+       "prereq": []
+      },
+      {
+       "codigo": "CAD103",
+       "nome": "Administração T.G.A.",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "CAD",
+       "prereq": []
+      }
+     ],
+     "optativasCh": 180
+    },
+    {
+     "n": 9,
+     "disciplinas": [
+      {
+       "codigo": null,
+       "nome": "Laboratórios de Projetos Integradores Área Temática",
+       "natureza": "OP",
+       "ch": 60,
+       "depto": "INU",
+       "prereq": []
+      },
+      {
+       "codigo": null,
+       "nome": "Projeto Final de Curso I",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "INU",
+       "prereq": []
+      },
+      {
+       "codigo": null,
+       "nome": "Eng. de Computação e Sociedade",
+       "natureza": "OB",
+       "ch": 30,
+       "depto": "INU",
+       "prereq": []
+      }
+     ],
+     "optativasCh": 180
+    },
+    {
+     "n": 10,
+     "disciplinas": [
+      {
+       "codigo": null,
+       "nome": "Estágio Supervisionado Eng Computação",
+       "natureza": "OB",
+       "ch": 165,
+       "depto": "INU",
+       "prereq": []
+      },
+      {
+       "codigo": null,
+       "nome": "Projeto Final de Curso II",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "INU",
+       "prereq": []
+      }
+     ],
+     "optativasCh": 180
+    }
+   ],
+   "optativas": [],
+   "avisos": [
+    "Versão da grade não confirmada: transcrita de uma imagem sem data.",
+    "Disciplinas ainda sem código oficial (código provisório na imagem): Arquitetura e Organização de Computadores II (INUXXX), Laboratório de Projetos I, Laboratórios de Projetos II e III (INUXXX), Pesquisa Operacional (INUXXX), Fundamentos de Inteligência Artificial (INUXXX), Redes de Computadores (INUXXX), Laboratórios de Projetos Integradores Área Temática (INUXXX), Projeto Final de Curso I e II (INUXXX), Eng. de Computação e Sociedade (INUxxx), Estágio Supervisionado Eng Computação (INUXXX), Processamento Digital de Sinais (ELEXXX), Concepção de Circuitos Integrados (ELEXXX), Projetos de Sistemas Embarcados (EEEXXX), Ciências do Ambiente (ESAxxx) e Introdução Segurança Computacional (DCCXXX).",
+    "Códigos provisórios substituídos pelos do catálogo, pelo nome: Intro Engenharia Computação (INUxxx) → INU034, Arquitetura e Organização de Computadores I (INUXXX) → INU035, Fund. Interação Humano Computador (DCCXXX) → DCC220.",
+    "Os espaços \"Optativa de Área Temática\", \"Optativa - Núcleo Específico\", \"Optativa - Núcleo Geral\", \"Optativa - Núcleo Específico ou Núcleo Avançado\" e \"Optativa - Núcleo Avançado\" (60h cada) entram na carga de optativas do período, não como disciplinas.",
+    "Pré-requisitos lidos das setas da imagem; onde as setas se cruzam sem deixar claro a origem, o pré-requisito foi omitido.",
+    "Pré-requisitos da imagem que não cabem na lista por falta de código oficial: Laboratório de Projetos I → Laboratórios de Projetos II → Laboratórios de Projetos III; Redes de Computadores → Introdução Segurança Computacional; Projeto Final de Curso I → Projeto Final de Curso II.",
+    "A lista de optativas não consta da grade em imagem.",
+    "\"Fundamentos de Estatística e Ciência de Dados\" aparece na imagem como \"EST0198\", código que não existe nos relatórios oficiais; ficou sem código até ser confirmado."
+   ]
+  },
+  {
+   "id": "mc-2025",
+   "curso": "Matemática Computacional",
+   "versao": "2025",
+   "percurso": "Bacharelado (núcleo avançado + núcleo geral)",
+   "rotulo": "Matemática Computacional — currículo 2025",
+   "fonte": {
+    "tipo": "prograd",
+    "url": "https://www.matcomp.dcc.ufmg.br/grade/grade-geral.pdf",
+    "versaoOficial": "V-20251",
+    "data": "2025-05-24"
+   },
+   "periodos": [
+    {
+     "n": 1,
+     "disciplinas": [
+      {
+       "codigo": "DCC203",
+       "nome": "Programação e Desenvolvimento de Software I",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": []
+      },
+      {
+       "codigo": "DCC638",
+       "nome": "Introdução à Lógica Computacional",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": []
+      },
+      {
+       "codigo": "ICE137",
+       "nome": "Introdução à Matemática Computacional",
+       "natureza": "OB",
+       "ch": 30,
+       "depto": "ICE",
+       "prereq": []
+      },
+      {
+       "codigo": "MAT001",
+       "nome": "Cálculo Diferencial e Integral I",
+       "natureza": "OB",
+       "ch": 90,
+       "depto": "MAT",
+       "prereq": []
+      },
+      {
+       "codigo": "MAT038",
+       "nome": "Geometria Analitica e Álgebra Linear",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "MAT",
+       "prereq": []
+      }
+     ],
+     "optativasCh": 0
+    },
+    {
+     "n": 2,
+     "disciplinas": [
+      {
+       "codigo": "DCC216",
+       "nome": "Matemática Discreta",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "DCC638"
+       ]
+      },
+      {
+       "codigo": "DCC219",
+       "nome": "Programação e Desenvolvimento de Software II",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "DCC203"
+       ]
+      },
+      {
+       "codigo": "MAT034",
+       "nome": "Álgebra A",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "MAT",
+       "prereq": []
+      },
+      {
+       "codigo": "MAT039",
+       "nome": "Cálculo Diferencial e Integral II",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "MAT",
+       "prereq": [
+        "MAT001"
+       ]
+      },
+      {
+       "codigo": "MAT048",
+       "nome": "Álgebra Linear I",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "MAT",
+       "prereq": [
+        "MAT038"
+       ]
+      }
+     ],
+     "optativasCh": 0
+    },
+    {
+     "n": 3,
+     "disciplinas": [
+      {
+       "codigo": "DCC221",
+       "nome": "Estruturas de Dados",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "DCC219"
+       ]
+      },
+      {
+       "codigo": "DCC639",
+       "nome": "Álgebra Linear Computacional",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "MAT038"
+       ]
+      },
+      {
+       "codigo": "EST032",
+       "nome": "Probabilidade",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "EST",
+       "prereq": []
+      },
+      {
+       "codigo": "MAT002",
+       "nome": "Cálculo Diferencial e Integral III",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "MAT",
+       "prereq": [
+        "MAT039"
+       ]
+      },
+      {
+       "codigo": "MAT015",
+       "nome": "Equações Diferenciais A",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "MAT",
+       "prereq": [
+        "MAT039"
+       ]
+      }
+     ],
+     "optativasCh": 0
+    },
+    {
+     "n": 4,
+     "disciplinas": [
+      {
+       "codigo": "DCC051",
+       "nome": "Introdução à Ciência dos Dados",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "EST032"
+       ]
+      },
+      {
+       "codigo": "DCC206",
+       "nome": "Algoritmos I",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "DCC221"
+       ]
+      },
+      {
+       "codigo": "DCC222",
+       "nome": "Introdução a Bancos de Dados",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "DCC216"
+       ]
+      },
+      {
+       "codigo": "MAT016",
+       "nome": "Equações Diferenciais B",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "MAT",
+       "prereq": []
+      },
+      {
+       "codigo": "MAT213",
+       "nome": "Álgebra Linear II",
+       "natureza": "OB",
+       "ch": 90,
+       "depto": "MAT",
+       "prereq": [
+        "MAT048"
+       ]
+      }
+     ],
+     "optativasCh": 0
+    },
+    {
+     "n": 5,
+     "disciplinas": [
+      {
+       "codigo": "DCC035",
+       "nome": "Pesquisa Operacional",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "DCC216"
+       ]
+      },
+      {
+       "codigo": "DCC207",
+       "nome": "Algoritmos II",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "DCC206"
+       ]
+      },
+      {
+       "codigo": "MAT243",
+       "nome": "Análise I",
+       "natureza": "OB",
+       "ch": 90,
+       "depto": "MAT",
+       "prereq": []
+      }
+     ],
+     "optativasCh": 60
+    },
+    {
+     "n": 6,
+     "disciplinas": [
+      {
+       "codigo": "DCC199",
+       "nome": "Teoria dos Grafos",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "DCC216"
+       ]
+      },
+      {
+       "codigo": "MAT235",
+       "nome": "Álgebra Linear Numérica",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "MAT",
+       "prereq": []
+      }
+     ],
+     "optativasCh": 180
+    },
+    {
+     "n": 7,
+     "disciplinas": [
+      {
+       "codigo": "MAT236",
+       "nome": "Equações Diferenciais Numericas",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "MAT",
+       "prereq": []
+      }
+     ],
+     "optativasCh": 240
+    },
+    {
+     "n": 8,
+     "disciplinas": [],
+     "optativasCh": 300
+    }
+   ],
+   "optativas": [
+    {
+     "codigo": "DCC006",
+     "nome": "Organização de Computadores I",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": [
+      "DCC090"
+     ]
+    },
+    {
+     "codigo": "DCC007",
+     "nome": "Organização de Computadores II",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": [
+      "DCC006"
+     ]
+    },
+    {
+     "codigo": "DCC024",
+     "nome": "Linguagens de Programação",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": [
+      "DCC221"
+     ]
+    },
+    {
+     "codigo": "DCC027",
+     "nome": "Computação Gráfica",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC028",
+     "nome": "Inteligência Artificial",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC029",
+     "nome": "Processamentos Digital de Imagens",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC030",
+     "nome": "Tópicos em Ciência da Computação",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC041",
+     "nome": "Introdução à Robótica",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC042",
+     "nome": "Robótica Móvel",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC043",
+     "nome": "Visao Computacional",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": [
+      "DCC129"
+     ]
+    },
+    {
+     "codigo": "DCC053",
+     "nome": "Compiladores I",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC055",
+     "nome": "Empreendimentos em Informática",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC057",
+     "nome": "Mineração de Dados",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC058",
+     "nome": "Projetos e Conceitos de Sistemas Paralelos e Distribuídos",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC068",
+     "nome": "Tópicos Especiais em Informática I",
+     "ch": 15,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC069",
+     "nome": "Tópicos Especiais em Informática II",
+     "ch": 30,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC070",
+     "nome": "Tópicos Especiais em Informática III",
+     "ch": 45,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC071",
+     "nome": "Tópicos Especiais em Informática IV",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC072",
+     "nome": "Engenharia de Software II",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC074",
+     "nome": "Fundamentos de Arquitetura de Computadores",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC075",
+     "nome": "Fundamentos de Sistemas Computacionais",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC076",
+     "nome": "Recuperação de Informação",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC078",
+     "nome": "Bancos de Dados Geográficos",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC079",
+     "nome": "Bioinformática",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC090",
+     "nome": "Teoria da Informação",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC091",
+     "nome": "Fluxo de Informação Quantitativo",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC092",
+     "nome": "Métodos Formais",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC093",
+     "nome": "Sistemas de Recomendação",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC094",
+     "nome": "Engenharia de Software",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": [
+      "DCC222",
+      "DCC219"
+     ]
+    },
+    {
+     "codigo": "DCC095",
+     "nome": "Redes de Computadores",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC114",
+     "nome": "Introdução aos Sistemas Lógicos",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": [
+      "DCC638"
+     ]
+    },
+    {
+     "codigo": "DCC129",
+     "nome": "Fundamentos da Teoria da Computação",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC186",
+     "nome": "Algoritmos para Bioinformática I",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC190",
+     "nome": "Bibliotecas Digitais",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC191",
+     "nome": "Computação Natural",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC192",
+     "nome": "Desenvolvimento de Jogos Digitais",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC193",
+     "nome": "Engenharia de Usabilidade",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC194",
+     "nome": "Interação Humano-Computador",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC198",
+     "nome": "Redes Complexas em Comp.: Modelagem, Algoritmos e Aplicações",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC215",
+     "nome": "Heurísticas e Metaheurísticas",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC218",
+     "nome": "Introdução a Sistemas Computacionais",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC223",
+     "nome": "Introdução à Segurança Computacional",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC605",
+     "nome": "Sistemas Operacionais",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": [
+      "DCC006"
+     ]
+    },
+    {
+     "codigo": "DCC636",
+     "nome": "Ética na Computação",
+     "ch": 30,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC637",
+     "nome": "Computação e Sociedade",
+     "ch": 30,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC641",
+     "nome": "Fundamentos de Sistemas Paralelos e Distribuídos",
+     "ch": 30,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC642",
+     "nome": "Introdução à Inteligência Artificial",
+     "ch": 30,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "ECN015",
+     "nome": "Economia Matemática",
+     "ch": 90,
+     "depto": "ECN",
+     "prereq": []
+    },
+    {
+     "codigo": "ECN101",
+     "nome": "Economia A I",
+     "ch": 60,
+     "depto": "ECN",
+     "prereq": []
+    },
+    {
+     "codigo": "EST011",
+     "nome": "Estatística Multivariada",
+     "ch": 60,
+     "depto": "EST",
+     "prereq": []
+    },
+    {
+     "codigo": "EST028",
+     "nome": "Probabilidade II",
+     "ch": 90,
+     "depto": "EST",
+     "prereq": []
+    },
+    {
+     "codigo": "EST034",
+     "nome": "Estatística Geral",
+     "ch": 60,
+     "depto": "EST",
+     "prereq": []
+    },
+    {
+     "codigo": "EST035",
+     "nome": "Análise de Regressão",
+     "ch": 60,
+     "depto": "EST",
+     "prereq": []
+    },
+    {
+     "codigo": "EST036",
+     "nome": "Planejamento de Experimentos",
+     "ch": 60,
+     "depto": "EST",
+     "prereq": []
+    },
+    {
+     "codigo": "EST038",
+     "nome": "Métodos Estatísticos de Previsão",
+     "ch": 60,
+     "depto": "EST",
+     "prereq": []
+    },
+    {
+     "codigo": "EST039",
+     "nome": "Processos Estocásticos",
+     "ch": 60,
+     "depto": "EST",
+     "prereq": []
+    },
+    {
+     "codigo": "EST055",
+     "nome": "Inferência",
+     "ch": 60,
+     "depto": "EST",
+     "prereq": []
+    },
+    {
+     "codigo": "EST079",
+     "nome": "Modelos Lineares Generalizados",
+     "ch": 60,
+     "depto": "EST",
+     "prereq": []
+    },
+    {
+     "codigo": "EST080",
+     "nome": "Estatística Não Paramétrica",
+     "ch": 60,
+     "depto": "EST",
+     "prereq": []
+    },
+    {
+     "codigo": "EST082",
+     "nome": "Iniciacao a Estatística",
+     "ch": 60,
+     "depto": "EST",
+     "prereq": []
+    },
+    {
+     "codigo": "EST088",
+     "nome": "Inferência Estatística com Abordagem Bayesiana",
+     "ch": 60,
+     "depto": "EST",
+     "prereq": []
+    },
+    {
+     "codigo": "EST171",
+     "nome": "Tópicos em Estatística",
+     "ch": 60,
+     "depto": "EST",
+     "prereq": []
+    },
+    {
+     "codigo": "EST230",
+     "nome": "Probabilidade",
+     "ch": 90,
+     "depto": "EST",
+     "prereq": []
+    },
+    {
+     "codigo": "EST231",
+     "nome": "Inferência Clássica",
+     "ch": 60,
+     "depto": "EST",
+     "prereq": []
+    },
+    {
+     "codigo": "FIS034",
+     "nome": "Mecânica I",
+     "ch": 60,
+     "depto": "FIS",
+     "prereq": []
+    },
+    {
+     "codigo": "FIS036",
+     "nome": "Mecânica II",
+     "ch": 60,
+     "depto": "FIS",
+     "prereq": []
+    },
+    {
+     "codigo": "FIS037",
+     "nome": "Eletromagnetismo I",
+     "ch": 60,
+     "depto": "FIS",
+     "prereq": []
+    },
+    {
+     "codigo": "FIS065",
+     "nome": "Fundamentos de Mecânica",
+     "ch": 60,
+     "depto": "FIS",
+     "prereq": []
+    },
+    {
+     "codigo": "FIS069",
+     "nome": "Fundamentos de Eletromagnetismo",
+     "ch": 60,
+     "depto": "FIS",
+     "prereq": []
+    },
+    {
+     "codigo": "FIS073",
+     "nome": "Introdução a Física Quântica",
+     "ch": 60,
+     "depto": "FIS",
+     "prereq": [
+      "FIS086"
+     ]
+    },
+    {
+     "codigo": "FIS086",
+     "nome": "Fundamentos de Oscilações,Ondas e Óptica",
+     "ch": 60,
+     "depto": "FIS",
+     "prereq": [
+      "FIS069"
+     ]
+    },
+    {
+     "codigo": "FIS088",
+     "nome": "Fundamentos de Física Quântica",
+     "ch": 30,
+     "depto": "FIS",
+     "prereq": [
+      "FIS069"
+     ]
+    },
+    {
+     "codigo": "FIS120",
+     "nome": "Física Quântica I",
+     "ch": 60,
+     "depto": "FIS",
+     "prereq": []
+    },
+    {
+     "codigo": "FIS126",
+     "nome": "Termodinâmica",
+     "ch": 60,
+     "depto": "FIS",
+     "prereq": []
+    },
+    {
+     "codigo": "FIS151",
+     "nome": "Física Experimental Básica: Mecânica",
+     "ch": 30,
+     "depto": "FIS",
+     "prereq": []
+    },
+    {
+     "codigo": "FIS152",
+     "nome": "Fundamentos de Mecânica dos Fluidos e Termodinâmica",
+     "ch": 30,
+     "depto": "FIS",
+     "prereq": [
+      "FIS065"
+     ]
+    },
+    {
+     "codigo": "FIS153",
+     "nome": "Física Experimental Básica: Eletromagnetismo",
+     "ch": 30,
+     "depto": "FIS",
+     "prereq": [
+      "FIS065"
+     ]
+    },
+    {
+     "codigo": "FIS154",
+     "nome": "Física Experimental Básica: Termodinâmica",
+     "ch": 30,
+     "depto": "FIS",
+     "prereq": [
+      "FIS151"
+     ]
+    },
+    {
+     "codigo": "FIS155",
+     "nome": "Física Experimental Básica - Ondas e Óptica",
+     "ch": 30,
+     "depto": "FIS",
+     "prereq": [
+      "FIS151",
+      "FIS069"
+     ]
+    },
+    {
+     "codigo": "ICB001",
+     "nome": "Bases Ecológicas para o Desenvolvimento Sustentável",
+     "ch": 30,
+     "depto": "ICB",
+     "prereq": []
+    },
+    {
+     "codigo": "ICE144",
+     "nome": "Mineração de Dados",
+     "ch": 60,
+     "depto": "ICE",
+     "prereq": []
+    },
+    {
+     "codigo": "ICE147",
+     "nome": "Aprendizado de Máquina Supervisionado",
+     "ch": 60,
+     "depto": "ICE",
+     "prereq": []
+    },
+    {
+     "codigo": "ICE148",
+     "nome": "Aprendizado de Máquina Não Supervisionado",
+     "ch": 60,
+     "depto": "ICE",
+     "prereq": []
+    },
+    {
+     "codigo": "ICE160",
+     "nome": "Formação Avançada I",
+     "ch": 15,
+     "depto": "ICE",
+     "prereq": []
+    },
+    {
+     "codigo": "ICE161",
+     "nome": "Formação Avançada II",
+     "ch": 30,
+     "depto": "ICE",
+     "prereq": []
+    },
+    {
+     "codigo": "ICE162",
+     "nome": "Formação Avançada III",
+     "ch": 45,
+     "depto": "ICE",
+     "prereq": []
+    },
+    {
+     "codigo": "ICE163",
+     "nome": "Formação Avançada IV",
+     "ch": 60,
+     "depto": "ICE",
+     "prereq": []
+    },
+    {
+     "codigo": "ICE175",
+     "nome": "Tópicos em Matemática Computacional I",
+     "ch": 15,
+     "depto": "ICE",
+     "prereq": []
+    },
+    {
+     "codigo": "ICE176",
+     "nome": "Tópicos em Matemática Computacional II",
+     "ch": 30,
+     "depto": "ICE",
+     "prereq": []
+    },
+    {
+     "codigo": "ICE177",
+     "nome": "Tópicos em Matemática Computacional III",
+     "ch": 45,
+     "depto": "ICE",
+     "prereq": []
+    },
+    {
+     "codigo": "ICE178",
+     "nome": "Tópicos em Matemática Computacional IV",
+     "ch": 60,
+     "depto": "ICE",
+     "prereq": []
+    },
+    {
+     "codigo": "LET223",
+     "nome": "Fundamentos de Libras",
+     "ch": 60,
+     "depto": "LET",
+     "prereq": []
+    },
+    {
+     "codigo": "MAT033",
+     "nome": "Tópicos em Matemática A",
+     "ch": 60,
+     "depto": "MAT",
+     "prereq": []
+    },
+    {
+     "codigo": "MAT037",
+     "nome": "Tópicos em Matemática B",
+     "ch": 90,
+     "depto": "MAT",
+     "prereq": []
+    },
+    {
+     "codigo": "MAT041",
+     "nome": "Tópicos em Matemática Computacional",
+     "ch": 60,
+     "depto": "MAT",
+     "prereq": []
+    },
+    {
+     "codigo": "MAT047",
+     "nome": "Análise Combinatória",
+     "ch": 60,
+     "depto": "MAT",
+     "prereq": []
+    },
+    {
+     "codigo": "MAT087",
+     "nome": "Tópicos em Mobilidade Acadêmica A",
+     "ch": 30,
+     "depto": "MAT",
+     "prereq": []
+    },
+    {
+     "codigo": "MAT088",
+     "nome": "Tópicos em Mobilidade Acadêmica B",
+     "ch": 60,
+     "depto": "MAT",
+     "prereq": []
+    },
+    {
+     "codigo": "MAT118",
+     "nome": "Variavel Complexa",
+     "ch": 60,
+     "depto": "MAT",
+     "prereq": [
+      "MAT002"
+     ]
+    },
+    {
+     "codigo": "MAT232",
+     "nome": "Grupos e Corpos",
+     "ch": 60,
+     "depto": "MAT",
+     "prereq": []
+    },
+    {
+     "codigo": "MAT233",
+     "nome": "Aneis e Modulos",
+     "ch": 60,
+     "depto": "MAT",
+     "prereq": []
+    },
+    {
+     "codigo": "MAT234",
+     "nome": "Introdução a Topologia",
+     "ch": 60,
+     "depto": "MAT",
+     "prereq": []
+    },
+    {
+     "codigo": "MAT237",
+     "nome": "Teoria dos Numeros",
+     "ch": 60,
+     "depto": "MAT",
+     "prereq": []
+    },
+    {
+     "codigo": "MAT238",
+     "nome": "Introdução às Curvas Algébricas",
+     "ch": 60,
+     "depto": "MAT",
+     "prereq": []
+    },
+    {
+     "codigo": "MAT239",
+     "nome": "Introdução a Teoria da Medida",
+     "ch": 60,
+     "depto": "MAT",
+     "prereq": []
+    },
+    {
+     "codigo": "MAT240",
+     "nome": "Introdução a Probabilidade",
+     "ch": 60,
+     "depto": "MAT",
+     "prereq": []
+    },
+    {
+     "codigo": "MAT241",
+     "nome": "Formas Diferenciais em Variedades",
+     "ch": 60,
+     "depto": "MAT",
+     "prereq": []
+    },
+    {
+     "codigo": "MAT242",
+     "nome": "Introdução a Análise Funcional",
+     "ch": 60,
+     "depto": "MAT",
+     "prereq": []
+    },
+    {
+     "codigo": "MAT244",
+     "nome": "Introdução a Geometria Diferencial",
+     "ch": 60,
+     "depto": "MAT",
+     "prereq": []
+    },
+    {
+     "codigo": "MAT245",
+     "nome": "Análise II",
+     "ch": 60,
+     "depto": "MAT",
+     "prereq": [
+      "MAT243"
+     ]
+    },
+    {
+     "codigo": "MAT246",
+     "nome": "Introd. Equações Diferenciais Ordinarias",
+     "ch": 60,
+     "depto": "MAT",
+     "prereq": []
+    },
+    {
+     "codigo": "MAT247",
+     "nome": "Introd. Equações Diferenciais Parciais",
+     "ch": 60,
+     "depto": "MAT",
+     "prereq": []
+    },
+    {
+     "codigo": "MAT248",
+     "nome": "Geometria Moderna",
+     "ch": 60,
+     "depto": "MAT",
+     "prereq": []
+    }
+   ],
+   "avisos": [
+    "A carga de optativas de cada período soma toda a carga horária adicional sugerida nele para o percurso (optativas, núcleo avançado, núcleo geral/formação livre etc.)."
+   ]
+  },
+  {
+   "id": "mc-2025-computacao",
+   "curso": "Matemática Computacional",
+   "versao": "2025",
+   "percurso": "Bacharelado com perfil em Computação",
+   "rotulo": "Matemática Computacional — currículo 2025 (perfil Computação)",
+   "fonte": {
+    "tipo": "prograd",
+    "url": "https://www.matcomp.dcc.ufmg.br/grade/grade-computacao.pdf",
+    "versaoOficial": "V-20251",
+    "data": "2025-05-24"
+   },
+   "periodos": [
+    {
+     "n": 1,
+     "disciplinas": [
+      {
+       "codigo": "DCC203",
+       "nome": "Programação e Desenvolvimento de Software I",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": []
+      },
+      {
+       "codigo": "DCC638",
+       "nome": "Introdução à Lógica Computacional",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": []
+      },
+      {
+       "codigo": "ICE137",
+       "nome": "Introdução à Matemática Computacional",
+       "natureza": "OB",
+       "ch": 30,
+       "depto": "ICE",
+       "prereq": []
+      },
+      {
+       "codigo": "MAT001",
+       "nome": "Cálculo Diferencial e Integral I",
+       "natureza": "OB",
+       "ch": 90,
+       "depto": "MAT",
+       "prereq": []
+      },
+      {
+       "codigo": "MAT038",
+       "nome": "Geometria Analitica e Álgebra Linear",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "MAT",
+       "prereq": []
+      }
+     ],
+     "optativasCh": 0
+    },
+    {
+     "n": 2,
+     "disciplinas": [
+      {
+       "codigo": "DCC216",
+       "nome": "Matemática Discreta",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "DCC638"
+       ]
+      },
+      {
+       "codigo": "DCC219",
+       "nome": "Programação e Desenvolvimento de Software II",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "DCC203"
+       ]
+      },
+      {
+       "codigo": "MAT034",
+       "nome": "Álgebra A",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "MAT",
+       "prereq": []
+      },
+      {
+       "codigo": "MAT039",
+       "nome": "Cálculo Diferencial e Integral II",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "MAT",
+       "prereq": [
+        "MAT001"
+       ]
+      },
+      {
+       "codigo": "MAT048",
+       "nome": "Álgebra Linear I",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "MAT",
+       "prereq": [
+        "MAT038"
+       ]
+      }
+     ],
+     "optativasCh": 0
+    },
+    {
+     "n": 3,
+     "disciplinas": [
+      {
+       "codigo": "DCC221",
+       "nome": "Estruturas de Dados",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "DCC219"
+       ]
+      },
+      {
+       "codigo": "DCC639",
+       "nome": "Álgebra Linear Computacional",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "MAT038"
+       ]
+      },
+      {
+       "codigo": "EST032",
+       "nome": "Probabilidade",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "EST",
+       "prereq": []
+      },
+      {
+       "codigo": "MAT002",
+       "nome": "Cálculo Diferencial e Integral III",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "MAT",
+       "prereq": [
+        "MAT039"
+       ]
+      },
+      {
+       "codigo": "MAT015",
+       "nome": "Equações Diferenciais A",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "MAT",
+       "prereq": [
+        "MAT039"
+       ]
+      }
+     ],
+     "optativasCh": 0
+    },
+    {
+     "n": 4,
+     "disciplinas": [
+      {
+       "codigo": "DCC051",
+       "nome": "Introdução à Ciência dos Dados",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "EST032"
+       ]
+      },
+      {
+       "codigo": "DCC206",
+       "nome": "Algoritmos I",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "DCC221"
+       ]
+      },
+      {
+       "codigo": "DCC222",
+       "nome": "Introdução a Bancos de Dados",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "DCC216"
+       ]
+      },
+      {
+       "codigo": "MAT016",
+       "nome": "Equações Diferenciais B",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "MAT",
+       "prereq": []
+      },
+      {
+       "codigo": "MAT213",
+       "nome": "Álgebra Linear II",
+       "natureza": "OB",
+       "ch": 90,
+       "depto": "MAT",
+       "prereq": [
+        "MAT048"
+       ]
+      }
+     ],
+     "optativasCh": 0
+    },
+    {
+     "n": 5,
+     "disciplinas": [
+      {
+       "codigo": "DCC035",
+       "nome": "Pesquisa Operacional",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "DCC216"
+       ]
+      },
+      {
+       "codigo": "DCC207",
+       "nome": "Algoritmos II",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "DCC206"
+       ]
+      },
+      {
+       "codigo": "MAT243",
+       "nome": "Análise I",
+       "natureza": "OB",
+       "ch": 90,
+       "depto": "MAT",
+       "prereq": []
+      }
+     ],
+     "optativasCh": 60
+    },
+    {
+     "n": 6,
+     "disciplinas": [
+      {
+       "codigo": "DCC094",
+       "nome": "Engenharia de Software",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "DCC222",
+        "DCC219"
+       ]
+      },
+      {
+       "codigo": "DCC129",
+       "nome": "Fundamentos da Teoria da Computação",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "DCC638"
+       ]
+      },
+      {
+       "codigo": "DCC199",
+       "nome": "Teoria dos Grafos",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "DCC216"
+       ]
+      },
+      {
+       "codigo": "DCC641",
+       "nome": "Fundamentos de Sistemas Paralelos e Distribuídos",
+       "natureza": "OB",
+       "ch": 30,
+       "depto": "DCC",
+       "prereq": []
+      },
+      {
+       "codigo": "DCC642",
+       "nome": "Introdução à Inteligência Artificial",
+       "natureza": "OB",
+       "ch": 30,
+       "depto": "DCC",
+       "prereq": [
+        "DCC221"
+       ]
+      }
+     ],
+     "optativasCh": 60
+    },
+    {
+     "n": 7,
+     "disciplinas": [],
+     "optativasCh": 300
+    },
+    {
+     "n": 8,
+     "disciplinas": [],
+     "optativasCh": 300
+    }
+   ],
+   "optativas": [
+    {
+     "codigo": "DCC006",
+     "nome": "Organização de Computadores I",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": [
+      "DCC090"
+     ]
+    },
+    {
+     "codigo": "DCC007",
+     "nome": "Organização de Computadores II",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": [
+      "DCC006"
+     ]
+    },
+    {
+     "codigo": "DCC024",
+     "nome": "Linguagens de Programação",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": [
+      "DCC221"
+     ]
+    },
+    {
+     "codigo": "DCC027",
+     "nome": "Computação Gráfica",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC028",
+     "nome": "Inteligência Artificial",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC029",
+     "nome": "Processamentos Digital de Imagens",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC030",
+     "nome": "Tópicos em Ciência da Computação",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC041",
+     "nome": "Introdução à Robótica",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC042",
+     "nome": "Robótica Móvel",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC043",
+     "nome": "Visao Computacional",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": [
+      "DCC129"
+     ]
+    },
+    {
+     "codigo": "DCC053",
+     "nome": "Compiladores I",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC055",
+     "nome": "Empreendimentos em Informática",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC057",
+     "nome": "Mineração de Dados",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC058",
+     "nome": "Projetos e Conceitos de Sistemas Paralelos e Distribuídos",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC068",
+     "nome": "Tópicos Especiais em Informática I",
+     "ch": 15,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC069",
+     "nome": "Tópicos Especiais em Informática II",
+     "ch": 30,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC070",
+     "nome": "Tópicos Especiais em Informática III",
+     "ch": 45,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC071",
+     "nome": "Tópicos Especiais em Informática IV",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC072",
+     "nome": "Engenharia de Software II",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC074",
+     "nome": "Fundamentos de Arquitetura de Computadores",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC075",
+     "nome": "Fundamentos de Sistemas Computacionais",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC076",
+     "nome": "Recuperação de Informação",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC078",
+     "nome": "Bancos de Dados Geográficos",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC079",
+     "nome": "Bioinformática",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC090",
+     "nome": "Teoria da Informação",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC091",
+     "nome": "Fluxo de Informação Quantitativo",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC092",
+     "nome": "Métodos Formais",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC093",
+     "nome": "Sistemas de Recomendação",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC095",
+     "nome": "Redes de Computadores",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC114",
+     "nome": "Introdução aos Sistemas Lógicos",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": [
+      "DCC638"
+     ]
+    },
+    {
+     "codigo": "DCC186",
+     "nome": "Algoritmos para Bioinformática I",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC190",
+     "nome": "Bibliotecas Digitais",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC191",
+     "nome": "Computação Natural",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC192",
+     "nome": "Desenvolvimento de Jogos Digitais",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC193",
+     "nome": "Engenharia de Usabilidade",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC194",
+     "nome": "Interação Humano-Computador",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC198",
+     "nome": "Redes Complexas em Comp.: Modelagem, Algoritmos e Aplicações",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC215",
+     "nome": "Heurísticas e Metaheurísticas",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC218",
+     "nome": "Introdução a Sistemas Computacionais",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC223",
+     "nome": "Introdução à Segurança Computacional",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC605",
+     "nome": "Sistemas Operacionais",
+     "ch": 60,
+     "depto": "DCC",
+     "prereq": [
+      "DCC006"
+     ]
+    },
+    {
+     "codigo": "DCC636",
+     "nome": "Ética na Computação",
+     "ch": 30,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "DCC637",
+     "nome": "Computação e Sociedade",
+     "ch": 30,
+     "depto": "DCC",
+     "prereq": []
+    },
+    {
+     "codigo": "ECN015",
+     "nome": "Economia Matemática",
+     "ch": 90,
+     "depto": "ECN",
+     "prereq": []
+    },
+    {
+     "codigo": "ECN101",
+     "nome": "Economia A I",
+     "ch": 60,
+     "depto": "ECN",
+     "prereq": []
+    },
+    {
+     "codigo": "EST011",
+     "nome": "Estatística Multivariada",
+     "ch": 60,
+     "depto": "EST",
+     "prereq": []
+    },
+    {
+     "codigo": "EST028",
+     "nome": "Probabilidade II",
+     "ch": 90,
+     "depto": "EST",
+     "prereq": []
+    },
+    {
+     "codigo": "EST034",
+     "nome": "Estatística Geral",
+     "ch": 60,
+     "depto": "EST",
+     "prereq": []
+    },
+    {
+     "codigo": "EST035",
+     "nome": "Análise de Regressão",
+     "ch": 60,
+     "depto": "EST",
+     "prereq": []
+    },
+    {
+     "codigo": "EST036",
+     "nome": "Planejamento de Experimentos",
+     "ch": 60,
+     "depto": "EST",
+     "prereq": []
+    },
+    {
+     "codigo": "EST038",
+     "nome": "Métodos Estatísticos de Previsão",
+     "ch": 60,
+     "depto": "EST",
+     "prereq": []
+    },
+    {
+     "codigo": "EST039",
+     "nome": "Processos Estocásticos",
+     "ch": 60,
+     "depto": "EST",
+     "prereq": []
+    },
+    {
+     "codigo": "EST055",
+     "nome": "Inferência",
+     "ch": 60,
+     "depto": "EST",
+     "prereq": []
+    },
+    {
+     "codigo": "EST079",
+     "nome": "Modelos Lineares Generalizados",
+     "ch": 60,
+     "depto": "EST",
+     "prereq": []
+    },
+    {
+     "codigo": "EST080",
+     "nome": "Estatística Não Paramétrica",
+     "ch": 60,
+     "depto": "EST",
+     "prereq": []
+    },
+    {
+     "codigo": "EST082",
+     "nome": "Iniciacao a Estatística",
+     "ch": 60,
+     "depto": "EST",
+     "prereq": []
+    },
+    {
+     "codigo": "EST088",
+     "nome": "Inferência Estatística com Abordagem Bayesiana",
+     "ch": 60,
+     "depto": "EST",
+     "prereq": []
+    },
+    {
+     "codigo": "EST171",
+     "nome": "Tópicos em Estatística",
+     "ch": 60,
+     "depto": "EST",
+     "prereq": []
+    },
+    {
+     "codigo": "EST230",
+     "nome": "Probabilidade",
+     "ch": 90,
+     "depto": "EST",
+     "prereq": []
+    },
+    {
+     "codigo": "EST231",
+     "nome": "Inferência Clássica",
+     "ch": 60,
+     "depto": "EST",
+     "prereq": []
+    },
+    {
+     "codigo": "FIS034",
+     "nome": "Mecânica I",
+     "ch": 60,
+     "depto": "FIS",
+     "prereq": []
+    },
+    {
+     "codigo": "FIS036",
+     "nome": "Mecânica II",
+     "ch": 60,
+     "depto": "FIS",
+     "prereq": []
+    },
+    {
+     "codigo": "FIS037",
+     "nome": "Eletromagnetismo I",
+     "ch": 60,
+     "depto": "FIS",
+     "prereq": []
+    },
+    {
+     "codigo": "FIS065",
+     "nome": "Fundamentos de Mecânica",
+     "ch": 60,
+     "depto": "FIS",
+     "prereq": []
+    },
+    {
+     "codigo": "FIS069",
+     "nome": "Fundamentos de Eletromagnetismo",
+     "ch": 60,
+     "depto": "FIS",
+     "prereq": []
+    },
+    {
+     "codigo": "FIS073",
+     "nome": "Introdução a Física Quântica",
+     "ch": 60,
+     "depto": "FIS",
+     "prereq": [
+      "FIS086"
+     ]
+    },
+    {
+     "codigo": "FIS086",
+     "nome": "Fundamentos de Oscilações,Ondas e Óptica",
+     "ch": 60,
+     "depto": "FIS",
+     "prereq": [
+      "FIS069"
+     ]
+    },
+    {
+     "codigo": "FIS088",
+     "nome": "Fundamentos de Física Quântica",
+     "ch": 30,
+     "depto": "FIS",
+     "prereq": [
+      "FIS069"
+     ]
+    },
+    {
+     "codigo": "FIS120",
+     "nome": "Física Quântica I",
+     "ch": 60,
+     "depto": "FIS",
+     "prereq": []
+    },
+    {
+     "codigo": "FIS126",
+     "nome": "Termodinâmica",
+     "ch": 60,
+     "depto": "FIS",
+     "prereq": []
+    },
+    {
+     "codigo": "FIS151",
+     "nome": "Física Experimental Básica: Mecânica",
+     "ch": 30,
+     "depto": "FIS",
+     "prereq": []
+    },
+    {
+     "codigo": "FIS152",
+     "nome": "Fundamentos de Mecânica dos Fluidos e Termodinâmica",
+     "ch": 30,
+     "depto": "FIS",
+     "prereq": [
+      "FIS065"
+     ]
+    },
+    {
+     "codigo": "FIS153",
+     "nome": "Física Experimental Básica: Eletromagnetismo",
+     "ch": 30,
+     "depto": "FIS",
+     "prereq": [
+      "FIS065"
+     ]
+    },
+    {
+     "codigo": "FIS154",
+     "nome": "Física Experimental Básica: Termodinâmica",
+     "ch": 30,
+     "depto": "FIS",
+     "prereq": [
+      "FIS151"
+     ]
+    },
+    {
+     "codigo": "FIS155",
+     "nome": "Física Experimental Básica - Ondas e Óptica",
+     "ch": 30,
+     "depto": "FIS",
+     "prereq": [
+      "FIS151",
+      "FIS069"
+     ]
+    },
+    {
+     "codigo": "ICB001",
+     "nome": "Bases Ecológicas para o Desenvolvimento Sustentável",
+     "ch": 30,
+     "depto": "ICB",
+     "prereq": []
+    },
+    {
+     "codigo": "ICE144",
+     "nome": "Mineração de Dados",
+     "ch": 60,
+     "depto": "ICE",
+     "prereq": []
+    },
+    {
+     "codigo": "ICE147",
+     "nome": "Aprendizado de Máquina Supervisionado",
+     "ch": 60,
+     "depto": "ICE",
+     "prereq": []
+    },
+    {
+     "codigo": "ICE148",
+     "nome": "Aprendizado de Máquina Não Supervisionado",
+     "ch": 60,
+     "depto": "ICE",
+     "prereq": []
+    },
+    {
+     "codigo": "ICE160",
+     "nome": "Formação Avançada I",
+     "ch": 15,
+     "depto": "ICE",
+     "prereq": []
+    },
+    {
+     "codigo": "ICE161",
+     "nome": "Formação Avançada II",
+     "ch": 30,
+     "depto": "ICE",
+     "prereq": []
+    },
+    {
+     "codigo": "ICE162",
+     "nome": "Formação Avançada III",
+     "ch": 45,
+     "depto": "ICE",
+     "prereq": []
+    },
+    {
+     "codigo": "ICE163",
+     "nome": "Formação Avançada IV",
+     "ch": 60,
+     "depto": "ICE",
+     "prereq": []
+    },
+    {
+     "codigo": "ICE175",
+     "nome": "Tópicos em Matemática Computacional I",
+     "ch": 15,
+     "depto": "ICE",
+     "prereq": []
+    },
+    {
+     "codigo": "ICE176",
+     "nome": "Tópicos em Matemática Computacional II",
+     "ch": 30,
+     "depto": "ICE",
+     "prereq": []
+    },
+    {
+     "codigo": "ICE177",
+     "nome": "Tópicos em Matemática Computacional III",
+     "ch": 45,
+     "depto": "ICE",
+     "prereq": []
+    },
+    {
+     "codigo": "ICE178",
+     "nome": "Tópicos em Matemática Computacional IV",
+     "ch": 60,
+     "depto": "ICE",
+     "prereq": []
+    },
+    {
+     "codigo": "LET223",
+     "nome": "Fundamentos de Libras",
+     "ch": 60,
+     "depto": "LET",
+     "prereq": []
+    },
+    {
+     "codigo": "MAT033",
+     "nome": "Tópicos em Matemática A",
+     "ch": 60,
+     "depto": "MAT",
+     "prereq": []
+    },
+    {
+     "codigo": "MAT037",
+     "nome": "Tópicos em Matemática B",
+     "ch": 90,
+     "depto": "MAT",
+     "prereq": []
+    },
+    {
+     "codigo": "MAT041",
+     "nome": "Tópicos em Matemática Computacional",
+     "ch": 60,
+     "depto": "MAT",
+     "prereq": []
+    },
+    {
+     "codigo": "MAT047",
+     "nome": "Análise Combinatória",
+     "ch": 60,
+     "depto": "MAT",
+     "prereq": []
+    },
+    {
+     "codigo": "MAT087",
+     "nome": "Tópicos em Mobilidade Acadêmica A",
+     "ch": 30,
+     "depto": "MAT",
+     "prereq": []
+    },
+    {
+     "codigo": "MAT088",
+     "nome": "Tópicos em Mobilidade Acadêmica B",
+     "ch": 60,
+     "depto": "MAT",
+     "prereq": []
+    },
+    {
+     "codigo": "MAT118",
+     "nome": "Variavel Complexa",
+     "ch": 60,
+     "depto": "MAT",
+     "prereq": [
+      "MAT002"
+     ]
+    },
+    {
+     "codigo": "MAT232",
+     "nome": "Grupos e Corpos",
+     "ch": 60,
+     "depto": "MAT",
+     "prereq": []
+    },
+    {
+     "codigo": "MAT233",
+     "nome": "Aneis e Modulos",
+     "ch": 60,
+     "depto": "MAT",
+     "prereq": []
+    },
+    {
+     "codigo": "MAT234",
+     "nome": "Introdução a Topologia",
+     "ch": 60,
+     "depto": "MAT",
+     "prereq": []
+    },
+    {
+     "codigo": "MAT235",
+     "nome": "Álgebra Linear Numérica",
+     "ch": 60,
+     "depto": "MAT",
+     "prereq": []
+    },
+    {
+     "codigo": "MAT236",
+     "nome": "Equações Diferenciais Numericas",
+     "ch": 60,
+     "depto": "MAT",
+     "prereq": []
+    },
+    {
+     "codigo": "MAT237",
+     "nome": "Teoria dos Numeros",
+     "ch": 60,
+     "depto": "MAT",
+     "prereq": []
+    },
+    {
+     "codigo": "MAT238",
+     "nome": "Introdução às Curvas Algébricas",
+     "ch": 60,
+     "depto": "MAT",
+     "prereq": []
+    },
+    {
+     "codigo": "MAT239",
+     "nome": "Introdução a Teoria da Medida",
+     "ch": 60,
+     "depto": "MAT",
+     "prereq": []
+    },
+    {
+     "codigo": "MAT240",
+     "nome": "Introdução a Probabilidade",
+     "ch": 60,
+     "depto": "MAT",
+     "prereq": []
+    },
+    {
+     "codigo": "MAT241",
+     "nome": "Formas Diferenciais em Variedades",
+     "ch": 60,
+     "depto": "MAT",
+     "prereq": []
+    },
+    {
+     "codigo": "MAT242",
+     "nome": "Introdução a Análise Funcional",
+     "ch": 60,
+     "depto": "MAT",
+     "prereq": []
+    },
+    {
+     "codigo": "MAT244",
+     "nome": "Introdução a Geometria Diferencial",
+     "ch": 60,
+     "depto": "MAT",
+     "prereq": []
+    },
+    {
+     "codigo": "MAT245",
+     "nome": "Análise II",
+     "ch": 60,
+     "depto": "MAT",
+     "prereq": [
+      "MAT243"
+     ]
+    },
+    {
+     "codigo": "MAT246",
+     "nome": "Introd. Equações Diferenciais Ordinarias",
+     "ch": 60,
+     "depto": "MAT",
+     "prereq": []
+    },
+    {
+     "codigo": "MAT247",
+     "nome": "Introd. Equações Diferenciais Parciais",
+     "ch": 60,
+     "depto": "MAT",
+     "prereq": []
+    },
+    {
+     "codigo": "MAT248",
+     "nome": "Geometria Moderna",
+     "ch": 60,
+     "depto": "MAT",
+     "prereq": []
+    }
+   ],
+   "avisos": [
+    "A carga de optativas de cada período soma toda a carga horária adicional sugerida nele para o percurso (optativas, núcleo avançado, núcleo geral/formação livre etc.)."
+   ]
+  },
+  {
+   "id": "si-2024",
+   "curso": "Sistemas de Informação",
+   "versao": "2024",
+   "percurso": "Percurso I – Bacharelado – NE/NG/NA",
+   "rotulo": "Sistemas de Informação — currículo 2024 (Percurso I)",
+   "fonte": {
+    "tipo": "imagem",
+    "url": "https://dcc.ufmg.br/wp-content/uploads/Grade-BSI-2025-Percurso-I.png",
+    "versaoOficial": null,
+    "data": null
+   },
+   "periodos": [
+    {
+     "n": 1,
+     "disciplinas": [
+      {
+       "codigo": "DCC203",
+       "nome": "Programação e Desenvolvimento de Software I",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": []
+      },
+      {
+       "codigo": "DCC638",
+       "nome": "Introdução à Lógica Computacional",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": []
+      },
+      {
+       "codigo": "DCC096",
+       "nome": "Introdução à Computação",
+       "natureza": "OB",
+       "ch": 30,
+       "depto": "DCC",
+       "prereq": []
+      },
+      {
+       "codigo": "MAT038",
+       "nome": "Geometria Analítica e Álgebra Linear",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "MAT",
+       "prereq": []
+      },
+      {
+       "codigo": "ECN140",
+       "nome": "Introdução à Economia",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "ECN",
+       "prereq": []
+      }
+     ],
+     "optativasCh": 0
+    },
+    {
+     "n": 2,
+     "disciplinas": [
+      {
+       "codigo": "DCC219",
+       "nome": "Programação e Desenvolvimento de Software II",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "DCC203"
+       ]
+      },
+      {
+       "codigo": "DCC114",
+       "nome": "Introdução a Sistemas Lógicos",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "DCC638"
+       ]
+      },
+      {
+       "codigo": "DCC216",
+       "nome": "Matemática Discreta",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "DCC638"
+       ]
+      },
+      {
+       "codigo": "MAT001",
+       "nome": "Cálculo Diferencial e Integral I",
+       "natureza": "OB",
+       "ch": 90,
+       "depto": "MAT",
+       "prereq": []
+      },
+      {
+       "codigo": "CAD103",
+       "nome": "Administração TGA (EAD)",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "CAD",
+       "prereq": []
+      }
+     ],
+     "optativasCh": 0
+    },
+    {
+     "n": 3,
+     "disciplinas": [
+      {
+       "codigo": "DCC221",
+       "nome": "Estruturas de Dados",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "DCC219"
+       ]
+      },
+      {
+       "codigo": "DCC222",
+       "nome": "Introdução a Bancos de Dados",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": []
+      },
+      {
+       "codigo": "DCC639",
+       "nome": "Álgebra Linear Computacional",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "MAT038",
+        "MAT001"
+       ]
+      },
+      {
+       "codigo": "MAT039",
+       "nome": "Cálculo Diferencial e Integral II",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "MAT",
+       "prereq": [
+        "MAT001"
+       ]
+      },
+      {
+       "codigo": "EST032",
+       "nome": "Probabilidade",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "EST",
+       "prereq": []
+      }
+     ],
+     "optativasCh": 0
+    },
+    {
+     "n": 4,
+     "disciplinas": [
+      {
+       "codigo": "DCC206",
+       "nome": "Algoritmos I",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "DCC216",
+        "DCC221"
+       ]
+      },
+      {
+       "codigo": "DCC006",
+       "nome": "Organização de Computadores I",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "DCC114"
+       ]
+      },
+      {
+       "codigo": "TGI004",
+       "nome": "Usuários da Informação",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "TGI",
+       "prereq": []
+      },
+      {
+       "codigo": "CAD163",
+       "nome": "Administração de Recursos Humanos",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "CAD",
+       "prereq": [
+        "CAD103"
+       ]
+      }
+     ],
+     "optativasCh": 120
+    },
+    {
+     "n": 5,
+     "disciplinas": [
+      {
+       "codigo": "DCC024",
+       "nome": "Linguagens de Programação",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "DCC221"
+       ]
+      },
+      {
+       "codigo": "DCC194",
+       "nome": "Interação Humano-Computador",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": []
+      },
+      {
+       "codigo": "OTI071",
+       "nome": "Organização e Tratamento da Informação",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "OTI",
+       "prereq": []
+      },
+      {
+       "codigo": "CIC010",
+       "nome": "Introdução à Contabilidade",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "CIC",
+       "prereq": [
+        "CAD103"
+       ]
+      },
+      {
+       "codigo": "CAD004",
+       "nome": "Administração da Produção",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "CAD",
+       "prereq": [
+        "CAD103"
+       ]
+      }
+     ],
+     "optativasCh": 60
+    },
+    {
+     "n": 6,
+     "disciplinas": [
+      {
+       "codigo": "DCC605",
+       "nome": "Sistemas Operacionais",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "DCC221"
+       ]
+      },
+      {
+       "codigo": "DCC094",
+       "nome": "Engenharia de Software",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "DCC222"
+       ]
+      },
+      {
+       "codigo": "CAD153",
+       "nome": "Administração de Custos",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "CAD",
+       "prereq": [
+        "CIC010"
+       ]
+      }
+     ],
+     "optativasCh": 180
+    },
+    {
+     "n": 7,
+     "disciplinas": [
+      {
+       "codigo": "DCC095",
+       "nome": "Redes de Computadores",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "DCC221"
+       ]
+      },
+      {
+       "codigo": "DCC072",
+       "nome": "Engenharia de Software II",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "DCC094"
+       ]
+      },
+      {
+       "codigo": "DCC636",
+       "nome": "Ética na Computação",
+       "natureza": "OB",
+       "ch": 30,
+       "depto": "DCC",
+       "prereq": []
+      },
+      {
+       "codigo": "CAD167",
+       "nome": "Administração Financeira",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "CAD",
+       "prereq": [
+        "CIC010"
+       ]
+      }
+     ],
+     "optativasCh": 120
+    },
+    {
+     "n": 8,
+     "disciplinas": [
+      {
+       "codigo": "DCC046",
+       "nome": "Monografia em Sistemas de Informação",
+       "natureza": "OB",
+       "ch": 90,
+       "depto": "DCC",
+       "prereq": []
+      },
+      {
+       "codigo": "DCC637",
+       "nome": "Computação e Sociedade",
+       "natureza": "OB",
+       "ch": 30,
+       "depto": "DCC",
+       "prereq": []
+      },
+      {
+       "codigo": "CAD164",
+       "nome": "Administração Mercadológica",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "CAD",
+       "prereq": []
+      }
+     ],
+     "optativasCh": 180
+    },
+    {
+     "n": 9,
+     "disciplinas": [
+      {
+       "codigo": "DCC073",
+       "nome": "Monografia em Sistemas de Informação II",
+       "natureza": "OB",
+       "ch": 90,
+       "depto": "DCC",
+       "prereq": [
+        "DCC046"
+       ]
+      }
+     ],
+     "optativasCh": 240
+    }
+   ],
+   "optativas": [],
+   "avisos": [
+    "Transcrito à mão da imagem da grade do Percurso I (Versão 2024, carga horária total de 3.000 horas). O arquivo do site do DCC se chama \"Grade-BSI-2025\", mas a imagem é a mesma da Versão 2024.",
+    "A carga de optativas de cada período soma as cargas de \"Optativas do Núcleo Específico\" e as de \"Núcleo Geral\" (60h no 8º e 60h no 9º período), que na imagem aparecem como espaços de 60h e não como disciplinas.",
+    "Códigos provisórios (DCCXXX) da imagem substituídos pelos do catálogo, pelo nome: Introdução à Computação → DCC096, Engenharia de Software → DCC094, Redes de Computadores → DCC095.",
+    "A lista de optativas não consta da grade em imagem."
+   ]
+  },
+  {
+   "id": "si-2024-percurso-2",
+   "curso": "Sistemas de Informação",
+   "versao": "2024",
+   "percurso": "Percurso II – Bacharelado – NE/NG/NC/NA",
+   "rotulo": "Sistemas de Informação — currículo 2024 (Percurso II)",
+   "fonte": {
+    "tipo": "imagem",
+    "url": "https://dcc.ufmg.br/wp-content/uploads/Grade-BSI-2025-Percurso-II.png",
+    "versaoOficial": null,
+    "data": null
+   },
+   "periodos": [
+    {
+     "n": 1,
+     "disciplinas": [
+      {
+       "codigo": "DCC203",
+       "nome": "Programação e Desenvolvimento de Software I",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": []
+      },
+      {
+       "codigo": "DCC638",
+       "nome": "Introdução à Lógica Computacional",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": []
+      },
+      {
+       "codigo": "DCC096",
+       "nome": "Introdução à Computação",
+       "natureza": "OB",
+       "ch": 30,
+       "depto": "DCC",
+       "prereq": []
+      },
+      {
+       "codigo": "MAT038",
+       "nome": "Geometria Analítica e Álgebra Linear",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "MAT",
+       "prereq": []
+      },
+      {
+       "codigo": "ECN140",
+       "nome": "Introdução à Economia",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "ECN",
+       "prereq": []
+      }
+     ],
+     "optativasCh": 0
+    },
+    {
+     "n": 2,
+     "disciplinas": [
+      {
+       "codigo": "DCC219",
+       "nome": "Programação e Desenvolvimento de Software II",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "DCC203"
+       ]
+      },
+      {
+       "codigo": "DCC114",
+       "nome": "Introdução a Sistemas Lógicos",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "DCC638"
+       ]
+      },
+      {
+       "codigo": "DCC216",
+       "nome": "Matemática Discreta",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "DCC638"
+       ]
+      },
+      {
+       "codigo": "MAT001",
+       "nome": "Cálculo Diferencial e Integral I",
+       "natureza": "OB",
+       "ch": 90,
+       "depto": "MAT",
+       "prereq": []
+      },
+      {
+       "codigo": "CAD103",
+       "nome": "Administração TGA (EAD)",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "CAD",
+       "prereq": []
+      }
+     ],
+     "optativasCh": 0
+    },
+    {
+     "n": 3,
+     "disciplinas": [
+      {
+       "codigo": "DCC221",
+       "nome": "Estruturas de Dados",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "DCC219"
+       ]
+      },
+      {
+       "codigo": "DCC222",
+       "nome": "Introdução a Bancos de Dados",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": []
+      },
+      {
+       "codigo": "DCC639",
+       "nome": "Álgebra Linear Computacional",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "MAT038",
+        "MAT001"
+       ]
+      },
+      {
+       "codigo": "MAT039",
+       "nome": "Cálculo Diferencial e Integral II",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "MAT",
+       "prereq": [
+        "MAT001"
+       ]
+      },
+      {
+       "codigo": "EST032",
+       "nome": "Probabilidade",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "EST",
+       "prereq": []
+      }
+     ],
+     "optativasCh": 0
+    },
+    {
+     "n": 4,
+     "disciplinas": [
+      {
+       "codigo": "DCC206",
+       "nome": "Algoritmos I",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "DCC216",
+        "DCC221"
+       ]
+      },
+      {
+       "codigo": "DCC006",
+       "nome": "Organização de Computadores I",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "DCC114"
+       ]
+      },
+      {
+       "codigo": "TGI004",
+       "nome": "Usuários da Informação",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "TGI",
+       "prereq": []
+      },
+      {
+       "codigo": "CAD163",
+       "nome": "Administração de Recursos Humanos",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "CAD",
+       "prereq": [
+        "CAD103"
+       ]
+      }
+     ],
+     "optativasCh": 120
+    },
+    {
+     "n": 5,
+     "disciplinas": [
+      {
+       "codigo": "DCC024",
+       "nome": "Linguagens de Programação",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "DCC221"
+       ]
+      },
+      {
+       "codigo": "DCC194",
+       "nome": "Interação Humano-Computador",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": []
+      },
+      {
+       "codigo": "OTI071",
+       "nome": "Organização e Tratamento da Informação",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "OTI",
+       "prereq": []
+      },
+      {
+       "codigo": "CIC010",
+       "nome": "Introdução à Contabilidade",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "CIC",
+       "prereq": [
+        "CAD103"
+       ]
+      },
+      {
+       "codigo": "CAD004",
+       "nome": "Administração da Produção",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "CAD",
+       "prereq": [
+        "CAD103"
+       ]
+      }
+     ],
+     "optativasCh": 60
+    },
+    {
+     "n": 6,
+     "disciplinas": [
+      {
+       "codigo": "DCC605",
+       "nome": "Sistemas Operacionais",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "DCC221"
+       ]
+      },
+      {
+       "codigo": "DCC094",
+       "nome": "Engenharia de Software",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "DCC222"
+       ]
+      },
+      {
+       "codigo": "CAD153",
+       "nome": "Administração de Custos",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "CAD",
+       "prereq": [
+        "CIC010"
+       ]
+      }
+     ],
+     "optativasCh": 180
+    },
+    {
+     "n": 7,
+     "disciplinas": [
+      {
+       "codigo": "DCC095",
+       "nome": "Redes de Computadores",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "DCC221"
+       ]
+      },
+      {
+       "codigo": "DCC072",
+       "nome": "Engenharia de Software II",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "DCC",
+       "prereq": [
+        "DCC094"
+       ]
+      },
+      {
+       "codigo": "DCC636",
+       "nome": "Ética na Computação",
+       "natureza": "OB",
+       "ch": 30,
+       "depto": "DCC",
+       "prereq": []
+      },
+      {
+       "codigo": "CAD167",
+       "nome": "Administração Financeira",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "CAD",
+       "prereq": [
+        "CIC010"
+       ]
+      }
+     ],
+     "optativasCh": 120
+    },
+    {
+     "n": 8,
+     "disciplinas": [
+      {
+       "codigo": "DCC046",
+       "nome": "Monografia em Sistemas de Informação",
+       "natureza": "OB",
+       "ch": 90,
+       "depto": "DCC",
+       "prereq": []
+      },
+      {
+       "codigo": "DCC637",
+       "nome": "Computação e Sociedade",
+       "natureza": "OB",
+       "ch": 30,
+       "depto": "DCC",
+       "prereq": []
+      },
+      {
+       "codigo": "CAD164",
+       "nome": "Administração Mercadológica",
+       "natureza": "OB",
+       "ch": 60,
+       "depto": "CAD",
+       "prereq": []
+      }
+     ],
+     "optativasCh": 180
+    },
+    {
+     "n": 9,
+     "disciplinas": [
+      {
+       "codigo": "DCC073",
+       "nome": "Monografia em Sistemas de Informação II",
+       "natureza": "OB",
+       "ch": 90,
+       "depto": "DCC",
+       "prereq": [
+        "DCC046"
+       ]
+      }
+     ],
+     "optativasCh": 240
+    }
+   ],
+   "optativas": [],
+   "avisos": [
+    "Transcrito à mão da imagem da grade do Percurso II (Versão 2024, carga horária total de 3.000 horas), publicada no site do DCC como \"Grade-BSI-2025-Percurso-II\".",
+    "A carga de optativas de cada período soma as cargas de \"Optativas do Núcleo Específico\", de \"Núcleo Complementar\" (60h no 4º, 120h no 6º, 60h no 7º e 60h no 8º período) e de \"Núcleo Geral\" (60h no 8º e 60h no 9º), que na imagem aparecem como espaços de 60h e não como disciplinas.",
+    "Códigos provisórios (DCCXXX) da imagem substituídos pelos do catálogo, pelo nome: Introdução à Computação → DCC096, Engenharia de Software → DCC094, Redes de Computadores → DCC095.",
+    "A lista de optativas não consta da grade em imagem."
+   ]
+  }
+ ]
+}
