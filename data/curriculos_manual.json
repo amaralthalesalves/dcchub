@@ -1185,7 +1185,7 @@
    "id": "ec-atual",
    "curso": "Engenharia de Computação",
    "versao": "atual",
-   "rotulo": "Engenharia de Computação — grade atual",
+   "rotulo": "Engenharia de Computação — curso novo",
    "fonte": {
     "tipo": "imagem",
     "url": null,
@@ -1744,7 +1744,7 @@
    ],
    "optativas": [],
    "avisos": [
-    "Versão da grade não confirmada: transcrita de uma imagem sem data.",
+    "Curso novo (quatro semestres de existência): várias disciplinas dos períodos finais ainda não têm código oficial, então aparecem sem turmas e sem ligação com a oferta.",
     "Disciplinas ainda sem código oficial (código provisório na imagem): Arquitetura e Organização de Computadores II (INUXXX), Laboratório de Projetos I, Laboratórios de Projetos II e III (INUXXX), Pesquisa Operacional (INUXXX), Fundamentos de Inteligência Artificial (INUXXX), Redes de Computadores (INUXXX), Laboratórios de Projetos Integradores Área Temática (INUXXX), Projeto Final de Curso I e II (INUXXX), Eng. de Computação e Sociedade (INUxxx), Estágio Supervisionado Eng Computação (INUXXX), Processamento Digital de Sinais (ELEXXX), Concepção de Circuitos Integrados (ELEXXX), Projetos de Sistemas Embarcados (EEEXXX), Ciências do Ambiente (ESAxxx) e Introdução Segurança Computacional (DCCXXX).",
     "Códigos provisórios substituídos pelos do catálogo, pelo nome: Intro Engenharia Computação (INUxxx) → INU034, Arquitetura e Organização de Computadores I (INUXXX) → INU035, Fund. Interação Humano Computador (DCCXXX) → DCC220.",
     "Os espaços \"Optativa de Área Temática\", \"Optativa - Núcleo Específico\", \"Optativa - Núcleo Geral\", \"Optativa - Núcleo Específico ou Núcleo Avançado\" e \"Optativa - Núcleo Avançado\" (60h cada) entram na carga de optativas do período, não como disciplinas.",
@@ -1752,7 +1752,8 @@
     "Pré-requisitos da imagem que não cabem na lista por falta de código oficial: Laboratório de Projetos I → Laboratórios de Projetos II → Laboratórios de Projetos III; Redes de Computadores → Introdução Segurança Computacional; Projeto Final de Curso I → Projeto Final de Curso II.",
     "A lista de optativas não consta da grade em imagem.",
     "\"Fundamentos de Estatística e Ciência de Dados\" aparece na imagem como \"EST0198\", código que não existe nos relatórios oficiais; ficou sem código até ser confirmado."
-   ]
+   ],
+   "nota": "Curso criado há quatro semestres: a grade ainda está se completando."
   }
  ]
 }
