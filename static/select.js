@@ -137,9 +137,19 @@
       list.style.maxHeight = `${Math.max(120, Math.min(300, room - searchH - 14))}px`;
       pop.style.minWidth = `${r.width}px`;
       const width = Math.min(pop.offsetWidth, window.innerWidth - 2 * margin);
-      pop.style.left = `${Math.max(margin, Math.min(r.left, window.innerWidth - margin - width))}px`;
+      const left = Math.max(margin, Math.min(r.left, window.innerWidth - margin - width));
+      pop.style.left = `${left}px`;
       if (up) { pop.style.top = 'auto'; pop.style.bottom = `${window.innerHeight - r.top + gap}px`; }
       else { pop.style.bottom = 'auto'; pop.style.top = `${r.bottom + gap}px`; }
+      // Um ancestral com backdrop-filter, filter ou transform (barras de vidro, animação de entrada da página) vira a
+      // referência do position: fixed, e as coordenadas da tela deslocariam a lista. Mede onde ela ficou e compensa.
+      const got = pop.getBoundingClientRect();
+      const dx = got.left - left, dy = up ? got.bottom - (r.top - gap) : got.top - (r.bottom + gap);
+      if (Math.abs(dx) > .5) pop.style.left = `${left - dx}px`;
+      if (Math.abs(dy) > .5) {
+        if (up) pop.style.bottom = `${window.innerHeight - r.top + gap + dy}px`;
+        else pop.style.top = `${r.bottom + gap - dy}px`;
+      }
       wrap.classList.toggle('up', up);
       // botão saiu da tela (rolagem): fecha
       if (r.bottom < 0 || r.top > window.innerHeight) close();
