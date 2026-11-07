@@ -1,13 +1,12 @@
 {
- "generatedAt": "2026-11-07T18:52:20+00:00",
+ "generatedAt": "2026-11-07T19:03:14+00:00",
  "curriculos": [
   {
    "id": "cc-2019",
    "curso": "Ciência da Computação",
    "versao": "2019",
    "percurso": "Bacharelado (núcleo avançado + núcleo geral)",
-   "rotulo": "Ciência da Computação — currículo 2019",
-   "nota": "Para quem entrou antes de 2024.",
+   "rotulo": "Ciência da Computação — entrei até 2024",
    "fonte": {
     "tipo": "prograd",
     "url": "https://dcc.ufmg.br/wp-content/uploads/versao_curricular_bcc_20241208.pdf",
@@ -771,8 +770,7 @@
    "id": "cc-2024",
    "curso": "Ciência da Computação",
    "versao": "2024",
-   "rotulo": "Ciência da Computação — currículo 2024",
-   "nota": "Para quem entrou a partir de 2024.",
+   "rotulo": "Ciência da Computação — entrei a partir de 2025",
    "fonte": {
     "tipo": "imagem",
     "url": null,
@@ -1153,14 +1151,15 @@
     "Códigos provisórios (DCCXXX) da imagem substituídos pelos do catálogo, pelo nome: Introdução à Computação → DCC096, Engenharia de Software → DCC094, Redes de Computadores → DCC095.",
     "A imagem traz \"DCC0641\" para Fundamentos de Sistemas Paralelos e Distribuídos; usado DCC641.",
     "A grade em imagem não indica em que períodos cursar as optativas, por isso nenhum período mostra carga de optativas.",
-    "A lista de optativas não consta da grade em imagem."
+    "A lista de optativas não consta da grade em imagem.",
+    "Vale para quem entrou a partir de 2025: as disciplinas novas do tronco comum (DCC096, DCC219, DCC221…) começaram a ser ofertadas em 2025/1."
    ]
   },
   {
    "id": "cd-2024",
    "curso": "Ciência de Dados",
    "versao": "2024",
-   "rotulo": "Ciência de Dados — currículo 2024",
+   "rotulo": "Ciência de Dados — entrei em 2024 ou 2025",
    "fonte": {
     "tipo": "prograd",
     "url": "https://dcc.ufmg.br/wp-content/uploads/versao_curricular_BCD_2025.pdf",
@@ -2311,7 +2310,7 @@
    "curso": "Ciência de Dados",
    "versao": "2026",
    "percurso": "Bacharelado (núcleo avançado + núcleo geral)",
-   "rotulo": "Ciência de Dados — currículo 2026",
+   "rotulo": "Ciência de Dados — entrei a partir de 2026",
    "fonte": {
     "tipo": "prograd",
     "url": "https://dcc.ufmg.br/wp-content/uploads/BCD-versao-V2026-1-1.pdf",
@@ -3471,7 +3470,7 @@
    "id": "ec-atual",
    "curso": "Engenharia de Computação",
    "versao": "atual",
-   "rotulo": "Engenharia de Computação — curso novo",
+   "rotulo": "Engenharia de Computação",
    "fonte": {
     "tipo": "imagem",
     "url": null,
@@ -4038,15 +4037,14 @@
     "Pré-requisitos da imagem que não cabem na lista por falta de código oficial: Laboratório de Projetos I → Laboratórios de Projetos II → Laboratórios de Projetos III; Redes de Computadores → Introdução Segurança Computacional; Projeto Final de Curso I → Projeto Final de Curso II.",
     "A lista de optativas não consta da grade em imagem.",
     "\"Fundamentos de Estatística e Ciência de Dados\" aparece na imagem como \"EST0198\", código que não existe nos relatórios oficiais; ficou sem código até ser confirmado."
-   ],
-   "nota": "Curso criado há quatro semestres: a grade ainda está se completando."
+   ]
   },
   {
    "id": "mc-2025",
    "curso": "Matemática Computacional",
    "versao": "2025",
    "percurso": "Bacharelado (núcleo avançado + núcleo geral)",
-   "rotulo": "Matemática Computacional — currículo 2025",
+   "rotulo": "Matemática Computacional",
    "fonte": {
     "tipo": "prograd",
     "url": "https://www.matcomp.dcc.ufmg.br/grade/grade-geral.pdf",
@@ -5176,7 +5174,7 @@
    "curso": "Matemática Computacional",
    "versao": "2025",
    "percurso": "Bacharelado com perfil em Computação",
-   "rotulo": "Matemática Computacional — currículo 2025 (perfil Computação)",
+   "rotulo": "Matemática Computacional — perfil Computação",
    "fonte": {
     "tipo": "prograd",
     "url": "https://www.matcomp.dcc.ufmg.br/grade/grade-computacao.pdf",
@@ -6310,8 +6308,7 @@
    "id": "si-2024",
    "curso": "Sistemas de Informação",
    "versao": "2024",
-   "percurso": "Percurso I – Bacharelado – NE/NG/NA",
-   "rotulo": "Sistemas de Informação — currículo 2024 (Percurso I)",
+   "rotulo": "Sistemas de Informação",
    "fonte": {
     "tipo": "imagem",
     "url": "https://dcc.ufmg.br/wp-content/uploads/Grade-BSI-2025-Percurso-I.png",
@@ -6699,403 +6696,9 @@
     "Transcrito à mão da imagem da grade do Percurso I (Versão 2024, carga horária total de 3.000 horas). O arquivo do site do DCC se chama \"Grade-BSI-2025\", mas a imagem é a mesma da Versão 2024.",
     "A carga de optativas de cada período soma as cargas de \"Optativas do Núcleo Específico\" e as de \"Núcleo Geral\" (60h no 8º e 60h no 9º período), que na imagem aparecem como espaços de 60h e não como disciplinas.",
     "Códigos provisórios (DCCXXX) da imagem substituídos pelos do catálogo, pelo nome: Introdução à Computação → DCC096, Engenharia de Software → DCC094, Redes de Computadores → DCC095.",
-    "A lista de optativas não consta da grade em imagem."
-   ]
-  },
-  {
-   "id": "si-2024-percurso-2",
-   "curso": "Sistemas de Informação",
-   "versao": "2024",
-   "percurso": "Percurso II – Bacharelado – NE/NG/NC/NA",
-   "rotulo": "Sistemas de Informação — currículo 2024 (Percurso II)",
-   "fonte": {
-    "tipo": "imagem",
-    "url": "https://dcc.ufmg.br/wp-content/uploads/Grade-BSI-2025-Percurso-II.png",
-    "versaoOficial": null,
-    "data": null
-   },
-   "periodos": [
-    {
-     "n": 1,
-     "disciplinas": [
-      {
-       "codigo": "DCC203",
-       "nome": "Programação e Desenvolvimento de Software I",
-       "natureza": "OB",
-       "ch": 60,
-       "depto": "DCC",
-       "prereq": []
-      },
-      {
-       "codigo": "DCC638",
-       "nome": "Introdução à Lógica Computacional",
-       "natureza": "OB",
-       "ch": 60,
-       "depto": "DCC",
-       "prereq": []
-      },
-      {
-       "codigo": "DCC096",
-       "nome": "Introdução à Computação",
-       "natureza": "OB",
-       "ch": 30,
-       "depto": "DCC",
-       "prereq": []
-      },
-      {
-       "codigo": "MAT038",
-       "nome": "Geometria Analítica e Álgebra Linear",
-       "natureza": "OB",
-       "ch": 60,
-       "depto": "MAT",
-       "prereq": []
-      },
-      {
-       "codigo": "ECN140",
-       "nome": "Introdução à Economia",
-       "natureza": "OB",
-       "ch": 60,
-       "depto": "ECN",
-       "prereq": []
-      }
-     ],
-     "optativasCh": 0
-    },
-    {
-     "n": 2,
-     "disciplinas": [
-      {
-       "codigo": "DCC219",
-       "nome": "Programação e Desenvolvimento de Software II",
-       "natureza": "OB",
-       "ch": 60,
-       "depto": "DCC",
-       "prereq": [
-        "DCC203"
-       ]
-      },
-      {
-       "codigo": "DCC114",
-       "nome": "Introdução a Sistemas Lógicos",
-       "natureza": "OB",
-       "ch": 60,
-       "depto": "DCC",
-       "prereq": [
-        "DCC638"
-       ]
-      },
-      {
-       "codigo": "DCC216",
-       "nome": "Matemática Discreta",
-       "natureza": "OB",
-       "ch": 60,
-       "depto": "DCC",
-       "prereq": [
-        "DCC638"
-       ]
-      },
-      {
-       "codigo": "MAT001",
-       "nome": "Cálculo Diferencial e Integral I",
-       "natureza": "OB",
-       "ch": 90,
-       "depto": "MAT",
-       "prereq": []
-      },
-      {
-       "codigo": "CAD103",
-       "nome": "Administração TGA (EAD)",
-       "natureza": "OB",
-       "ch": 60,
-       "depto": "CAD",
-       "prereq": []
-      }
-     ],
-     "optativasCh": 0
-    },
-    {
-     "n": 3,
-     "disciplinas": [
-      {
-       "codigo": "DCC221",
-       "nome": "Estruturas de Dados",
-       "natureza": "OB",
-       "ch": 60,
-       "depto": "DCC",
-       "prereq": [
-        "DCC219"
-       ]
-      },
-      {
-       "codigo": "DCC222",
-       "nome": "Introdução a Bancos de Dados",
-       "natureza": "OB",
-       "ch": 60,
-       "depto": "DCC",
-       "prereq": []
-      },
-      {
-       "codigo": "DCC639",
-       "nome": "Álgebra Linear Computacional",
-       "natureza": "OB",
-       "ch": 60,
-       "depto": "DCC",
-       "prereq": [
-        "MAT038",
-        "MAT001"
-       ]
-      },
-      {
-       "codigo": "MAT039",
-       "nome": "Cálculo Diferencial e Integral II",
-       "natureza": "OB",
-       "ch": 60,
-       "depto": "MAT",
-       "prereq": [
-        "MAT001"
-       ]
-      },
-      {
-       "codigo": "EST032",
-       "nome": "Probabilidade",
-       "natureza": "OB",
-       "ch": 60,
-       "depto": "EST",
-       "prereq": []
-      }
-     ],
-     "optativasCh": 0
-    },
-    {
-     "n": 4,
-     "disciplinas": [
-      {
-       "codigo": "DCC206",
-       "nome": "Algoritmos I",
-       "natureza": "OB",
-       "ch": 60,
-       "depto": "DCC",
-       "prereq": [
-        "DCC216",
-        "DCC221"
-       ]
-      },
-      {
-       "codigo": "DCC006",
-       "nome": "Organização de Computadores I",
-       "natureza": "OB",
-       "ch": 60,
-       "depto": "DCC",
-       "prereq": [
-        "DCC114"
-       ]
-      },
-      {
-       "codigo": "TGI004",
-       "nome": "Usuários da Informação",
-       "natureza": "OB",
-       "ch": 60,
-       "depto": "TGI",
-       "prereq": []
-      },
-      {
-       "codigo": "CAD163",
-       "nome": "Administração de Recursos Humanos",
-       "natureza": "OB",
-       "ch": 60,
-       "depto": "CAD",
-       "prereq": [
-        "CAD103"
-       ]
-      }
-     ],
-     "optativasCh": 120
-    },
-    {
-     "n": 5,
-     "disciplinas": [
-      {
-       "codigo": "DCC024",
-       "nome": "Linguagens de Programação",
-       "natureza": "OB",
-       "ch": 60,
-       "depto": "DCC",
-       "prereq": [
-        "DCC221"
-       ]
-      },
-      {
-       "codigo": "DCC194",
-       "nome": "Interação Humano-Computador",
-       "natureza": "OB",
-       "ch": 60,
-       "depto": "DCC",
-       "prereq": []
-      },
-      {
-       "codigo": "OTI071",
-       "nome": "Organização e Tratamento da Informação",
-       "natureza": "OB",
-       "ch": 60,
-       "depto": "OTI",
-       "prereq": []
-      },
-      {
-       "codigo": "CIC010",
-       "nome": "Introdução à Contabilidade",
-       "natureza": "OB",
-       "ch": 60,
-       "depto": "CIC",
-       "prereq": [
-        "CAD103"
-       ]
-      },
-      {
-       "codigo": "CAD004",
-       "nome": "Administração da Produção",
-       "natureza": "OB",
-       "ch": 60,
-       "depto": "CAD",
-       "prereq": [
-        "CAD103"
-       ]
-      }
-     ],
-     "optativasCh": 60
-    },
-    {
-     "n": 6,
-     "disciplinas": [
-      {
-       "codigo": "DCC605",
-       "nome": "Sistemas Operacionais",
-       "natureza": "OB",
-       "ch": 60,
-       "depto": "DCC",
-       "prereq": [
-        "DCC221"
-       ]
-      },
-      {
-       "codigo": "DCC094",
-       "nome": "Engenharia de Software",
-       "natureza": "OB",
-       "ch": 60,
-       "depto": "DCC",
-       "prereq": [
-        "DCC222"
-       ]
-      },
-      {
-       "codigo": "CAD153",
-       "nome": "Administração de Custos",
-       "natureza": "OB",
-       "ch": 60,
-       "depto": "CAD",
-       "prereq": [
-        "CIC010"
-       ]
-      }
-     ],
-     "optativasCh": 180
-    },
-    {
-     "n": 7,
-     "disciplinas": [
-      {
-       "codigo": "DCC095",
-       "nome": "Redes de Computadores",
-       "natureza": "OB",
-       "ch": 60,
-       "depto": "DCC",
-       "prereq": [
-        "DCC221"
-       ]
-      },
-      {
-       "codigo": "DCC072",
-       "nome": "Engenharia de Software II",
-       "natureza": "OB",
-       "ch": 60,
-       "depto": "DCC",
-       "prereq": [
-        "DCC094"
-       ]
-      },
-      {
-       "codigo": "DCC636",
-       "nome": "Ética na Computação",
-       "natureza": "OB",
-       "ch": 30,
-       "depto": "DCC",
-       "prereq": []
-      },
-      {
-       "codigo": "CAD167",
-       "nome": "Administração Financeira",
-       "natureza": "OB",
-       "ch": 60,
-       "depto": "CAD",
-       "prereq": [
-        "CIC010"
-       ]
-      }
-     ],
-     "optativasCh": 120
-    },
-    {
-     "n": 8,
-     "disciplinas": [
-      {
-       "codigo": "DCC046",
-       "nome": "Monografia em Sistemas de Informação",
-       "natureza": "OB",
-       "ch": 90,
-       "depto": "DCC",
-       "prereq": []
-      },
-      {
-       "codigo": "DCC637",
-       "nome": "Computação e Sociedade",
-       "natureza": "OB",
-       "ch": 30,
-       "depto": "DCC",
-       "prereq": []
-      },
-      {
-       "codigo": "CAD164",
-       "nome": "Administração Mercadológica",
-       "natureza": "OB",
-       "ch": 60,
-       "depto": "CAD",
-       "prereq": []
-      }
-     ],
-     "optativasCh": 180
-    },
-    {
-     "n": 9,
-     "disciplinas": [
-      {
-       "codigo": "DCC073",
-       "nome": "Monografia em Sistemas de Informação II",
-       "natureza": "OB",
-       "ch": 90,
-       "depto": "DCC",
-       "prereq": [
-        "DCC046"
-       ]
-      }
-     ],
-     "optativasCh": 240
-    }
-   ],
-   "optativas": [],
-   "avisos": [
-    "Transcrito à mão da imagem da grade do Percurso II (Versão 2024, carga horária total de 3.000 horas), publicada no site do DCC como \"Grade-BSI-2025-Percurso-II\".",
-    "A carga de optativas de cada período soma as cargas de \"Optativas do Núcleo Específico\", de \"Núcleo Complementar\" (60h no 4º, 120h no 6º, 60h no 7º e 60h no 8º período) e de \"Núcleo Geral\" (60h no 8º e 60h no 9º), que na imagem aparecem como espaços de 60h e não como disciplinas.",
-    "Códigos provisórios (DCCXXX) da imagem substituídos pelos do catálogo, pelo nome: Introdução à Computação → DCC096, Engenharia de Software → DCC094, Redes de Computadores → DCC095.",
-    "A lista de optativas não consta da grade em imagem."
+    "A lista de optativas não consta da grade em imagem.",
+    "Os percursos I e II têm as mesmas obrigatórias nos mesmos períodos (muda só como as horas livres são contadas), então aparecem como um só.",
+    "Vale para quem entrou a partir de 2025: as disciplinas novas do tronco comum (DCC096, DCC219, DCC221…) começaram a ser ofertadas em 2025/1."
    ]
   }
  ]

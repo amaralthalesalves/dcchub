@@ -1536,20 +1536,14 @@ async function viewOffer({ params, isCurrent }) {
     const box = $('#my-course');
     if (!box) return;
     const cur = profile && curricula.find((c) => c.id === profile.id);
-    const byCourse = new Map();
-    curricula.forEach((c) => byCourse.set(c.curso, [...(byCourse.get(c.curso) || []), c]));
     box.innerHTML = `<div class="my-course-row">
       <label class="field grow"><span>Meu curso</span><select id="mc-curso">
-        <option value="">Escolha seu curso e currículo…</option>
-        ${[...byCourse].map(([curso, list]) => `<optgroup label="${esc(curso)}">${list.map((c) => `<option value="${esc(c.id)}" ${cur?.id === c.id ? 'selected' : ''}>${esc(c.rotulo)}${c.percurso ? ` — ${esc(c.percurso)}` : ''}</option>`).join('')}</optgroup>`).join('')}
+        <option value="">Escolha seu curso…</option>
+        ${curricula.map((c) => `<option value="${esc(c.id)}" ${cur?.id === c.id ? 'selected' : ''}>${esc(c.rotulo)}</option>`).join('')}
       </select></label>
       ${cur ? `<label class="field"><span>Período</span><select id="mc-periodo">${cur.periodos.map((per) => `<option value="${per.n}" ${per.n === profile.periodo ? 'selected' : ''}>${ordinal(per.n)} período</option>`).join('')}</select></label>
       <label class="check"><input type="checkbox" id="mc-only" ${profile.only ? 'checked' : ''}> Só do meu curso</label>` : ''}
-    </div>
-    <p class="small muted my-course-note">${cur ? `${cur.nota ? `${esc(cur.nota)} ` : ''}Confira sempre no SIGA. ` : 'Com o curso e o período, a lista começa pelas disciplinas que você precisa cursar agora. '}Fica salvo só neste navegador.</p>
-    ${cur ? `<details class="my-course-about"><summary>Sobre estes dados</summary>
-      <p class="small muted">${cur.fonte?.tipo === 'imagem' ? 'Transcrito à mão da grade publicada pelo colegiado' : `Do relatório oficial da Pró-reitoria de Graduação (versão ${esc(cur.fonte?.versaoOficial || cur.versao)})`}${cur.fonte?.url ? ` — <a href="${safeHref(cur.fonte.url)}" target="_blank" rel="noreferrer">fonte ↗</a>` : ''}.</p>
-      ${(cur.avisos || []).length ? `<ul class="small muted">${cur.avisos.map((a) => `<li>${esc(a)}</li>`).join('')}</ul>` : ''}</details>` : ''}`;
+    </div>`;
     $('#mc-curso').addEventListener('change', (e) => {
       const c = curricula.find((x) => x.id === e.target.value);
       profile = c ? { id: c.id, periodo: Math.min(profile?.periodo || 1, c.periodos.length), only: !!profile?.only } : null;
@@ -1956,6 +1950,7 @@ async function viewAbout() {
     <p id="versoes">Quando o currículo muda, a disciplina ganha um código novo e o antigo continua sendo ofertado por um tempo para quem está na versão anterior (ex.: <b>Estruturas de Dados</b> DCC205 → DCC221, <b>PDS II</b> DCC204 → DCC219, <b>Redes</b> DCC023 → DCC095). Aqui as versões aparecem como <b>uma só disciplina</b>, com todas as turmas e avaliações juntas. Disciplinas <b>extintas</b> — de currículos antigos, como Algoritmos e Estruturas de Dados I e II, ou que não aparecem em nenhuma oferta dos últimos dois anos (${esc(b.activeTerms?.[0] || '')}–${esc(b.latestTerm)}) — não aparecem no site. Quando há uma sucessora (ex.: Introdução à Ciência da Computação DCC050 e Fundamentos de SI DCC044 → Introdução à Computação DCC096, do tronco comum), links antigos levam a ela.</p>
     <h3 id="atual">E o semestre atual?</h3>
     <p>O site só mostra como oferta oficial o que o DCC publica. ${b.offerPublished ? `A oferta de ${esc(b.latestTerm)} já está publicada.` : `<b>A oferta de ${esc(b.currentTerm)} ainda não foi publicada</b>, então as turmas “atuais” exibidas são as de ${esc(b.latestTerm)}.`} Enquanto a oferta não sai, estudantes podem <b>informar quem está dando cada disciplina</b> na página do docente ou da disciplina. Esses relatos aparecem separados, com o número de pessoas que confirmaram, e somem quando a oferta oficial é publicada.</p>
+    <p id="curriculos">Na <a href="#/oferta">grade</a>, ao escolher seu curso, as disciplinas do seu período aparecem primeiro. Os currículos vêm dos relatórios oficiais da Pró-reitoria de Graduação e, quando só existem como imagem no site do colegiado (Ciência da Computação a partir de 2025, Sistemas de Informação e Engenharia de Computação), foram transcritos à mão. Confira sempre no SIGA. O curso e o período escolhidos ficam só no seu navegador.</p>
     <p id="materiais">A seção <a href="#/materiais">Materiais</a> aponta para o <b>newCompleaks</b>, acervo público de provas e materiais mantido pelos estudantes no Google Drive. O site só guarda os links e a contagem de arquivos de cada pasta (<code>scripts/sync_provas.py</code>); o conteúdo continua no Drive, e nada é carregado de lá ao navegar aqui.</p>
     <p>Disciplinas de <b>tópicos especiais</b> (DCC030, DCC049, DCC831…) mudam de tema a cada semestre, então cada tema aparece como uma disciplina própria. Algumas ofertas antigas listam só o primeiro nome do docente; quando não foi possível identificar com segurança, a turma aparece como “docente não informado”.</p>
     <p class="muted small">Última sincronização: ${b.generatedAt ? new Date(b.generatedAt).toLocaleString('pt-BR') : '—'}. ${b.sources.offerings ? `${b.sources.offerings.length} páginas de oferta lidas.` : ''}</p>

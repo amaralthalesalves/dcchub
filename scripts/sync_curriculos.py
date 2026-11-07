@@ -42,29 +42,28 @@ PERCURSO_GERAL = "Bacharelado (núcleo avançado + núcleo geral)"
 FONTES: list[dict] = [
     {
         "id": "cc-2019", "curso": "Ciência da Computação", "versao": "2019",
-        "percurso": PERCURSO_GERAL, "rotulo": "Ciência da Computação — currículo 2019",
-        "nota": "Para quem entrou antes de 2024.",
+        "percurso": PERCURSO_GERAL, "rotulo": "Ciência da Computação — entrei até 2024",
         "arquivo": "versao_curricular_bcc_20241208.pdf",
         "url": "https://dcc.ufmg.br/wp-content/uploads/versao_curricular_bcc_20241208.pdf",
         "percursoId": "01-02",
     },
     {
         "id": "cd-2024", "curso": "Ciência de Dados", "versao": "2024",
-        "rotulo": "Ciência de Dados — currículo 2024",
+        "rotulo": "Ciência de Dados — entrei em 2024 ou 2025",
         "arquivo": "versao_curricular_BCD_2025.pdf",
         "url": "https://dcc.ufmg.br/wp-content/uploads/versao_curricular_BCD_2025.pdf",
         "percursoId": None,
     },
     {
         "id": "cd-2026", "curso": "Ciência de Dados", "versao": "2026",
-        "percurso": PERCURSO_GERAL, "rotulo": "Ciência de Dados — currículo 2026",
+        "percurso": PERCURSO_GERAL, "rotulo": "Ciência de Dados — entrei a partir de 2026",
         "arquivo": "BCD-versao-V2026-1-1.pdf",
         "url": "https://dcc.ufmg.br/wp-content/uploads/BCD-versao-V2026-1-1.pdf",
         "percursoId": None,
     },
     {
         "id": "mc-2025", "curso": "Matemática Computacional", "versao": "2025",
-        "percurso": PERCURSO_GERAL, "rotulo": "Matemática Computacional — currículo 2025",
+        "percurso": PERCURSO_GERAL, "rotulo": "Matemática Computacional",
         "arquivo": "grade-geral.pdf",
         "url": "https://www.matcomp.dcc.ufmg.br/grade/grade-geral.pdf",
         "percursoId": None,
@@ -72,7 +71,7 @@ FONTES: list[dict] = [
     {
         "id": "mc-2025-computacao", "curso": "Matemática Computacional", "versao": "2025",
         "percurso": "Bacharelado com perfil em Computação",
-        "rotulo": "Matemática Computacional — currículo 2025 (perfil Computação)",
+        "rotulo": "Matemática Computacional — perfil Computação",
         "arquivo": "grade-computacao.pdf",
         "url": "https://www.matcomp.dcc.ufmg.br/grade/grade-computacao.pdf",
         "percursoId": None,
