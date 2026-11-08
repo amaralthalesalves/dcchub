@@ -274,6 +274,7 @@ async function router() {
       if (token !== renderToken) return;
       await view({ params, args: m.slice(1).map(decodeURIComponent), anchor, isCurrent: () => token === renderToken });
       if (token !== renderToken) return;
+      showRules();
       enterRoute(path);
       if (anchor) document.getElementById(anchor)?.scrollIntoView();
       else if (!history.state?.keepScroll) window.scrollTo(0, 0);
@@ -418,6 +419,51 @@ function viewGate(methods = ['code']) {
   retry?.addEventListener('click', () => { $('#gate-sent').hidden = true; form.hidden = false; $('input', form).focus(); });
   if (email && pending) { showOtp(pending.msg); return; }
   $(email ? 'input[name=email]' : 'input[name=code]').focus();
+}
+
+// Regras da comunidade: quem entra (por e-mail ou código) precisa aceitar uma vez neste navegador antes de usar o site.
+// Fica só no navegador (localStorage): o servidor não guarda quem aceitou, para não criar nada que ligue a pessoa ao
+// acesso. Mudou o texto de forma importante? Suba RULES_VERSION e todo mundo vê de novo.
+const RULES_KEY = 'dcchub-regras', RULES_VERSION = '1', REPO_URL = 'https://github.com/amaralthalesalves/dcchub';
+const RULES = [
+  ['i-users', 'Respeito', 'Critique a disciplina e a didática, não a pessoa. Nada de ofensas, apelidos ou comentários sobre aparência e vida pessoal.'],
+  ['i-shield', 'Anonimato', 'Não escreva nada que identifique você ou outras pessoas: nomes de colegas, matrícula, situações que só você viveu.'],
+  ['i-inbox', 'Discrição', 'O que é da comunidade fica na comunidade. Não espalhe prints de avaliações nem compartilhe o acesso com quem não é da UFMG.'],
+  ['i-pen', 'Honestidade', 'Avalie só turmas que você cursou e conte a sua experiência real, com contexto. Uma avaliação por turma.'],
+];
+function rulesAccepted() {
+  try { return localStorage.getItem(RULES_KEY) === RULES_VERSION; } catch (_) { return true; } // sem armazenamento: não trava o site
+}
+function showRules() {
+  if (rulesAccepted() || state.boot?.docente || document.getElementById('rules-dialog')) return;
+  const dlg = document.createElement('dialog');
+  dlg.id = 'rules-dialog';
+  dlg.className = 'dialog rules-dialog';
+  dlg.setAttribute('aria-labelledby', 'rules-title');
+  dlg.innerHTML = `<form method="dialog" class="dialog-body rules">
+    <span class="brand-logo" aria-hidden="true">D</span>
+    <h2 id="rules-title">Regras da comunidade</h2>
+    <p class="muted">O DCCHub só funciona se for um lugar seguro para todo mundo, inclusive para quem ensina. Antes de participar:</p>
+    <ul class="rules-list">${RULES.map(([ico, t, d]) => `<li><span class="rules-ico" aria-hidden="true"><svg class="ico"><use href="#${ico}"/></svg></span><div><b>${t}</b><p>${d}</p></div></li>`).join('')}</ul>
+    <p class="small muted">O que quebra as regras sai do ar. Regras completas no rodapé do site.</p>
+    <label class="rules-accept"><input type="checkbox" name="ok"> Li e concordo com as regras da comunidade</label>
+    <button class="btn btn-lg" value="accept" disabled>Participar</button>
+    <div class="rules-star">
+      <svg class="ico" aria-hidden="true"><use href="#i-github"/></svg>
+      <p class="small">O DCCHub é feito por estudantes e tem código aberto. Se curtir, <a href="${REPO_URL}" target="_blank" rel="noopener">deixe uma estrela no GitHub</a> — ajuda o projeto a chegar em mais gente.</p>
+    </div>
+  </form>`;
+  document.body.append(dlg);
+  const box = $('input[name=ok]', dlg), btn = $('button[value=accept]', dlg);
+  box.addEventListener('change', () => { btn.disabled = !box.checked; });
+  dlg.addEventListener('cancel', (e) => e.preventDefault()); // Esc não fecha: precisa aceitar
+  $('form', dlg).addEventListener('submit', (e) => {
+    if (!box.checked) { e.preventDefault(); return; }
+    try { localStorage.setItem(RULES_KEY, RULES_VERSION); } catch (_) { /* sem armazenamento */ }
+    setTimeout(() => dlg.remove(), 0);
+  });
+  dlg.showModal();
+  box.focus();
 }
 
 function errorBlock(err) {
