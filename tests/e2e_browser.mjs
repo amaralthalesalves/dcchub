@@ -35,6 +35,15 @@ const ok = (cond, msg) => { console.log(`${cond ? '✓' : '✗'} ${msg}`); if (!
 await send('Page.enable');
 await send('Page.navigate', { url: `${base}/#/` }); await sleep(1500);
 
+// 0) regras da comunidade: aparecem na primeira visita, Esc não fecha, só sai aceitando
+ok(await ev(`return !!document.querySelector('#rules-dialog[open]')`), 'regras da comunidade aparecem na primeira visita');
+ok(await ev(`return document.querySelector('#rules-dialog button[value=accept]').disabled`), 'botão Participar começa desligado');
+await ev(`document.querySelector('#rules-dialog').dispatchEvent(new Event('cancel',{cancelable:true}))`);
+ok(await ev(`return !!document.querySelector('#rules-dialog[open]')`), 'Esc não fecha as regras');
+await ev(`const b=document.querySelector('#rules-dialog input[name=ok]'); b.click(); document.querySelector('#rules-dialog button[value=accept]').click()`); await sleep(200);
+ok(await ev(`return !document.querySelector('#rules-dialog') && localStorage.getItem('dcchub-regras') === '1'`), 'aceitar fecha as regras e lembra no navegador');
+await go('#/'); ok(await ev(`return !document.querySelector('#rules-dialog')`), 'regras não voltam depois de aceitas');
+
 // 1) busca global
 ok(await ev(`const i=document.querySelector('#global-search'); i.value='dcc206'; i.dispatchEvent(new Event('input')); return document.querySelector('#global-results .search-item b')?.textContent`) === 'Algoritmos I', 'busca global por código acha Algoritmos I');
 await ev(`document.querySelector('#global-search').dispatchEvent(new KeyboardEvent('keydown',{key:'Enter'}))`); await sleep(1200);
