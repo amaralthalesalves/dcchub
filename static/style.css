@@ -592,13 +592,18 @@ a.chip:hover { border-color: var(--line-strong); color: var(--ink); text-decorat
 
 /* ---------- rodapé */
 .footer { margin-top: auto; border-top: 1px solid var(--line); background: transparent; }
-.footer-inner { max-width: 1120px; margin: 0 auto; padding: 22px 32px 28px; display: grid; grid-template-columns: 1fr auto; gap: 10px 40px; font-size: 13.5px; color: var(--muted); }
+.footer-inner { max-width: 1120px; margin: 0 auto; padding: 32px 32px 28px; display: grid; grid-template-columns: minmax(0, 420px) auto; justify-content: space-between; gap: 24px 64px; font-size: 13.5px; color: var(--muted); }
 .footer-brand { font: 760 17px/1.2 var(--display); letter-spacing: -.03em; color: var(--ink); }
 .footer-brand b { font-weight: 650; }
 .footer-inner p { margin: 4px 0 0; }
-.footer-links { display: flex; gap: 18px; flex-wrap: wrap; align-items: flex-start; }
+.footer-links { display: grid; grid-template-columns: repeat(2, auto); gap: 24px 64px; align-items: start; }
+.footer-col { display: grid; gap: 9px; justify-items: start; }
+.footer-col h2 { font-size: 12px; font-weight: 600; line-height: 1.2; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin: 0 0 3px; }
 .footer-links a { color: var(--ink-2); }
-.footer-note { grid-column: 1 / -1; font-size: 12.5px; margin: 0; }
+.footer-links a:hover { color: var(--ink); }
+.footer-gh { display: inline-flex; align-items: center; gap: 7px; }
+.footer-gh .ico { width: 15px; height: 15px; }
+.footer-note { grid-column: 1 / -1; font-size: 12.5px; margin: 0; padding-top: 18px; border-top: 1px solid var(--line); }
 
 /* ---------- avisos, versões, relatos da comunidade */
 .notice { display: flex; gap: 12px; align-items: flex-start; padding: 14px 16px; margin: 0 0 20px; border-radius: 12px;
@@ -672,7 +677,8 @@ a.chip:hover { border-color: var(--line-strong); color: var(--ink); text-decorat
   .rating-ends { display: flex; justify-content: space-between; color: var(--muted); }
   .offer-row { grid-template-columns: 1fr; }
   .offer-actions { justify-content: flex-start; }
-  .footer-inner { grid-template-columns: 1fr; padding: 20px 16px; }
+  .footer-inner { grid-template-columns: 1fr; padding: 24px 16px; gap: 22px; }
+  .footer-links { gap: 20px 32px; }
   .bar-row { grid-template-columns: 112px 1fr; }
   .course-card { flex-direction: column; }
   .course-card-side { flex-direction: row; align-items: center; flex-wrap: wrap; text-align: left; }
