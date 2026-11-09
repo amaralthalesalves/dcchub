@@ -959,7 +959,7 @@ async function viewHome() {
             <li><b>${teachingNow}</b> docentes lecionando</li>
             <li><b>${activeCount}</b> em atividade no DCC</li>
           </ul>
-          ${spotCourses.length ? `<p class="spot-sub">Mais avaliadas nesta oferta</p>
+          ${spotCourses.length ? `<p class="spot-sub">Em oferta em ${esc(b.latestTerm || '')} · mais comentadas</p>
           <ol class="spot-list">${spotCourses.map((c) => `<li><a href="#/disciplina/${encodeURIComponent(c.id)}"><span><b>${esc(c.name)}</b><small>${esc(courseCode(c))} · ${plural(c.stats.count, 'avaliação', 'avaliações')}</small></span>${pill(c.stats.overall)}</a></li>`).join('')}</ol>` : ''}
           <a class="btn btn-lg spot-cta" href="#/oferta"><svg class="ico"><use href="#i-calendar"/></svg>Montar minha grade</a>
         </aside>
