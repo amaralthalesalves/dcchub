@@ -341,17 +341,17 @@ function viewGate(methods = ['code']) {
       btn.disabled = false;
     }
   });
-  // os desafios (tokens assinados, sem o código e sem o e-mail) ficam na aba: recarregar a página não perde o código
-  // pedido. Guarda os últimos 3: com e-mail lento, a pessoa pede outro e o primeiro chega depois — qualquer um serve.
+  // os desafios (tokens assinados, sem o código e sem o e-mail) ficam no navegador (não só na aba): recarregar, fechar
+  // a aba ou abrir o site em outra aba não perde o código pedido. Guarda os últimos 3: com e-mail lento, a pessoa pede outro e o primeiro chega depois — qualquer um serve.
   const KEY = 'dcchub-otp', PENDING = 3, RESEND_WAIT = 60_000;
   const load = () => {
     try {
-      const v = JSON.parse(sessionStorage.getItem(KEY) || 'null');
+      const v = JSON.parse(localStorage.getItem(KEY) || 'null');
       const items = (v?.items || []).filter((i) => i.exp > Date.now());
       return items.length ? { ...v, items } : null;
     } catch (_) { return null; }
   };
-  const save = (v) => { try { v ? sessionStorage.setItem(KEY, JSON.stringify(v)) : sessionStorage.removeItem(KEY); } catch (_) { /* sem armazenamento */ } };
+  const save = (v) => { try { v ? localStorage.setItem(KEY, JSON.stringify(v)) : localStorage.removeItem(KEY); } catch (_) { /* sem armazenamento */ } };
   let pending = load();
   const form = $('#gate-email'), otp = $('#gate-otp'), retry = $('#gate-retry');
   // espera antes de pedir outro código: quase sempre o primeiro só está atrasado
@@ -384,8 +384,11 @@ function viewGate(methods = ['code']) {
     btn.disabled = true;
     try {
       const res = await api('/api/access/email', { method: 'POST', body: { email: value } });
-      const item = { challenge: res.challenge, exp: Date.now() + res.expiresIn * 1000 };
-      pending = { items: [item, ...(load()?.items || [])].slice(0, PENDING), msg: res.message, sentAt: Date.now() };
+      // sem desafio novo (limite de envios por endereço): mantém os já pedidos, que continuam valendo
+      const items = load()?.items || [];
+      if (res.challenge) items.unshift({ challenge: res.challenge, exp: Date.now() + res.expiresIn * 1000 });
+      else if (!items.length) { err.textContent = res.message; btn.disabled = false; return; } // pedidos feitos em outro navegador
+      pending = { items: items.slice(0, PENDING), msg: res.message, sentAt: Date.now() };
       save(pending);
       showOtp(res.message);
     } catch (e2) {

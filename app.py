@@ -649,11 +649,13 @@ class RateLimiter:
 FEEDBACK_KINDS = ("sugestao", "problema", "dados", "outro")
 FEEDBACK_MIN, FEEDBACK_MAX = 10, 2000
 
-LIMITS = {"check": (120, 60), "access": (10, 600), "login": (5, 600), "classreport": (20, 600), "review": (6, 600), "vote": (60, 60), "report": (10, 600), "restore": (10, 600), "admin": (30, 60),
+LIMITS = {"check": (120, 60), "access": (60, 600), "login": (20, 600), "classreport": (20, 600), "review": (6, 600), "vote": (60, 60), "report": (10, 600), "restore": (10, 600), "admin": (30, 60),
           "feedback": (5, 3600),
           # identidade anônima nova sai de graça (basta apagar o cookie), então os limites abaixo valem por rede (IP) e,
           # no acesso por e-mail, por login — nunca guardados: só em memória, como os demais
-          "login-day": (20, 86400),       # códigos pedidos por IP por dia (protege a cota diária do serviço de e-mail)
+          # Wi-Fi da UFMG é NAT: muita gente sai pelo mesmo IP, então os limites de login por IP são folgados. Quem segura
+          # abuso é o limite por endereço (3/hora), as 5 tentativas por código e o teto global diário de envios.
+          "login-day": (150, 86400),      # códigos pedidos por IP por dia (protege a cota diária do serviço de e-mail)
           "review-pair": (3, 86400),      # avaliações do MESMO docente+disciplina por IP por dia (3, não 1: Wi-Fi do campus é NAT)
           "review-access": (1, 86400),    # idem, por login de e-mail
           "vote-pair": (3, 86400)}        # votos "útil" na MESMA avaliação por IP por dia
@@ -1568,17 +1570,21 @@ class App(BaseHTTPRequestHandler):
         self.limit("login-day", message="Muitos pedidos de código a partir desta conexão hoje. Tente amanhã.")
         # e-mail publicado de um docente (mesmo que seja @ufmg.br): o código abre só a página dele
         code, challenge = email_login.new_docente_code(SECRET, docente) if docente else email_login.new_code(SECRET)
-        # no máximo 3 e-mails por endereço por hora (chave HMAC só em memória). Acima disso a resposta é a mesma, com
-        # um desafio de verdade, mas nada é enviado: ninguém usa o site para encher a caixa de outra pessoa.
-        if limiter.hit("login-addr", email_login.address_key(SECRET, address), 3, 3600):
-            # teto global por dia: sem ele, poucas conexões gastariam a cota do serviço de envio e ninguém mais entraria
-            if not limiter.hit("login-global", "*", EMAIL_DAILY_LIMIT, 86400):
-                raise ApiError(503, "O limite diário de envios de e-mail foi atingido. Tente de novo amanhã"
-                               + (" ou entre com o código da comunidade." if ACCESS_CODES else "."))
-            if docente:
-                email_login.send_async(EMAIL, address, code, email_login.DOCENTE_TTL // 86400)
-            else:
-                email_login.send_async(EMAIL, address, code)
+        # no máximo 3 e-mails por endereço por hora (chave HMAC só em memória): ninguém usa o site para encher a caixa
+        # de outra pessoa. Acima disso nada é enviado e NÃO sai desafio novo: antes saía um desafio "de mentira" que
+        # empurrava para fora do navegador o desafio de um código já enviado (e atrasado), e esse código parava de valer.
+        if not limiter.hit("login-addr", email_login.address_key(SECRET, address), 3, 3600):
+            return self.send_json({"ok": True, "challenge": None, "expiresIn": email_login.CODE_TTL,
+                                   "message": f"Já enviamos 3 códigos para {address} na última hora. Use qualquer um "
+                                              "deles (o e-mail da UFMG às vezes demora) ou peça outro mais tarde."})
+        # teto global por dia: sem ele, poucas conexões gastariam a cota do serviço de envio e ninguém mais entraria
+        if not limiter.hit("login-global", "*", EMAIL_DAILY_LIMIT, 86400):
+            raise ApiError(503, "O limite diário de envios de e-mail foi atingido. Tente de novo amanhã"
+                           + (" ou entre com o código da comunidade." if ACCESS_CODES else "."))
+        if docente:
+            email_login.send_async(EMAIL, address, code, email_login.DOCENTE_TTL // 86400)
+        else:
+            email_login.send_async(EMAIL, address, code)
         self.send_json({"ok": True, "challenge": challenge, "expiresIn": email_login.CODE_TTL,
                         "message": f"Enviamos um código de 6 dígitos para {address}. Ele vale por "
                                    f"{email_login.CODE_TTL // 60} minutos."})

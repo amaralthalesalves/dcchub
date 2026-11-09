@@ -391,15 +391,19 @@ class ServerTest(unittest.TestCase):
             for f in app.DB.parent.glob(app.DB.name + "*"):
                 self.assertNotIn(b"aluna", f.read_bytes().lower(), f.name)
 
-            # limite por endereço: a resposta é igual (com desafio), mas nada além de 3 envios por hora
+            # limite por endereço: nada além de 3 envios por hora, e o 4º pedido NÃO devolve desafio novo (um desafio
+            # sem e-mail empurrava para fora do navegador o de um código já enviado e atrasado)
             app.limiter.events.clear()
-            for _ in range(4):
+            for i in range(4):
                 status, data, _ = self.client().post("/api/access/email", {"email": "outra@ufmg.br"})
                 self.assertEqual(status, 200)
-                self.assertIn("challenge", data)
+                self.assertEqual(data["challenge"] is None, i == 3, i)
+            self.assertIn("Já enviamos 3 códigos", data["message"])
             self.assertEqual(sum(1 for to, _ in sent if to == "outra@ufmg.br"), 3)
-            # limite por IP
-            statuses = [self.client().post("/api/access/email", {"email": f"p{i}@ufmg.br"})[0] for i in range(6)]
+            # limite por IP (folgado: Wi-Fi da UFMG é NAT), mas existe
+            self.assertGreaterEqual(app.LIMITS["login"][0], 20)
+            statuses = [self.client().post("/api/access/email", {"email": f"p{i}@ufmg.br"})[0]
+                        for i in range(app.LIMITS["login"][0] + 1)]
             self.assertIn(429, statuses)
 
             app.EMAIL.epoch = "2"  # revoga todos os acessos por e-mail
