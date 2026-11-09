@@ -689,7 +689,7 @@ function reviewCard(r, { show = 'course' } = {}) {
       ${r.grade ? `<li><span>Conceito</span><b>${esc(r.grade)}</b></li>` : ''}
     </ul>
     ${r.tags.length ? `<div class="chips">${r.tags.map((t) => `<span class="chip ${tagTone(t)}">${esc(t)}</span>`).join('')}</div>` : ''}
-    <div class="review-text">${paragraphs}</div>
+    ${r.comment ? `<div class="review-text">${paragraphs}</div>` : ''}
     <footer class="review-foot">
       ${r.mine
         ? `<span class="muted small">Esta é a sua avaliação</span>
@@ -699,6 +699,15 @@ function reviewCard(r, { show = 'course' } = {}) {
            <button class="link-btn muted" data-action="report" data-id="${r.id}">Denunciar</button>`}
     </footer>
   </article>`;
+}
+
+// Avaliações com comentário primeiro; as só com notas (comentário é opcional) contam nas médias e ficam num bloco
+// recolhido no fim, para a lista não virar uma parede de cartões sem texto
+function reviewCards(reviews, show) {
+  const text = reviews.filter((r) => r.comment), bare = reviews.filter((r) => !r.comment);
+  return text.map((r) => reviewCard(r, { show })).join('')
+    + (bare.length ? `<details class="ratings-only"${text.length ? '' : ' open'}><summary>${text.length ? '+ ' : ''}${plural(bare.length, 'avaliação só com notas', 'avaliações só com notas')}</summary>
+      <div class="review-list">${bare.map((r) => reviewCard(r, { show })).join('')}</div></details>` : '');
 }
 
 function reviewsSection({ reviews, show, filterOptions, filterLabel, ctaHref, subjectName }) {
@@ -718,7 +727,7 @@ function reviewsSection({ reviews, show, filterOptions, filterLabel, ctaHref, su
       </div>
     </div>
     <div class="review-list" data-show="${show}">
-      ${reviews.length ? reviews.map((r) => reviewCard(r, { show })).join('') : `<div class="empty-state small-empty"><p>Ninguém avaliou ${esc(subjectName)} ainda.</p>${ctaHref ? `<a class="btn" href="${ctaHref}">Escrever a primeira avaliação</a>` : ''}</div>`}
+      ${reviews.length ? reviewCards(reviews, show) : `<div class="empty-state small-empty"><p>Ninguém avaliou ${esc(subjectName)} ainda.</p>${ctaHref ? `<a class="btn" href="${ctaHref}">Escrever a primeira avaliação</a>` : ''}</div>`}
     </div>
   </section>`;
 }
@@ -737,7 +746,7 @@ function wireReviewList(reviews, show) {
       high: (a, b) => b.ratings.overall - a.ratings.overall || b.createdAt - a.createdAt || b.id - a.id,
       low: (a, b) => a.ratings.overall - b.ratings.overall || b.createdAt - a.createdAt || b.id - a.id,
     }[sort];
-    list.innerHTML = sorted.sort(by).map((r) => reviewCard(r, { show })).join('') || '<p class="muted">Nenhuma avaliação com esse filtro.</p>';
+    list.innerHTML = reviewCards(sorted.sort(by), show) || '<p class="muted">Nenhuma avaliação com esse filtro.</p>';
   };
   $('[data-filter="reviews"]')?.addEventListener('change', (e) => { filter = e.target.value; redraw(); });
   $('[data-sort="reviews"]')?.addEventListener('change', (e) => { sort = e.target.value; redraw(); });
@@ -921,7 +930,8 @@ function mascotSvg() {
 async function viewHome() {
   setTitle('');
   const b = state.boot;
-  const recent = await api('/api/reviews?sort=recent&limit=6').then((d) => d.reviews).catch(() => []);
+  // com comentário opcional, a vitrine da home mostra as que têm texto (as só com notas aparecem nas páginas)
+  const recent = await api('/api/reviews?sort=recent&limit=24').then((d) => d.reviews.filter((r) => r.comment).slice(0, 6)).catch(() => []);
   // carrossel com 10 docentes: os mais bem avaliados (2+ avaliações); se faltar, quem tem 1; se ainda faltar, quem está
   // lecionando agora, mesmo sem avaliações (aí o título deixa de dizer "mais bem avaliados")
   const CAROUSEL_SIZE = 10;
@@ -1750,17 +1760,17 @@ async function viewReviewForm({ params, isCurrent }) {
             </div></div>
           <label class="field">Conceito obtido<select id="f-grade"><option value="">Prefiro não dizer</option>${b.grades.filter((g) => g !== 'Prefiro não dizer').map((g) => `<option ${init.grade === g ? 'selected' : ''}>${esc(g)}</option>`).join('')}</select></label>
         </div>
-        <div class="field"><span>Marcadores <small class="muted">(até ${b.maxTags})</small></span>
+        <div class="field"><span>Marcadores <small class="muted">(até ${b.maxTags} · o jeito mais rápido de contar como foi)</small></span>
           ${Object.entries(b.tags).map(([tone, list]) => `<div class="chips tag-picker">${list.map((t) => `<label class="chip ${tone === 'positivo' ? 'pos' : tone === 'negativo' ? 'neg' : 'neu'}"><input type="checkbox" name="tags" value="${esc(t)}" ${init.tags?.includes(t) ? 'checked' : ''}><span>${esc(t)}</span></label>`).join('')}</div>`).join('')}
           <small class="err" data-err="tags"></small>
         </div>
       </fieldset>
 
-      <fieldset class="form-step"><legend><span>4</span> Comentário</legend>
+      <fieldset class="form-step"><legend><span>4</span> Comentário <small class="muted">(opcional)</small></legend>
         <label class="field"><span class="sr-only">Comentário</span>
-          <textarea id="f-comment" rows="7" maxlength="${b.comment.max}" placeholder="Como eram as aulas? E as provas e trabalhos? O que você gostaria de ter sabido antes de se matricular? Alguma dica para quem vai cursar?">${esc(init.comment)}</textarea>
+          <textarea id="f-comment" rows="7" maxlength="${b.comment.max}" placeholder="Opcional — uma frase já ajuda muito quem vai escolher a turma. Como eram as aulas? E as provas e trabalhos? O que você gostaria de ter sabido antes de se matricular?">${esc(init.comment)}</textarea>
           <div class="mod-hints" id="mod-hints" aria-live="polite" hidden></div>
-          <div class="field-foot"><small class="err" data-err="comment"></small><small class="muted"><span id="count">0</span>/${b.comment.max} · mínimo ${b.comment.min}</small></div>
+          <div class="field-foot"><small class="err" data-err="comment"></small><small class="muted"><span id="count">0</span>/${b.comment.max} · se escrever, mínimo ${b.comment.min}</small></div>
         </label>
         <ul class="tips small muted"><li>Seja específico: exemplos concretos ajudam mais que adjetivos.</li><li>Critique práticas, não pessoas. Ofensas, comentários sobre aparência ou vida pessoal e dados pessoais impedem a publicação — o formulário avisa enquanto você escreve.</li><li>Você poderá editar ou apagar depois, neste navegador.</li></ul>
       </fieldset>
@@ -1894,7 +1904,8 @@ async function viewReviewForm({ params, isCurrent }) {
     if (!payload.course) errors.course = 'Escolha a disciplina.';
     if (!payload.term) errors.term = 'Escolha o semestre.';
     b.criteria.forEach((c) => { if (!payload.ratings[c.key]) errors[c.key] = 'Escolha uma nota.'; });
-    if (payload.comment.trim().length < b.comment.min) errors.comment = `Escreva pelo menos ${b.comment.min} caracteres.`;
+    const typed = payload.comment.trim().length;
+    if (typed && typed < b.comment.min) errors.comment = `Escreva pelo menos ${b.comment.min} caracteres ou deixe em branco.`;
     showErrors(errors);
     if (Object.keys(errors).length) { $('#form-message').textContent = 'Revise os campos destacados.'; return; }
     const btn = $('button[type="submit"]', form);

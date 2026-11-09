@@ -136,7 +136,7 @@ TAGS = {
 ALL_TAGS = [t for group in TAGS.values() for t in group]
 MAX_TAGS = 5
 GRADES = ["A", "B", "C", "D", "E", "F", "Trancou", "Cursando", "Prefiro não dizer"]
-COMMENT_MIN, COMMENT_MAX = 30, 2000
+COMMENT_MIN, COMMENT_MAX = 15, 2000  # comentário é opcional; o mínimo só vale se a pessoa escrever algo
 REPORT_REASONS = ["Ofensivo ou desrespeitoso", "Expõe dados pessoais", "Spam ou sem relação", "Informação falsa", "Outro"]
 AUTO_HIDE_REPORTS = 4  # denúncias de REDES distintas (não de cookies) para tirar do ar até a moderação olhar
 BURST_REVIEWS = 5  # avaliações do mesmo docente num só dia: destacadas no painel de moderação
@@ -456,7 +456,7 @@ def init_db() -> None:
         # "dificuldade para passar", separada de "para aprender": vazia nas avaliações anteriores
         if "passing" not in columns:
             conn.execute("ALTER TABLE reviews ADD COLUMN passing INTEGER CHECK(passing BETWEEN 1 AND 5)")
-        for row in conn.execute("SELECT id, comment FROM reviews WHERE comment_key IS NULL").fetchall():
+        for row in conn.execute("SELECT id, comment FROM reviews WHERE comment_key IS NULL AND comment != ''").fetchall():
             conn.execute("UPDATE reviews SET comment_key=? WHERE id=?", (comment_key(row["comment"]), row["id"]))
         conn.execute("CREATE INDEX IF NOT EXISTS idx_reviews_comment_key ON reviews(comment_key)")
         version = conn.execute("PRAGMA user_version").fetchone()[0]
@@ -512,7 +512,9 @@ def new_review_id(taken) -> int:
             return candidate
 
 
-def comment_key(comment: str) -> str:
+def comment_key(comment: str) -> str | None:
+    if not comment.strip():
+        return None  # avaliação só com notas: nada a comparar (senão todas as sem texto seriam "duplicadas")
     return hashlib.sha256(" ".join(moderation.fold(comment).split()).encode()).hexdigest()
 
 
@@ -1234,12 +1236,12 @@ class App(BaseHTTPRequestHandler):
             errors["tags"] = f"Escolha até {MAX_TAGS} marcadores da lista."
             tags = []
         comment = clean_comment(data.get("comment"))
-        if len(comment) < COMMENT_MIN:
-            errors["comment"] = f"Escreva pelo menos {COMMENT_MIN} caracteres — detalhes ajudam quem vai escolher a turma."
+        if comment and len(comment) < COMMENT_MIN:  # opcional, mas "ok" ou "bom" não ajudam ninguém
+            errors["comment"] = f"Escreva pelo menos {COMMENT_MIN} caracteres ou deixe o comentário em branco."
         elif len(comment) > COMMENT_MAX:
             errors["comment"] = f"Use no máximo {COMMENT_MAX} caracteres."
         issues = []
-        if "comment" not in errors:
+        if comment and "comment" not in errors:
             issues = moderation.analyze(comment, CATALOG.professors.get(professor, {}).get("name"))
             rejected = [i for i in issues if i.action == moderation.REJECT]
             if rejected:
@@ -1286,9 +1288,11 @@ class App(BaseHTTPRequestHandler):
         self.send_json({"id": review_id, "status": status, "message": message, "held": status == "held"}, 201)
 
     @staticmethod
-    def reject_duplicate(key: str, viewer: str, exclude_id: int | None = None) -> None:
+    def reject_duplicate(key: str | None, viewer: str, exclude_id: int | None = None) -> None:
         """Comentário idêntico a outra avaliação (copiar-colar em massa, spam): devolve para reescrever.
         Compara a chave do texto normalizado (comment_key, indexada) — uma busca, não uma varredura da tabela."""
+        if key is None:  # sem comentário
+            return
         with connect() as conn:
             # só de OUTRAS pessoas: reenviar a própria avaliação cai no aviso de "você já avaliou" (409)
             if conn.execute("SELECT 1 FROM reviews WHERE comment_key=? AND status!='removed' AND reviewer_hash!=? AND id!=? LIMIT 1",

@@ -897,6 +897,21 @@ class ServerTest(unittest.TestCase):
         _, ok, _ = c.post("/api/moderation/check", {"comment": "A prova foi um lixo, nada a ver com as listas da disciplina.", "professor": "ana-silva"})
         self.assertEqual((ok["decision"], ok["issues"]), ("publish", []))
 
+    def test_comment_is_optional(self):
+        """Comentário opcional (menos atrito): só com notas vale, várias sem texto não são "duplicadas", e se a pessoa
+        escrever algo, "ok"/"bom" ainda é curto demais."""
+        status, created, _ = self.client().post("/api/reviews", review(comment=""))
+        self.assertEqual(status, 201, created)
+        status, other, _ = self.client().post("/api/reviews", review(professor="bruno-costa", term="2025.2", comment="   "))
+        self.assertEqual(status, 201, "duas avaliações sem texto, de pessoas diferentes, não contam como cópia")
+        status, data, _ = self.client().post("/api/reviews", review(course="DCC011", term="2025.2", comment="bom"))
+        self.assertEqual(status, 400)
+        self.assertIn("deixe o comentário em branco", data["fields"]["comment"])
+        reviews = self.client().get("/api/professors/ana-silva")[1]["reviews"]
+        self.assertEqual([r["comment"] for r in reviews if r["id"] == created["id"]], [""])
+        with app.connect() as conn:
+            self.assertIsNone(conn.execute("SELECT comment_key FROM reviews WHERE id=?", (created["id"],)).fetchone()[0])
+
     def test_duplicate_comment_rejected(self):
         text = "Aulas muito boas, listas semanais e provas coerentes com o conteúdo."
         self.assertEqual(self.client().post("/api/reviews", review(comment=text))[0], 201)

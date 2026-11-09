@@ -435,6 +435,10 @@ a.chip:hover { border-color: var(--line-strong); color: var(--ink); text-decorat
 .review-text { color: var(--ink-2); }
 .review-text p { margin: 0 0 .6em; white-space: normal; overflow-wrap: anywhere; }
 .review-text p:last-child { margin: 0; }
+.ratings-only { margin-top: 4px; }
+.ratings-only > summary { cursor: pointer; color: var(--muted); font-size: 14px; padding: 8px 2px; width: fit-content; }
+.ratings-only > summary:hover { color: var(--ink); }
+.ratings-only > .review-list { margin-top: 8px; }
 .review-foot { display: flex; align-items: center; gap: 8px; border-top: 1px solid var(--line); padding-top: 10px; flex-wrap: wrap; }
 .helpful { display: inline-flex; align-items: center; gap: 6px; background: var(--surface); border: 1px solid var(--line-strong); color: var(--ink-2); border-radius: 999px; padding: 4px 12px; font: 500 13px var(--sans); cursor: pointer; }
 .helpful:hover { background: var(--surface-2); color: var(--ink); }
