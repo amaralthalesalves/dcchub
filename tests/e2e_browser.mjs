@@ -36,7 +36,8 @@ await send('Page.enable');
 await send('Page.navigate', { url: `${base}/#/` }); await sleep(1500);
 
 // 0) regras da comunidade: aparecem na primeira visita, Esc não fecha, só sai aceitando
-ok(await ev(`return !!document.querySelector('#rules-dialog[open]')`), 'regras da comunidade aparecem na primeira visita');
+// espera o diálogo (até 10 s): no runner do GitHub a primeira carga às vezes passa de 1,5 s e o teste falhava à toa
+ok(await ev(`for (let i = 0; i < 100 && !document.querySelector('#rules-dialog[open]'); i++) await new Promise((r) => setTimeout(r, 100)); return !!document.querySelector('#rules-dialog[open]')`), 'regras da comunidade aparecem na primeira visita');
 ok(await ev(`return document.querySelector('#rules-dialog button[value=accept]').disabled`), 'botão Participar começa desligado');
 await ev(`document.querySelector('#rules-dialog').dispatchEvent(new Event('cancel',{cancelable:true}))`);
 ok(await ev(`return !!document.querySelector('#rules-dialog[open]')`), 'Esc não fecha as regras');
