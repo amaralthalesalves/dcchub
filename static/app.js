@@ -1947,7 +1947,7 @@ async function viewMine() {
         <button class="btn btn-ghost btn-sm" id="copy-code" type="button" hidden>Copiar</button>
       </div>
       <form class="row-gap" id="restore-form">
-        <label class="field grow"><span>Tenho um código</span><input name="code" autocomplete="off" spellcheck="false" placeholder="Cole aqui o código de 43 caracteres"></label>
+        <label class="field grow"><span>Tenho um código</span><input name="code" autocomplete="off" spellcheck="false" placeholder="Cole aqui o seu código de recuperação"></label>
         <button class="btn" type="submit">Recuperar</button>
       </form>
     </section>

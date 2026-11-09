@@ -133,7 +133,7 @@ ok((await ev(`document.querySelector('#ics-export').open = true; return document
 await go('#/minhas'); await sleep(800);
 ok((await ev(`return document.querySelectorAll('.review').length`)) === 1, 'minhas avaliações lista 1');
 await ev(`document.querySelector('#show-code').click()`); await sleep(600);
-ok((await ev(`return document.querySelector('#code-box').textContent.length`)) === 43, 'código de recuperação exibido');
+ok((await ev(`return document.querySelector('#code-box').textContent`)).match(/^\d+\.[A-Za-z0-9_-]{43}$/), 'código de recuperação exibido');
 // 8) apagar
 await ev(`window.confirm=()=>true; document.querySelector('[data-action="delete-review"]').click()`); await sleep(1500);
 ok((await ev(`return document.querySelectorAll('.review').length`)) === 0, 'avaliação apagada');

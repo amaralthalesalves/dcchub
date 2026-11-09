@@ -17,6 +17,8 @@ services:
       DCCHUB_SMTP_PASSWORD: ${DCCHUB_SMTP_PASSWORD:-}
       DCCHUB_SMTP_FROM: ${DCCHUB_SMTP_FROM:-}
       DCCHUB_EMAIL_EPOCH: ${DCCHUB_EMAIL_EPOCH:-1}
+      # geração da identidade anônima (cookie das avaliações); subir desliga todas as anteriores (ver app.py)
+      DCCHUB_IDENTITY_EPOCH: ${DCCHUB_IDENTITY_EPOCH:-2}
       DCCHUB_EMAIL_DAILY_LIMIT: ${DCCHUB_EMAIL_DAILY_LIMIT:-250}
       # avisos à moderação quando algo entra na fila (mesmo SMTP); o link do painel usa o domínio
       DCCHUB_MOD_EMAIL: ${DCCHUB_MOD_EMAIL:-}

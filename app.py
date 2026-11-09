@@ -68,6 +68,13 @@ def env(name: str, default: str | None = None) -> str | None:
 
 DB = Path(env("DB") or DATA / "avaliacoes.db")
 COOKIE = "avalia_dcc"  # nome mantido de propósito: trocar desconectaria todo mundo da própria identidade anônima
+# Geração da identidade anônima: o cookie vale "<geração>.<43 caracteres aleatórios>" e só a geração atual é aceita.
+# Subir DCCHUB_IDENTITY_EPOCH desliga TODAS as identidades anteriores (as avaliações ficam, mas ninguém mais as edita),
+# para quando cookies de identidade podem ter ido parar no navegador errado. Geração 2 (09/11/2026): antes da correção
+# do keep-alive (e21d04f), o Set-Cookie de um navegador saía na resposta de outro, e esse cookie, válido por 2 anos,
+# continuava dando ao outro navegador a identidade (e as avaliações) de quem o recebeu primeiro.
+IDENTITY_EPOCH = int(env("IDENTITY_EPOCH") or 2)
+IDENTITY_TOKEN = re.compile(rf"{IDENTITY_EPOCH}\.[A-Za-z0-9_-]{{43}}")
 TRUST_PROXY = env("TRUST_PROXY") == "1"
 ADMIN_TOKEN = env("ADMIN_TOKEN", "") or ""
 ACCESS_COOKIE = "dcchub_access"
@@ -163,6 +170,14 @@ def review_day(ts: float | None = None) -> int:
 
 def token_hash(token: str) -> str:
     return hmac.new(SECRET.encode(), token.encode(), hashlib.sha256).hexdigest()
+
+
+def new_identity_token() -> str:
+    return f"{IDENTITY_EPOCH}.{secrets.token_urlsafe(32)}"
+
+
+def valid_identity(token: str) -> bool:
+    return bool(IDENTITY_TOKEN.fullmatch(token))
 
 
 def clean_line(value: object, limit: int) -> str:
@@ -777,9 +792,9 @@ class App(BaseHTTPRequestHandler):
     def secure_request(self) -> bool:
         return self.headers.get("X-Forwarded-Proto") == "https" if TRUST_PROXY else False
 
-    def make_cookie(self, token: str) -> str:
+    def make_cookie(self, token: str, max_age: int = 63072000) -> str:
         secure = "; Secure" if self.secure_request() else ""
-        return f"{COOKIE}={token}; Path=/; Max-Age=63072000; HttpOnly; SameSite=Strict{secure}"
+        return f"{COOKIE}={token}; Path=/; Max-Age={max_age}; HttpOnly; SameSite=Strict{secure}"
 
     def viewer(self, create: bool = False) -> str | None:
         """Hash do identificador anônimo do navegador (cria um novo cookie se pedido)."""
@@ -790,15 +805,24 @@ class App(BaseHTTPRequestHandler):
             except Exception:  # noqa: BLE001
                 pass
             token = cookies[COOKIE].value if COOKIE in cookies else ""
-            self._viewer = token_hash(token) if re.fullmatch(r"[A-Za-z0-9_-]{43}", token) else None
+            self._viewer = token_hash(token) if valid_identity(token) else None
+            if token and self._viewer is None:
+                # identidade de uma geração anterior (ou corrompida): o navegador a esquece; se a requisição criar
+                # uma identidade nova, o Set-Cookie dela substitui este
+                self.new_cookie = self.make_cookie("", 0)
         if self._viewer is None and create:
-            token = secrets.token_urlsafe(32)
+            token = new_identity_token()
             self.new_cookie = self.make_cookie(token)
             self._viewer = token_hash(token)
         return self._viewer
 
     def read_body(self) -> bytes:
         """Lê (e descarta, se preciso) todo o corpo: com keep-alive, bytes não lidos corrompem a próxima requisição."""
+        if self.headers.get("Transfer-Encoding"):
+            # o Caddy repassa corpo de tamanho desconhecido como chunked, sem Content-Length: lido como vazio, o resto
+            # ficava no socket, virava uma "requisição" inválida e a resposta de erro dela ia para outra pessoa
+            self.close_connection = True
+            raise ApiError(411, "Requisição inválida.")
         try:
             length = int(self.headers.get("Content-Length") or 0)
         except ValueError:
@@ -1410,15 +1434,16 @@ class App(BaseHTTPRequestHandler):
         self.read_json()
         self.limit("restore")
         token = self.cookie(COOKIE)
-        if not re.fullmatch(r"[A-Za-z0-9_-]{43}", token):
+        if not valid_identity(token):
             raise ApiError(404, "Este navegador ainda não tem um identificador anônimo.")
         self.send_json({"code": token})
 
     def post_restore(self) -> None:
         self.limit("restore")
         code = clean_line(self.read_json().get("code"), 60)
-        if not re.fullmatch(r"[A-Za-z0-9_-]{43}", code):
-            raise ApiError(400, "Código inválido.")
+        if not valid_identity(code):
+            # códigos de gerações anteriores também param aqui: quem tinha um cookie vazado também teria o código
+            raise ApiError(400, "Código inválido ou de uma versão antiga do site.")
         with connect() as conn:
             n = conn.execute("SELECT COUNT(*) FROM reviews WHERE reviewer_hash=? AND status!='removed'", (token_hash(code),)).fetchone()[0]
         if not n:

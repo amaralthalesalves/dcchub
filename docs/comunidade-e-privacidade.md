@@ -101,6 +101,7 @@ Comentários recusados pela moderação **não são guardados**.
 - Links vindos de dados raspados só viram `href` se forem `http(s)`/`mailto` (segunda barreira, além da CSP).
 - Checagem de `Origin` em toda escrita; limite de tamanho do corpo; campo-armadilha contra bots.
 - O código de recuperação **é** a identidade anônima (o mesmo valor do cookie `HttpOnly`). Por isso só sai por `POST` JSON da própria origem, com limite e sem cache. Uma página com script injetado ainda conseguiria pedi-lo, e é a CSP (nenhum script inline ou de terceiros) que impede isso.
+- **Geração da identidade** (`DCCHUB_IDENTITY_EPOCH`): só cookies da geração atual valem. Em 09/11/2026 a geração subiu para 2 porque, antes da correção do keep-alive (commit e21d04f), o `Set-Cookie` de um navegador podia sair na resposta de outro; o cookie dura 2 anos, então os dois navegadores continuavam com a mesma identidade mesmo depois da correção. Trocar de geração desliga todos os cookies antigos de uma vez. Quem perdeu o acesso a uma avaliação pede à moderação, que a liga a um código novo com `scripts/nova_identidade.py`.
 - Consultas SQL sempre parametrizadas.
 - Painel de moderação protegido por `DCCHUB_ADMIN_TOKEN` (`Authorization: Bearer …`).
 

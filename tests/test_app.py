@@ -952,7 +952,7 @@ class ServerTest(unittest.TestCase):
         self.assertEqual(a.get("/api/me/code")[0], 404, "não sai por GET")
         _, code, _ = a.post("/api/me/code")
         b = self.client()
-        self.assertEqual(b.post("/api/me/restore", {"code": "x" * 43})[0], 404)
+        self.assertEqual(b.post("/api/me/restore", {"code": f"{app.IDENTITY_EPOCH}." + "x" * 43})[0], 404)
         status, data, _ = b.post("/api/me/restore", {"code": code["code"]})
         self.assertEqual(status, 200, data)
         _, me, _ = b.get("/api/me")
@@ -1006,6 +1006,62 @@ class ServerTest(unittest.TestCase):
         self.assertEqual([r["id"] for r in json.loads(res.read())["reviews"]], [created["id"]], "nada do outro veio parar aqui")
         self.assertIsNone(res.getheader("Set-Cookie"))
         conn.close()
+
+    def test_chunked_body_is_refused_and_connection_closed(self):
+        """Corpo chunked (sem Content-Length) não pode ficar no socket: viraria uma resposta extra para outra pessoa."""
+        import socket
+        body = json.dumps(review()).encode()
+        with socket.create_connection(("127.0.0.1", self.port), timeout=10) as sock:
+            sock.sendall(b"POST /api/reviews HTTP/1.1\r\nHost: x\r\nContent-Type: application/json\r\nTransfer-Encoding: chunked\r\n\r\n"
+                         + f"{len(body):x}\r\n".encode() + body + b"\r\n0\r\n\r\nGET /api/me HTTP/1.1\r\nHost: x\r\n\r\n")
+            data = b""
+            while chunk := sock.recv(65536):
+                data += chunk
+        self.assertTrue(data.startswith(b"HTTP/1.1 411"), data[:80])
+        self.assertEqual(data.count(b"HTTP/1.1 "), 1, "uma resposta só, e a conexão fecha")
+
+    def test_identity_from_previous_generation_is_dropped(self):
+        """Cookies anteriores à correção do keep-alive podem estar em mais de um navegador (o Set-Cookie de um saía na
+        resposta de outro): a geração antiga não vale mais nada — nem para ver, editar, apagar ou recuperar."""
+        leaked = "A" * 43  # formato da geração 1: 43 caracteres sem prefixo
+        with app.connect() as conn:
+            payload = review()
+            conn.execute("INSERT INTO reviews (id, professor, course, term, overall, didactics, fairness, difficulty, workload, "
+                         "comment, comment_key, status, reviewer_hash, created_at) VALUES (77, ?, ?, ?, 4, 4, 4, 3, 3, ?, 'k', "
+                         "'published', ?, 0)", (payload["professor"], payload["course"], payload["term"], payload["comment"],
+                                                app.token_hash(leaked)))
+        friend = self.client()
+        friend.cookie = f"{app.COOKIE}={leaked}"
+        status, me, res = friend.get("/api/me")
+        self.assertEqual(me, {"reviews": [], "hasIdentity": False})
+        self.assertRegex(res.getheader("Set-Cookie"), rf"^{app.COOKIE}=; .*Max-Age=0", "o navegador esquece o cookie antigo")
+        friend.cookie = f"{app.COOKIE}={leaked}"
+        _, prof, _ = friend.get("/api/professors/ana-silva")
+        self.assertFalse(prof["reviews"][0]["mine"])
+        self.assertEqual(friend.request("PUT", "/api/reviews/77", review(overall=1))[0], 404)
+        friend.cookie = f"{app.COOKIE}={leaked}"
+        self.assertEqual(friend.request("DELETE", "/api/reviews/77")[0], 404)
+        self.assertEqual(self.client().post("/api/me/restore", {"code": leaked})[0], 400, "código antigo não recupera")
+        friend.cookie = f"{app.COOKIE}={app.IDENTITY_EPOCH}.{leaked}"  # pôr o prefixo novo não leva à identidade antiga
+        self.assertEqual(friend.request("PUT", "/api/reviews/77", review(overall=1))[0], 404)
+
+        # avaliar de novo com o cookie antigo gera uma identidade nova, da geração atual
+        friend.cookie = f"{app.COOKIE}={leaked}"
+        status, created, res = friend.post("/api/reviews", review(professor="bruno-costa"))
+        self.assertEqual(status, 201, created)
+        self.assertRegex(friend.cookie, rf"^{app.COOKIE}={app.IDENTITY_EPOCH}\.[A-Za-z0-9_-]{{43}}$")
+        self.assertEqual([r["id"] for r in friend.get("/api/me")[1]["reviews"]], [created["id"]])
+
+        # a moderação devolve a avaliação antiga só à autora, com um código novo
+        import nova_identidade as nova
+        code = nova.rekey([77])
+        author = self.client()
+        status, data, _ = author.post("/api/me/restore", {"code": code})
+        self.assertEqual(status, 200, data)
+        self.assertEqual([r["id"] for r in author.get("/api/me")[1]["reviews"]], [77])
+        self.assertEqual(author.request("PUT", "/api/reviews/77", review(
+            comment="Revisei: a disciplina exige bastante, mas as listas ajudam muito na prova."))[0], 200)
+        self.assertEqual([r["id"] for r in friend.get("/api/me")[1]["reviews"]], [created["id"]], "o amigo não a vê")
 
     def test_reports_hide_review_only_from_distinct_networks(self):
         """Cookie anônimo novo sai de graça: denúncias de muitas janelas na mesma rede não tiram a avaliação do ar."""
@@ -1169,7 +1225,8 @@ class ServerTest(unittest.TestCase):
         self.assertEqual(c.post("/api/me/code", headers={"Origin": "https://evil.example"})[0], 403)
         self.assertEqual(c.request("POST", "/api/me/code", raw=b"x=1", headers={"Content-Type": "application/x-www-form-urlencoded"})[0], 415)
         status, data, res = c.post("/api/me/code")
-        self.assertEqual((status, len(data["code"])), (200, 43))
+        self.assertRegex(data["code"], rf"^{app.IDENTITY_EPOCH}\.[A-Za-z0-9_-]{{43}}$")
+        self.assertEqual(status, 200)
         self.assertEqual(res.getheader("Cache-Control"), "no-store")
 
     def test_client_ip_uses_last_forwarded_hop(self):
