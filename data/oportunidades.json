@@ -1,5 +1,5 @@
 {
- "generatedAt": "2026-11-05T12:09:53+00:00",
+ "generatedAt": "2026-11-09T19:58:05+00:00",
  "source": "https://dcc.ufmg.br/oportunidades/",
  "items": [
   {
@@ -839,29 +839,6 @@
    ]
   },
   {
-   "slug": "vaga-speed-lab-coordenador-de-recursos-computacionais",
-   "title": "Coordenador de Recursos Computacionais – Speed/DCC/UFMG",
-   "url": "https://dcc.ufmg.br/oportunidade/vaga-speed-lab-coordenador-de-recursos-computacionais/",
-   "open": true,
-   "deadline": "Inscrições abertas até o preenchimento da vaga.",
-   "types": [
-    "Emprego"
-   ],
-   "areas": [],
-   "groups": [],
-   "audiences": [
-    "Profissionais"
-   ],
-   "summary": "O Coordenador de Recursos Computacionais é o profissional que atua em assuntos que envolvem a infraestrutura de TI (Tecnologia da Informação) em uma organização, neste caso, no Laboratório SPEED e associados.",
-   "stipends": [],
-   "hours": [
-    40
-   ],
-   "published": null,
-   "apply": null,
-   "professors": []
-  },
-  {
    "slug": "bolsa-de-iniciacao-cientifica-suporte-a-infraestrutura-de-ti",
    "title": "Bolsa de Iniciação Científica – Suporte à Infraestrutura de TI",
    "url": "https://dcc.ufmg.br/oportunidade/bolsa-de-iniciacao-cientifica-suporte-a-infraestrutura-de-ti/",
@@ -885,6 +862,29 @@
    ],
    "hours": [
     20
+   ],
+   "published": null,
+   "apply": null,
+   "professors": []
+  },
+  {
+   "slug": "vaga-speed-lab-coordenador-de-recursos-computacionais",
+   "title": "Coordenador de Recursos Computacionais – Speed/DCC/UFMG",
+   "url": "https://dcc.ufmg.br/oportunidade/vaga-speed-lab-coordenador-de-recursos-computacionais/",
+   "open": true,
+   "deadline": "Inscrições abertas até o preenchimento da vaga.",
+   "types": [
+    "Emprego"
+   ],
+   "areas": [],
+   "groups": [],
+   "audiences": [
+    "Profissionais"
+   ],
+   "summary": "O Coordenador de Recursos Computacionais é o profissional que atua em assuntos que envolvem a infraestrutura de TI (Tecnologia da Informação) em uma organização, neste caso, no Laboratório SPEED e associados.",
+   "stipends": [],
+   "hours": [
+    40
    ],
    "published": null,
    "apply": null,
