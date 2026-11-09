@@ -898,6 +898,11 @@ class App(BaseHTTPRequestHandler):
     ]
 
     def dispatch(self, method: str) -> None:
+        # O handler vive enquanto a CONEXÃO vive (keep-alive) e o Caddy reaproveita a mesma conexão para requisições de
+        # pessoas diferentes: estado de uma requisição não pode sobrar para a próxima. Sem isto, a identidade anônima
+        # (_viewer) e os Set-Cookie de um navegador iam parar em outro.
+        self.__dict__.pop("_viewer", None)
+        self.new_cookie = self.access_cookie = None
         url = urlparse(self.path)
         path = unquote(url.path)
         self.query = {k: v[0] for k, v in parse_qs(url.query).items()}

@@ -963,6 +963,31 @@ class ServerTest(unittest.TestCase):
         self.assertIn("offerings", json.loads(res.read()))
         conn.close()
 
+    def test_keep_alive_does_not_leak_identity_between_requests(self):
+        """Regressão: o Caddy reaproveita a conexão com o app para navegadores diferentes; a identidade anônima e o
+        Set-Cookie de uma requisição ficavam no handler e iam para a próxima (avaliação de um aparecia no outro)."""
+        author, other = self.client(), self.client()
+        _, created, _ = author.post("/api/reviews", review())
+        conn = http.client.HTTPConnection("127.0.0.1", self.port, timeout=10)
+        conn.request("GET", "/api/me", headers={"Cookie": author.cookie})  # 1º navegador: tem a avaliação
+        res = conn.getresponse()
+        self.assertEqual([r["id"] for r in json.loads(res.read())["reviews"]], [created["id"]])
+        conn.request("GET", "/api/me")  # 2º navegador, sem cookie, na MESMA conexão
+        res = conn.getresponse()
+        self.assertEqual(json.loads(res.read()), {"reviews": [], "hasIdentity": False})
+        self.assertIsNone(res.getheader("Set-Cookie"))
+        conn.request("POST", "/api/reviews", body=json.dumps(review(professor="bruno-costa")).encode(),
+                     headers={"Content-Type": "application/json", **({"Cookie": other.cookie} if other.cookie else {})})
+        res = conn.getresponse()
+        res.read()
+        new_cookie = (res.getheader("Set-Cookie") or "").split(";")[0]
+        self.assertTrue(new_cookie and new_cookie != author.cookie, "o 2º navegador ganha identidade própria")
+        conn.request("GET", "/api/me", headers={"Cookie": author.cookie})
+        res = conn.getresponse()
+        self.assertEqual([r["id"] for r in json.loads(res.read())["reviews"]], [created["id"]], "nada do outro veio parar aqui")
+        self.assertIsNone(res.getheader("Set-Cookie"))
+        conn.close()
+
     def test_reports_hide_review_only_from_distinct_networks(self):
         """Cookie anônimo novo sai de graça: denúncias de muitas janelas na mesma rede não tiram a avaliação do ar."""
         author = self.client()
