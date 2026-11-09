@@ -53,6 +53,7 @@
   --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
   --display: "Bricolage", var(--sans);
   --mono: ui-monospace, "SF Mono", "Cascadia Mono", "Roboto Mono", Menlo, Consolas, monospace;
+  --bot-frame: #1d4ed8; --bot-screen: #e8efff; --bot-eye: #0c1a4a; --bot-body: #3b6fe0; --bot-limb: #7a9cf0; --bot-paper: #d6e2ff; --bot-hand: #b3c8f7; --bot-dark: #14317a;
   color-scheme: light;
 }
 @media (prefers-color-scheme: dark) {
@@ -67,6 +68,7 @@
     --focus: #8db4ff; --btn: #1f4fb0; --btn-hover: #2a5ec8; --btn-ink: #ffffff;
     --shadow-sm: 0 1px 2px rgba(0, 0, 0, .4); --shadow: 0 1px 2px rgba(0, 0, 0, .35), 0 10px 30px rgba(0, 0, 0, .3); --shadow-hover: 0 2px 6px rgba(0, 0, 0, .45), 0 16px 40px rgba(0, 0, 0, .4); --shadow-pop: 0 24px 60px rgba(0, 0, 0, .7), 0 2px 8px rgba(0, 0, 0, .45);
     --chev: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%238d99b2' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+    --bot-frame: #4a7ef0; --bot-screen: #dfe8ff; --bot-eye: #0b1430; --bot-body: #2f5fc8; --bot-limb: #6189e2; --bot-paper: #c4d5fb; --bot-hand: #e9f0ff; --bot-dark: #1b3a8a;
     color-scheme: dark;
   }
 }
@@ -81,6 +83,7 @@
     --focus: #8db4ff; --btn: #1f4fb0; --btn-hover: #2a5ec8; --btn-ink: #ffffff;
     --shadow-sm: 0 1px 2px rgba(0, 0, 0, .4); --shadow: 0 1px 2px rgba(0, 0, 0, .35), 0 10px 30px rgba(0, 0, 0, .3); --shadow-hover: 0 2px 6px rgba(0, 0, 0, .45), 0 16px 40px rgba(0, 0, 0, .4); --shadow-pop: 0 24px 60px rgba(0, 0, 0, .7), 0 2px 8px rgba(0, 0, 0, .45);
     --chev: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%238d99b2' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+    --bot-frame: #4a7ef0; --bot-screen: #dfe8ff; --bot-eye: #0b1430; --bot-body: #2f5fc8; --bot-limb: #6189e2; --bot-paper: #c4d5fb; --bot-hand: #e9f0ff; --bot-dark: #1b3a8a;
     color-scheme: dark;
 }
 
@@ -997,3 +1000,16 @@ main.route-in > * { animation: route-in .32s cubic-bezier(.2, .7, .2, 1) both; }
 .offer-missing-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 4px 18px 14px; }
 .extra-slot { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
 .planner-extra { font-weight: 600; color: var(--ink); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
+
+/* mascote em pixel art na página inicial: cabeça e corpo sobem e descem 1 pixel, pernas paradas; pisca de vez em quando */
+.mascot { display: block; width: 72px; height: 80px; margin: 0 0 14px; shape-rendering: crispEdges; image-rendering: pixelated; }
+.mascot .F { fill: var(--bot-frame); } .mascot .S { fill: var(--bot-screen); } .mascot .E, .mascot .M, .mascot .C { fill: var(--bot-eye); }
+.mascot .W { fill: #fff; } .mascot .B { fill: var(--bot-body); } .mascot .L { fill: var(--bot-limb); } .mascot .P { fill: var(--bot-paper); }
+.mascot .H { fill: var(--bot-hand); } .mascot .D, .mascot .N { fill: var(--bot-dark); }
+.mascot .bot-top { animation: bot-bob 1.6s steps(1, end) infinite; }
+.mascot .bot-open { animation: bot-blink 4.8s steps(1, end) infinite; }
+.mascot .bot-closed { opacity: 0; animation: bot-blink-closed 4.8s steps(1, end) infinite; }
+@keyframes bot-bob { 0% { transform: translateY(0); } 50% { transform: translateY(1px); } }
+@keyframes bot-blink { 0%, 92% { opacity: 1; } 94%, 97% { opacity: 0; } 98% { opacity: 1; } }
+@keyframes bot-blink-closed { 0%, 92% { opacity: 0; } 94%, 97% { opacity: 1; } 98% { opacity: 0; } }
+@media (max-width: 640px) { .mascot { width: 54px; height: 60px; margin-bottom: 10px; } }

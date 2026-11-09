@@ -897,6 +897,24 @@ function openReportDialog(id) {
 }
 
 // ---------------------------------------------------------------- páginas
+// Mascote em pixel art (cada letra é um pixel; as cores ficam no CSS, então segue o tema claro/escuro)
+const BOT_TOP = [
+  '..FFFFFFFFFFFFFF..', '.FSSSSSSSSSSSSSSF.', '.FSSSSSSSSSSSSSSF.', '.FSSSSSSSSSSSSSSF.', '.FSSSSSSSSSSSSSSF.',
+  '.FSSSSSSSSSSSSSSF.', '.FSSSSSSSSSSSSSSF.', '.FSSSSSSMSSMSSSSF.', '.FSSSSSSSMMSSSSSF.', '.FSSSSSSSSSSSSSSF.',
+  '..FFFFFFFFFFFFFF..', '........NN........', '....LBBBBBBBBL....', '...L.BPPPPPPB.L...', '...L.BPPPPPPB.L...',
+  '..HH.BBBBBBBB.HH..', '.....BBBBBBBB.....'];
+const BOT_LEGS = ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '',
+  '......L....L......', '......L....L......', '.....DD....DD.....'];
+const BOT_OPEN = ['', '', '....EEE....EEE....', '....EWE....EWE....', '....EEE....EEE....', '....EEE....EEE....'];
+const BOT_CLOSED = ['', '', '', '', '....CCC....CCC....'];
+function botPixels(rows) {
+  return rows.map((row, y) => [...row].map((ch, x) => (ch === '.' ? '' : `<rect class="${ch}" x="${x}" y="${y}" width="1" height="1"/>`)).join('')).join('');
+}
+function mascotSvg() {
+  return `<svg class="mascot" viewBox="0 0 18 20" aria-hidden="true" focusable="false"><g class="bot-top">${botPixels(BOT_TOP)}`
+    + `<g class="bot-open">${botPixels(BOT_OPEN)}</g><g class="bot-closed">${botPixels(BOT_CLOSED)}</g></g>${botPixels(BOT_LEGS)}</svg>`;
+}
+
 async function viewHome() {
   setTitle('');
   const b = state.boot;
@@ -935,6 +953,7 @@ async function viewHome() {
     <div class="hero">
       <div class="hero-inner">
         <div class="hero-copy">
+          ${mascotSvg()}
           <h1>Docentes, disciplinas e oportunidades do DCC em um só lugar</h1>
           <ul class="meta-row" aria-label="Semestre">
             <li><svg class="ico"><use href="#i-calendar"/></svg>Semestre ${esc(b.currentTerm || '')}</li>
