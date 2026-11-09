@@ -917,15 +917,19 @@ async function viewHome() {
       .sort((x, y) => Number(!!y.photo) - Number(!!x.photo) || x.name.localeCompare(y.name)).slice(0, CAROUSEL_SIZE - rated.length));
   }
   const live = b.courses.filter((c) => c.offeredNow && c.kind === 'regular');
-  const mostReviewed = b.courses.filter((c) => c.stats).sort((x, y) => y.stats.count - x.stats.count).slice(0, 10);
-  const featuredCourses = mostReviewed.length >= 3 ? mostReviewed : [...live].sort((x, y) => y.terms.length - x.terms.length || x.name.localeCompare(y.name)).slice(0, 10);
+  const mostReviewed = b.courses.filter((c) => c.stats).sort((x, y) => y.stats.count - x.stats.count);
   const activeCount = b.professors.filter((p) => p.status === 'ativo' || p.status === 'voluntario').length;
   const teachingNow = b.professors.filter((p) => p.teachingNow).length;
   // disciplinas da oferta atual com mais avaliações (o que os colegas mais comentam entre o que dá para cursar agora)
   const spotCourses = live.filter((c) => c.stats).sort((x, y) => y.stats.count - x.stats.count).slice(0, 4);
   // a seção de baixo não repete o que já está no painel
   const spotIds = new Set(spotCourses.map((c) => c.id));
-  const moreCourses = featuredCourses.filter((c) => !spotIds.has(c.id)).slice(0, 6);
+  // "Mais avaliadas" só quando, já sem as do painel, sobram cartões suficientes; senão a seção ficava com 1 cartão
+  // de 1 avaliação sob o título "mais avaliadas" (as de fato mais avaliadas estavam no painel). Aí mostra a oferta.
+  const moreReviewed = mostReviewed.filter((c) => !spotIds.has(c.id));
+  const showMostReviewed = moreReviewed.length >= 4;
+  const moreCourses = (showMostReviewed ? moreReviewed
+    : [...live].sort((x, y) => y.terms.length - x.terms.length || x.name.localeCompare(y.name)).filter((c) => !spotIds.has(c.id))).slice(0, 6);
   main.innerHTML = `
   <section class="page">
     <div class="hero">
@@ -975,7 +979,7 @@ async function viewHome() {
       <div class="carousel-dots" role="group" aria-label="Páginas"></div>
     </section>` : ''}
 
-    <div class="section-head"><div><p class="eyebrow">${mostReviewed.length >= 3 ? 'Mais comentadas' : `Oferta ${esc(b.latestTerm || '')}`}</p><h2>${mostReviewed.length >= 3 ? 'Disciplinas mais avaliadas' : b.offerPublished ? 'Disciplinas deste semestre' : `Disciplinas da oferta ${esc(b.latestTerm || '')}`}</h2></div><a href="#/disciplinas">Todas as disciplinas →</a></div>
+    <div class="section-head"><div><p class="eyebrow">${showMostReviewed ? 'Mais comentadas' : `Oferta ${esc(b.latestTerm || '')}`}</p><h2>${showMostReviewed ? 'Disciplinas mais avaliadas' : b.offerPublished ? 'Disciplinas deste semestre' : `Disciplinas da oferta ${esc(b.latestTerm || '')}`}</h2></div><a href="#/disciplinas">Todas as disciplinas →</a></div>
     <div class="grid grid-2">${moreCourses.map(courseRow).join('')}</div>
 
     <div class="section-head"><div><p class="eyebrow">Comunidade</p><h2>Avaliações recentes</h2></div>${recent.length ? '' : ''}</div>
