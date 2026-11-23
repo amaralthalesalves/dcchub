@@ -1,5 +1,5 @@
 {
- "generatedAt": "2026-11-05T12:03:02+00:00",
+ "generatedAt": "2026-11-23T21:36:54+00:00",
  "sources": {
   "professors": "https://dcc.ufmg.br/professores/",
   "offerings": [
@@ -279,7 +279,7 @@
   },
   {
    "slug": "antonio-otavio-fernandes",
-   "name": "Antonio Otavio Fernandes",
+   "name": "Antônio Otávio Fernandes",
    "status": "aposentado",
    "photo": "photos/antonio-otavio-fernandes.jpeg",
    "areas": [],
@@ -1956,7 +1956,7 @@
   },
   {
    "slug": "virgilio-augusto-fernandes-almeida",
-   "name": "Virgilio Augusto Fernandes Almeida",
+   "name": "Virgílio Augusto Fernandes Almeida",
    "status": "voluntario",
    "photo": "photos/virgilio-augusto-fernandes-almeida.png",
    "areas": [

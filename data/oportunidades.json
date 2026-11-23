@@ -1,5 +1,5 @@
 {
- "generatedAt": "2026-11-05T12:09:53+00:00",
+ "generatedAt": "2026-11-23T21:37:10+00:00",
  "source": "https://dcc.ufmg.br/oportunidades/",
  "items": [
   {
@@ -156,34 +156,6 @@
    ]
   },
   {
-   "slug": "bolsista-de-pesquisa-nivel-mestrado-em-andamento",
-   "title": "Bolsista de Pesquisa – Nível Mestrado em Andamento – Projeto NIAR Saúde",
-   "url": "https://dcc.ufmg.br/oportunidade/bolsista-de-pesquisa-nivel-mestrado-em-andamento/",
-   "open": true,
-   "deadline": "As inscrições ficarão abertas até a vaga ser preenchida.",
-   "types": [
-    "Mestrado"
-   ],
-   "areas": [
-    "Inteligência artificial"
-   ],
-   "groups": [],
-   "audiences": [
-    "Mestrado"
-   ],
-   "summary": "O Núcleo de Inteligência Artificial Responsável para Saúde (NIAR Saúde UFMG) tem como objetivo projetar, implementar, validar, demonstrar e operar processos, metodologias, técnicas e tecnologias para garantir a responsabilidade no acesso a dados de saúde e na construção e utilização de modelos de inteligência artificial e afins com esses dados.",
-   "stipends": [
-    {
-     "who": "",
-     "value": "R$ 3.000,00"
-    }
-   ],
-   "hours": [],
-   "published": "2026-09-02",
-   "apply": "https://forms.gle/h4RTV7iWvKbRYsAB9",
-   "professors": []
-  },
-  {
    "slug": "bolsista-de-pesquisa-nivel-graduacao-em-andamento-projeto-niar-saude",
    "title": "Bolsista de Pesquisa – Nível Graduação em Andamento – Projeto NIAR Saúde",
    "url": "https://dcc.ufmg.br/oportunidade/bolsista-de-pesquisa-nivel-graduacao-em-andamento-projeto-niar-saude/",
@@ -209,6 +181,34 @@
    "hours": [],
    "published": "2026-09-02",
    "apply": "https://forms.gle/e42s5tqbUz17hnF88",
+   "professors": []
+  },
+  {
+   "slug": "bolsista-de-pesquisa-nivel-mestrado-em-andamento",
+   "title": "Bolsista de Pesquisa – Nível Mestrado em Andamento – Projeto NIAR Saúde",
+   "url": "https://dcc.ufmg.br/oportunidade/bolsista-de-pesquisa-nivel-mestrado-em-andamento/",
+   "open": true,
+   "deadline": "As inscrições ficarão abertas até a vaga ser preenchida.",
+   "types": [
+    "Mestrado"
+   ],
+   "areas": [
+    "Inteligência artificial"
+   ],
+   "groups": [],
+   "audiences": [
+    "Mestrado"
+   ],
+   "summary": "O Núcleo de Inteligência Artificial Responsável para Saúde (NIAR Saúde UFMG) tem como objetivo projetar, implementar, validar, demonstrar e operar processos, metodologias, técnicas e tecnologias para garantir a responsabilidade no acesso a dados de saúde e na construção e utilização de modelos de inteligência artificial e afins com esses dados.",
+   "stipends": [
+    {
+     "who": "",
+     "value": "R$ 3.000,00"
+    }
+   ],
+   "hours": [],
+   "published": "2026-09-02",
+   "apply": "https://forms.gle/h4RTV7iWvKbRYsAB9",
    "professors": []
   },
   {
@@ -238,34 +238,6 @@
    ],
    "published": "2026-08-21",
    "apply": null,
-   "professors": []
-  },
-  {
-   "slug": "bolsa-de-pesquisa-automacao-de-processos-unidade-embrapii-dcc-ufmg-fapemig",
-   "title": "Bolsa de Pesquisa – Automação de processos – Unidade Embrapii DCC/UFMG – FAPEMIG",
-   "url": "https://dcc.ufmg.br/oportunidade/bolsa-de-pesquisa-automacao-de-processos-unidade-embrapii-dcc-ufmg-fapemig/",
-   "open": true,
-   "deadline": "As inscrições abertas até o preenchimeto da vaga.",
-   "types": [
-    "Bolsa de pesquisa"
-   ],
-   "areas": [],
-   "groups": [
-    "Embrapii"
-   ],
-   "audiences": [],
-   "summary": "A Unidade EMBRAPII do Departamento de Ciência da Computação (DCC) da Universidade Federal de Minas Gerais (UFMG) é credenciada para desenvolver projetos de Pesquisa, Desenvolvimento e Inovação (PD&I) em parceria com empresas, focando em Sistemas Ciberfísicos. Sua missão é criar plataformas computacionais que integrem componentes físicos, virtuais e…",
-   "stipends": [
-    {
-     "who": "",
-     "value": "R$ 5.720,00"
-    }
-   ],
-   "hours": [
-    40
-   ],
-   "published": "2026-07-17",
-   "apply": "https://forms.gle/vrcJPBKiKqJ6PXBk7",
    "professors": []
   },
   {
@@ -810,6 +782,34 @@
    ]
   },
   {
+   "slug": "bolsa-dtc-mestrando-laboratorio-de-compiladores-dcc-ufmg",
+   "title": "Bolsa DTC – Mestrando – Laboratório de Compiladores – DCC/UFMG",
+   "url": "https://dcc.ufmg.br/oportunidade/bolsa-dtc-mestrando-laboratorio-de-compiladores-dcc-ufmg/",
+   "open": true,
+   "deadline": "Inscrições abertas até o preenchimento da vaga",
+   "types": [
+    "Bolsa"
+   ],
+   "areas": [
+    "Compiladores"
+   ],
+   "groups": [],
+   "audiences": [
+    "Mestrado"
+   ],
+   "summary": "O laboratório de compiladores tem vagas para Projeto de Desenvolvimento, a saber:",
+   "stipends": [
+    {
+     "who": "Bolsa DTC (para aluno em programa de mestrado)",
+     "value": "R$ 3.000,00"
+    }
+   ],
+   "hours": [],
+   "published": null,
+   "apply": null,
+   "professors": []
+  },
+  {
    "slug": "bolsa-de-pos-doutorado-vagas-abertas-em-ciberseguranca",
    "title": "Bolsa de Pós-Doutorado – Cibersegurança",
    "url": "https://dcc.ufmg.br/oportunidade/bolsa-de-pos-doutorado-vagas-abertas-em-ciberseguranca/",
@@ -837,58 +837,6 @@
    "professors": [
     "michele-nogueira-lima"
    ]
-  },
-  {
-   "slug": "vaga-speed-lab-coordenador-de-recursos-computacionais",
-   "title": "Coordenador de Recursos Computacionais – Speed/DCC/UFMG",
-   "url": "https://dcc.ufmg.br/oportunidade/vaga-speed-lab-coordenador-de-recursos-computacionais/",
-   "open": true,
-   "deadline": "Inscrições abertas até o preenchimento da vaga.",
-   "types": [
-    "Emprego"
-   ],
-   "areas": [],
-   "groups": [],
-   "audiences": [
-    "Profissionais"
-   ],
-   "summary": "O Coordenador de Recursos Computacionais é o profissional que atua em assuntos que envolvem a infraestrutura de TI (Tecnologia da Informação) em uma organização, neste caso, no Laboratório SPEED e associados.",
-   "stipends": [],
-   "hours": [
-    40
-   ],
-   "published": null,
-   "apply": null,
-   "professors": []
-  },
-  {
-   "slug": "bolsa-de-iniciacao-cientifica-suporte-a-infraestrutura-de-ti",
-   "title": "Bolsa de Iniciação Científica – Suporte à Infraestrutura de TI",
-   "url": "https://dcc.ufmg.br/oportunidade/bolsa-de-iniciacao-cientifica-suporte-a-infraestrutura-de-ti/",
-   "open": true,
-   "deadline": "Até a vaga ser preenchida.",
-   "types": [
-    "Bolsa de pesquisa",
-    "Iniciação científica"
-   ],
-   "areas": [],
-   "groups": [],
-   "audiences": [
-    "Graduação"
-   ],
-   "summary": "O Laboratório de Incerteza em Inteligência Artificial (LabUAI) está selecionando um(a) estudante de graduação para atuar no suporte à infraestrutura de TI.",
-   "stipends": [
-    {
-     "who": "",
-     "value": "R$ 1.092,00"
-    }
-   ],
-   "hours": [
-    20
-   ],
-   "published": null,
-   "apply": null,
-   "professors": []
   },
   {
    "slug": "postdoctoral-fellowship-open-positions-in-cybersecurity",
@@ -922,29 +870,24 @@
    ]
   },
   {
-   "slug": "bolsa-dtc-mestrando-laboratorio-de-compiladores-dcc-ufmg",
-   "title": "Bolsa DTC – Mestrando – Laboratório de Compiladores – DCC/UFMG",
-   "url": "https://dcc.ufmg.br/oportunidade/bolsa-dtc-mestrando-laboratorio-de-compiladores-dcc-ufmg/",
+   "slug": "vaga-speed-lab-coordenador-de-recursos-computacionais",
+   "title": "Coordenador de Recursos Computacionais – Speed/DCC/UFMG",
+   "url": "https://dcc.ufmg.br/oportunidade/vaga-speed-lab-coordenador-de-recursos-computacionais/",
    "open": true,
-   "deadline": "Inscrições abertas até o preenchimento da vaga",
+   "deadline": "Inscrições abertas até o preenchimento da vaga.",
    "types": [
-    "Bolsa"
+    "Emprego"
    ],
-   "areas": [
-    "Compiladores"
-   ],
+   "areas": [],
    "groups": [],
    "audiences": [
-    "Mestrado"
+    "Profissionais"
    ],
-   "summary": "O laboratório de compiladores tem vagas para Projeto de Desenvolvimento, a saber:",
-   "stipends": [
-    {
-     "who": "Bolsa DTC (para aluno em programa de mestrado)",
-     "value": "R$ 3.000,00"
-    }
+   "summary": "O Coordenador de Recursos Computacionais é o profissional que atua em assuntos que envolvem a infraestrutura de TI (Tecnologia da Informação) em uma organização, neste caso, no Laboratório SPEED e associados.",
+   "stipends": [],
+   "hours": [
+    40
    ],
-   "hours": [],
    "published": null,
    "apply": null,
    "professors": []
@@ -1199,35 +1142,32 @@
    ]
   },
   {
-   "slug": "iniciacao-cientifica-projeto-i-phm",
-   "title": "Iniciação Científica – Projeto I-PHM",
-   "url": "https://dcc.ufmg.br/oportunidade/iniciacao-cientifica-projeto-i-phm/",
+   "slug": "bolsa-de-iniciacao-cientifica-suporte-a-infraestrutura-de-ti",
+   "title": "Bolsa de Iniciação Científica – Suporte à Infraestrutura de TI",
+   "url": "https://dcc.ufmg.br/oportunidade/bolsa-de-iniciacao-cientifica-suporte-a-infraestrutura-de-ti/",
    "open": false,
    "deadline": null,
    "types": [
     "Bolsa de pesquisa",
     "Iniciação científica"
    ],
-   "areas": [
-    "Aprendizado de máquina",
-    "Inteligência artificial"
-   ],
+   "areas": [],
    "groups": [],
    "audiences": [
     "Graduação"
    ],
-   "summary": "I-PHM: Plataforma inteligente de manutenção preditiva para monitoramento e prognóstico da saúde de ativos industriais",
+   "summary": "O Laboratório de Incerteza em Inteligência Artificial (LabUAI) está selecionando um(a) estudante de graduação para atuar no suporte à infraestrutura de TI.",
    "stipends": [
     {
      "who": "",
-     "value": "R$ 1.500,00"
+     "value": "R$ 1.092,00"
     }
    ],
    "hours": [
     20
    ],
-   "published": "2026-07-13",
-   "apply": "https://forms.gle/Bc64bv2ZRbGLbqwt5",
+   "published": null,
+   "apply": null,
    "professors": []
   }
  ]
