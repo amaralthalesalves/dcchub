@@ -788,11 +788,119 @@ body.gated { padding-bottom: 0; }
 .docente-head { display: flex; align-items: center; gap: 16px; }
 .docente-head > div { flex: 1; min-width: 0; }
 @media (max-width: 600px) { .docente-head { flex-wrap: wrap; align-items: flex-start; } .docente-head .avatar-xl { width: 64px; height: 64px; } .docente-head h1 { font-size: 26px; } }
-.gate { min-height: 70vh; display: grid; place-items: center; }
+/* landing de quem chega sem acesso: hero com o cartão de acesso,
+   blocos alternados texto + miniatura, faixa escura do anonimato, como entrar + FAQ e chamada final */
+.landing { display: grid; gap: 120px; padding-top: 0; overflow-x: clip; } /* o brilho atrás do cartão não cria rolagem lateral */
+/* no PC o hero ocupa a tela toda, centralizado, com a seta indicando que a página continua */
+.lp-hero { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) 420px; gap: 72px; align-items: center; align-content: center;
+  min-height: 100svh; padding: 48px 0 96px; }
+.lp-scroll { position: absolute; left: 50%; bottom: 28px; translate: -50% 0; width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center;
+  border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink-2); cursor: pointer; box-shadow: var(--shadow); animation: lp-nudge 2.4s ease-in-out infinite; }
+#lp-como { scroll-margin-top: 96px; }
+.lp-scroll:hover { color: var(--ink); background: var(--surface-2); }
+.lp-scroll svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+@keyframes lp-nudge { 0%, 60%, 100% { transform: translateY(0); } 30% { transform: translateY(6px); } }
+@media (prefers-reduced-motion: reduce) { .lp-scroll { animation: none; } }
+.lp-copy h1 { font-size: clamp(40px, 5.2vw, 64px); max-width: 13ch; margin-bottom: 20px; }
+.lp-lead { font-size: 17px; line-height: 1.6; color: var(--ink-2); max-width: 54ch; margin: 0; }
+.lp-lead + .lp-lead { margin-top: 12px; }
+.lp-actions { display: flex; flex-wrap: wrap; gap: 10px; margin: 30px 0 22px; }
+.lp-trust { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 8px 20px; color: var(--muted); font-size: 14px; }
+.lp-trust li { display: inline-flex; align-items: center; gap: 7px; }
+
+.lp-stage { position: relative; padding: 52px 0 40px; }
+/* bilhetes de comentário (exemplos, sem autoria) na frente dos cantos do cartão, no azul-noite da faixa do anonimato */
+.lp-note { position: absolute; z-index: 3; margin: 0; max-width: 190px; padding: 10px 12px; display: grid; gap: 4px;
+  background: linear-gradient(160deg, #173a8f, #0c1a4a 85%); border: 1px solid rgba(150, 180, 255, .18); border-radius: 14px; box-shadow: var(--shadow-pop); }
+.lp-note blockquote { margin: 0; font-size: 13px; line-height: 1.4; color: #fff; }
+.lp-note figcaption { font-size: 11.5px; font-weight: 600; color: #b9d0ff; }
+.lp-note-a { top: 6px; right: -28px; transform: rotate(2.5deg); border-bottom-right-radius: 4px; }
+.lp-note-b { bottom: -6px; left: -64px; transform: rotate(-2deg); border-top-left-radius: 4px; }
+.lp-stage::before { content: ""; position: absolute; inset: -10% -20% -10% -30%; z-index: -1; pointer-events: none;
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--primary) 22%, transparent), transparent); }
+.lp-stage .gate-card { position: relative; z-index: 2; box-shadow: var(--shadow-pop); }
+.lp-mock { background: var(--surface-solid); border: 1px solid var(--line); border-radius: 18px; box-shadow: var(--shadow); color: var(--ink); }
+.lp-code { font: 600 11.5px/1 var(--sans); color: var(--muted); background: var(--surface-2); border-radius: 6px; padding: 4px 6px; }
+
+.lp-feature { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 72px; align-items: center; }
+.lp-feature + .lp-feature { margin-top: 112px; }
+.lp-flip .lp-text { order: 2; }
+.lp-text h2, .lp-band h2, .lp-final h2 { font-size: clamp(28px, 3.2vw, 38px); line-height: 1.1; letter-spacing: -.03em; text-wrap: balance; margin-bottom: 18px; }
+.lp-panel { padding: 22px; display: grid; gap: 16px; }
+.lp-person { display: flex; align-items: center; gap: 12px; }
+.lp-person span:last-child { display: grid; }
+.lp-person small, .lp-list small { color: var(--muted); font-size: 13px; }
+.lp-avatar { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; background: var(--surface-3); color: var(--muted); }
+.lp-scores { list-style: none; padding: 0; margin: 0; display: grid; }
+.lp-scores li { display: flex; align-items: center; gap: 10px; padding: 11px 0; border-top: 1px solid var(--line); font-size: 14.5px; font-weight: 600; }
+.lp-scores .pill { margin-left: auto; }
+.lp-panel blockquote { margin: 0; padding: 12px 14px; border-radius: 12px; background: var(--surface-2); color: var(--ink-2); font-size: 14px; }
+.lp-week { display: grid; grid-template-columns: 44px repeat(5, minmax(0, 1fr)); grid-template-rows: 20px repeat(4, 46px); gap: 5px; }
+.lp-day { grid-row: 1; text-align: center; font-size: 12px; font-weight: 600; color: var(--muted); }
+.lp-hour { grid-column: 1; font-size: 11px; color: var(--muted); padding-top: 3px; font-variant-numeric: tabular-nums; }
+.lp-slot { border-radius: 9px; padding: 6px 7px; font-size: 11.5px; font-weight: 600; line-height: 1.2; background: var(--primary-soft); color: var(--primary-soft-ink); }
+.lp-slot.b { background: var(--good-bg); color: var(--good); }
+.lp-slot.c { background: var(--ok-bg); color: var(--ok); }
+.lp-slot.d { background: var(--neu-bg); color: var(--neu); }
+.lp-slot.x { z-index: 1; justify-self: end; width: 64%; background: var(--bad-bg); color: var(--bad); outline: 2px solid var(--bad-fill); outline-offset: -2px; backdrop-filter: blur(2px); }
+.lp-conflict { margin: 0; display: flex; align-items: center; gap: 10px; font-size: 13.5px; color: var(--ink-2); }
+.lp-list { list-style: none; padding: 0; margin: 0; display: grid; }
+.lp-list li { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-top: 1px solid var(--line); }
+.lp-list li:first-child { border-top: 0; padding-top: 0; }
+.lp-list li > span:last-child { display: grid; font-size: 14.5px; }
+.lp-ico { width: 38px; height: 38px; flex: none; border-radius: 11px; display: grid; place-items: center; background: var(--primary-soft); color: var(--primary); }
+
+/* faixa do anonimato: sempre azul-noite, nos dois temas */
+.lp-band { padding: 56px; border-radius: 28px; color: #dfe8ff; background: linear-gradient(160deg, #173a8f, #0c1a4a 70%); border: 1px solid rgba(150, 180, 255, .18); }
+.lp-band h2 { color: #fff; max-width: 22ch; margin-bottom: 36px; }
+.lp-ledger { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+.lp-ledger h3 { color: #b9d0ff; font-size: 15px; margin-bottom: 14px; }
+.lp-ledger ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; }
+.lp-ledger li { position: relative; padding-left: 30px; line-height: 1.5; }
+.lp-ledger li::before { position: absolute; left: 0; top: 1px; width: 20px; height: 20px; border-radius: 50%; display: grid; place-items: center; font: 700 12px/1 var(--sans); }
+.lp-yes li::before { content: "✓"; background: rgba(127, 207, 156, .18); color: #7fcf9c; }
+.lp-no li::before { content: "✕"; background: rgba(240, 140, 132, .18); color: #f08c84; }
+
+.lp-help { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); gap: 72px; align-items: start; }
+.lp-help h2 { font-size: 26px; letter-spacing: -.025em; margin-bottom: 20px; }
+.lp-steps { list-style: none; counter-reset: step; padding: 0; margin: 0; display: grid; gap: 20px; }
+.lp-steps li { counter-increment: step; display: grid; grid-template-columns: 36px 1fr; column-gap: 14px; }
+.lp-steps li::before { content: counter(step); grid-row: span 2; width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; background: var(--btn); color: var(--btn-ink); font: 760 16px/1 var(--display); }
+.lp-steps span { color: var(--muted); font-size: 14.5px; }
+.lp-faq details { border-top: 1px solid var(--line); padding: 14px 2px; }
+.lp-faq details:last-of-type { border-bottom: 1px solid var(--line); }
+.lp-faq summary { cursor: pointer; font-weight: 600; }
+.lp-faq details p { margin: 8px 0 0; color: var(--ink-2); }
+
+.lp-final { position: relative; text-align: center; display: grid; justify-items: center; padding: 64px 24px 56px; margin-top: 40px; border-radius: 28px; background: var(--btn); color: var(--btn-ink); }
+.lp-final h2 { color: var(--btn-ink); max-width: 20ch; margin-bottom: 26px; }
+.lp-final .btn { background: #fff; border-color: #fff; color: #14317a; }
+.lp-final .btn:hover { background: #e8efff; border-color: #e8efff; color: #14317a; }
+.lp-final-bot { position: absolute; top: -66px; }
+.lp-final-bot .mascot { width: 63px; height: 70px; margin: 0; }
+.lp-final-bot .mascot .F { fill: #fff; }
+
+@media (max-width: 980px) {
+  .lp-hero { grid-template-columns: 1fr; min-height: 0; gap: 40px; padding: 28px 0 0; }
+  .lp-scroll { display: none; }
+  .lp-stage { justify-self: center; width: min(440px, 100%); }
+  .lp-note-a { right: -6px; } .lp-note-b { left: -6px; bottom: -40px; }
+  .lp-feature, .lp-help { grid-template-columns: 1fr; gap: 32px; }
+  .lp-flip .lp-text { order: 0; }
+  .lp-feature + .lp-feature { margin-top: 80px; }
+}
+@media (max-width: 640px) {
+  .landing { gap: 80px; }
+  .lp-band { padding: 32px 22px; }
+  .lp-ledger { grid-template-columns: 1fr; gap: 28px; }
+  .lp-week { grid-template-columns: 36px repeat(5, minmax(0, 1fr)); gap: 4px; }
+  .lp-slot { font-size: 10px; padding: 4px; }
+  .lp-slot.x { width: 82%; }
+}
 .gate-card { width: 100%; max-width: 440px; background: var(--surface); border: 1px solid var(--line); border-radius: 16px; box-shadow: var(--shadow); padding: 32px 28px; display: grid; gap: 14px; text-align: center; justify-items: center; }
 .gate-card .brand-logo { width: 44px; height: 44px; font-size: 20px; border-radius: 12px; }
-.gate-card h1 { font-size: 28px; }
-.gate-card h1 span { color: var(--primary); }
+.gate-card h2 { font-size: 28px; }
+.gate-card h2 span { color: var(--primary); }
 .gate-card p { margin: 0; color: var(--ink-2); }
 .gate-form { width: 100%; display: grid; gap: 10px; text-align: left; }
 .gate-form .btn { width: 100%; }

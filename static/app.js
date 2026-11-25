@@ -300,11 +300,33 @@ function viewGate(methods = ['code']) {
         <button class="btn ${email ? 'btn-ghost' : 'btn-lg'}" type="submit">Entrar com código</button>
         <p class="err" role="alert"></p>
       </form>`;
-  main.innerHTML = `<section class="page narrow gate">
+  // landing: explica o site para quem chega sem acesso. As miniaturas da interface usam dados de exemplo, sem nomes nem
+  // fotos (nada vem da API, que está fechada aqui); o cartão de acesso fica no hero e o mascote, na chamada final.
+  const slot = (day, row, span, text, cls = '') => `<span class="lp-slot ${cls}" style="grid-column:${day + 1};grid-row:${row + 1} / span ${span}">${text}</span>`;
+  const item = (icon, title, meta) => `<li><span class="lp-ico" aria-hidden="true"><svg class="ico"><use href="#i-${icon}"/></svg></span><span><b>${title}</b><small>${meta}</small></span></li>`;
+  main.innerHTML = `<section class="page landing">
+   <div class="lp-hero">
+    <div class="lp-copy">
+      <p class="eyebrow">Para estudantes do DCC/UFMG</p>
+      <h1>Escolha suas disciplinas sabendo o que esperar.</h1>
+      <p class="lp-lead">Avaliações anônimas de quem já cursou, a oferta do semestre com montador de grade, provas antigas e oportunidades de pesquisa, tudo num lugar só.</p>
+      <div class="lp-actions">
+        <button class="btn btn-lg" type="button" data-lp="login">Entrar</button>
+        <button class="btn btn-lg btn-ghost" type="button" data-lp="como">Ver como funciona</button>
+      </div>
+      <ul class="lp-trust">
+        <li><svg class="ico"><use href="#i-shield"/></svg>Anônimo, sem conta</li>
+        ${email ? `<li><svg class="ico"><use href="#i-mail"/></svg>Só para e-mails @ufmg.br</li>` : ''}
+        <li><svg class="ico"><use href="#i-github"/></svg>Código aberto</li>
+      </ul>
+    </div>
+    <div class="lp-stage">
+     <figure class="lp-note lp-note-a" aria-hidden="true"><blockquote>As listas são o segredo da prova. Faz todas.</blockquote><figcaption>Algoritmos I</figcaption></figure>
+     <figure class="lp-note lp-note-b" aria-hidden="true"><blockquote>Aula muito boa, mas a prova é longa. Treina o tempo.</blockquote><figcaption>Matemática Discreta</figcaption></figure>
     <div class="gate-card">
       <span class="brand-logo" aria-hidden="true">D</span>
-      <h1>DCC<span>Hub</span></h1>
-      <p>Espaço da comunidade estudantil do DCC/UFMG: avaliações anônimas de turmas, oferta do semestre, materiais e oportunidades.</p>
+      <h2>DCC<span>Hub</span></h2>
+      <p>Entre para ver avaliações, oferta, materiais e oportunidades.</p>
       ${email ? `<form id="gate-email" class="gate-form" novalidate>
         <label class="field">E-mail da UFMG<input name="email" type="email" autocomplete="email" autocapitalize="off" spellcheck="false" required placeholder="voce@ufmg.br"></label>
         <button class="btn btn-lg" type="submit">Receber código de acesso</button>
@@ -327,7 +349,116 @@ function viewGate(methods = ['code']) {
       <p class="small muted">O código é divulgado nos canais dos estudantes (centro acadêmico, grupos de turma). Ele não identifica você: o acesso continua anônimo.</p>`}
       <p class="small muted">Projeto independente de estudantes, sem vínculo com o DCC ou com a UFMG. Pedidos de remoção de conteúdo: <a href="mailto:dcchubufmg@gmail.com">dcchubufmg@gmail.com</a>.</p>
     </div>
+    </div>
+    <button class="lp-scroll" type="button" data-lp="como" aria-label="Ver o resto da página"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
+   </div>
+
+   <div id="lp-como">
+   <section class="lp-feature">
+     <div class="lp-text">
+       <h2>A nota do docente naquela disciplina.</h2>
+       <p class="lp-lead">O mesmo docente pode ser ótimo numa optativa e exigente numa obrigatória. Por isso cada avaliação fica ligada à disciplina, com didática, justiça das provas, dificuldade e carga de trabalho separadas.</p>
+       <p class="lp-lead">Os rankings usam média bayesiana: uma única nota 5 não coloca ninguém no topo.</p>
+     </div>
+     <div class="lp-mock lp-panel" aria-hidden="true">
+       <div class="lp-person"><span class="lp-avatar"><svg class="ico"><use href="#i-users"/></svg></span><span><b>Docente</b><small>Notas por disciplina</small></span></div>
+       <ul class="lp-scores">
+         <li><span class="lp-code">DCC206</span>Algoritmos I<span class="pill good">4,6</span></li>
+         <li><span class="lp-code">DCC221</span>Estruturas de Dados<span class="pill ok">3,4</span></li>
+         <li><span class="lp-code">DCC831</span>Aprendizado Profundo<span class="pill good">4,8</span></li>
+       </ul>
+       <div class="chips"><span class="chip pos">Listas de exercícios</span><span class="chip pos">Aulas organizadas</span><span class="chip neg">Provas longas</span></div>
+       <blockquote>As listas são puxadas, mas são exatamente o que cai na prova.</blockquote>
+     </div>
+   </section>
+
+   <section class="lp-feature lp-flip">
+     <div class="lp-text">
+       <h2>Monte a grade e veja os conflitos antes da matrícula.</h2>
+       <p class="lp-lead">Todas as turmas do semestre, com horário, sala e a nota de cada docente naquela disciplina. Escolha seu curso, adicione turmas e exporte para o calendário do celular.</p>
+     </div>
+     <div class="lp-mock lp-panel" aria-hidden="true">
+       <div class="lp-week">
+         ${['Seg', 'Ter', 'Qua', 'Qui', 'Sex'].map((d, i) => `<span class="lp-day" style="grid-column:${i + 2}">${d}</span>`).join('')}
+         ${['07:30', '09:25', '13:00', '14:55'].map((h, i) => `<span class="lp-hour" style="grid-row:${i + 2}">${h}</span>`).join('')}
+         ${slot(1, 1, 1, 'ALG I')}${slot(3, 1, 1, 'ALG I')}${slot(2, 2, 1, 'Mat. Discreta', 'b')}${slot(4, 2, 1, 'Mat. Discreta', 'b')}
+         ${slot(1, 3, 2, 'PDS II', 'c')}${slot(1, 4, 1, 'Redes', 'x')}${slot(5, 2, 1, 'ED', 'd')}${slot(3, 3, 1, 'Redes', 'e')}
+       </div>
+       <p class="lp-conflict"><span class="pill bad">Conflito</span>Redes e PDS II na segunda às 14:55</p>
+     </div>
+   </section>
+
+   <section class="lp-feature">
+     <div class="lp-text">
+       <h2>Provas antigas e chamadas de pesquisa no mesmo lugar.</h2>
+       <p class="lp-lead">O acervo de materiais mantido pelos estudantes, organizado por disciplina, e as chamadas de iniciação científica, bolsas e estágios do DCC, com filtros por tipo e área.</p>
+     </div>
+     <div class="lp-mock lp-panel" aria-hidden="true">
+       <ul class="lp-list">
+         ${item('archive', 'Algoritmos I', 'Provas e listas antigas, 38 arquivos')}
+         ${item('archive', 'Estruturas de Dados', 'Provas resolvidas, 21 arquivos')}
+         ${item('briefcase', 'Iniciação científica em visão computacional', 'Bolsa, inscrições abertas')}
+         ${item('briefcase', 'Estágio em desenvolvimento web', 'Graduação, a partir do 4º período')}
+       </ul>
+     </div>
+   </section>
+   </div>
+
+   <section class="lp-band">
+     <h2>Ninguém sabe quem escreveu uma avaliação.</h2>
+     <div class="lp-ledger">
+       <div>
+         <h3>O que o site guarda</h3>
+         <ul class="lp-yes">
+           <li>A avaliação, publicada sem autoria</li>
+           <li>Um identificador aleatório do seu navegador (o banco guarda só um hash dele), para você poder editar o que escreveu</li>
+         </ul>
+       </div>
+       <div>
+         <h3>O que o site não guarda</h3>
+         <ul class="lp-no">
+           ${email ? `<li>Seu e-mail: ele só serve para enviar o código</li>` : ''}
+           <li>Seu IP: nunca vai para logs nem para o banco; fica só na memória, por até 24 horas, para limitar abuso</li>
+           <li>Nome, matrícula ou, no banco, qualquer ligação entre o seu acesso e o que você escreve</li>
+           <li>Rastreadores, analytics ou anúncios</li>
+         </ul>
+       </div>
+     </div>
+   </section>
+
+   <section class="lp-help">
+     <div>
+       <h2>Como entrar</h2>
+       <ol class="lp-steps">
+         ${email ? `<li><b>Digite seu e-mail @ufmg.br</b><span>Não precisa criar conta nem senha.</span></li>
+         <li><b>Copie o código de 6 dígitos</b><span>Ele chega no seu e-mail em alguns minutos.</span></li>`
+         : `<li><b>Pegue o código de acesso</b><span>Ele é divulgado nos canais dos estudantes (centro acadêmico, grupos de turma).</span></li>
+           <li><b>Digite o código no cartão</b><span>Não precisa criar conta nem senha.</span></li>`}
+         <li><b>Pronto</b><span>Você fica conectado neste navegador.</span></li>
+       </ol>
+     </div>
+     <div class="lp-faq">
+       <h2>Perguntas frequentes</h2>
+       ${email ? `<details><summary>Por que só e-mails @ufmg.br?</summary><p>Para que só a comunidade da UFMG leia e escreva avaliações. O e-mail confirma que você é da universidade e depois é descartado.</p></details>` : ''}
+       <details><summary>O que posso escrever numa avaliação?</summary><p>Fale da disciplina e das práticas de ensino. Um filtro confere o comentário enquanto você escreve e não deixa publicar ofensas, comentários sobre aparência ou vida pessoal, boatos e dados pessoais.</p></details>
+       ${email ? `<details><summary>O código não chegou.</summary><p>O e-mail da UFMG pode levar alguns minutos, principalmente se é redirecionado para outra caixa. Confira o spam; se pedir outro código, os anteriores continuam valendo.</p></details>` : ''}
+       <details><summary>O DCCHub é oficial?</summary><p>Não. É um projeto independente de estudantes, sem vínculo com o DCC ou com a UFMG. Os dados de oferta e de docentes vêm das páginas públicas do DCC.</p></details>
+       <details><summary>Sou docente e quero pedir a remoção de uma avaliação.</summary><p>Escreva para <a href="mailto:dcchubufmg@gmail.com">dcchubufmg@gmail.com</a> com o link e o motivo. Cada pedido é lido por uma pessoa; avaliações que violam as regras saem do ar.</p></details>
+     </div>
+   </section>
+
+   <section class="lp-final">
+     <div class="lp-final-bot" aria-hidden="true">${mascotSvg()}</div>
+     <h2>Escolha a próxima turma com mais informação.</h2>
+     <button class="btn btn-lg" type="button" data-lp="login">${email ? 'Entrar com e-mail da UFMG' : 'Entrar'}</button>
+   </section>
   </section>`;
+  // "Entrar" rola até o cartão e foca o primeiro campo; "Como funciona" rola até as seções (sem href="#…": o hash é do roteador)
+  main.querySelectorAll('[data-lp]').forEach((b) => b.addEventListener('click', () => {
+    if (b.dataset.lp === 'como') { $('#lp-como').scrollIntoView({ behavior: 'smooth' }); return; }
+    $('.gate-card').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    $$('.gate-card input').find((i) => i.offsetParent)?.focus({ preventScroll: true }); // o campo visível (e-mail ou código de 6 dígitos)
+  }));
   const enter = () => { document.body.classList.remove('gated'); state.boot = null; router(); };
   $('#gate-code')?.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -421,7 +552,7 @@ function viewGate(methods = ['code']) {
   $('input', otp)?.addEventListener('input', (e) => { if (e.target.value.replace(/\D/g, '').length === 6) otp.requestSubmit(); });
   retry?.addEventListener('click', () => { $('#gate-sent').hidden = true; form.hidden = false; $('input', form).focus(); });
   if (email && pending) { showOtp(pending.msg); return; }
-  $(email ? 'input[name=email]' : 'input[name=code]').focus();
+  $(email ? 'input[name=email]' : 'input[name=code]').focus({ preventScroll: true }); // sem rolar: no celular o cartão fica abaixo do texto da landing
 }
 
 // Regras da comunidade: quem entra (por e-mail ou código) precisa aceitar uma vez neste navegador antes de usar o site.
@@ -1019,7 +1150,7 @@ async function viewHome() {
       : `<div class="empty-state callout"><h3>Ainda não há avaliações publicadas</h3><p>As avaliações aparecem aqui assim que forem publicadas. São anônimas e não exigem cadastro.</p><a class="btn" href="#/avaliar">Avaliar uma turma</a></div>`}
 
     <section class="band" aria-labelledby="band-title">
-      <h2 id="band-title">Ninguém sabe quem escreveu. Nem a gente.</h2>
+      <h2 id="band-title">Ninguém sabe quem escreveu.</h2>
       <div class="band-points">
         <p><b>Sem conta.</b> Nada de nome, e-mail ou matrícula. Seu navegador guarda um identificador aleatório, e o servidor só conhece um hash dele.</p>
         <p><b>Ligado à oferta oficial.</b> Docentes, disciplinas e horários vêm do site do DCC. Turmas que constam na oferta ganham o selo “turma confirmada”.</p>
@@ -2000,7 +2131,7 @@ async function viewAbout() {
         ? `<li>Sem cadastro e sem conta. O e-mail @ufmg.br serve só para enviar o código de acesso: <b>não é guardado</b> (nem no banco, nem em logs), e o acesso que ele libera não tem nenhuma ligação com as avaliações que você escreve. Não pedimos nome nem matrícula.</li>`
         : '<li>Sem cadastro: não pedimos nome, e-mail ou matrícula.</li>'}
       <li>Seu navegador recebe um identificador aleatório (cookie <code>HttpOnly</code>). O banco guarda apenas um <abbr title="HMAC-SHA256 com chave secreta do servidor">hash</abbr> dele — usado só para impedir avaliações repetidas e permitir edição.</li>
-      <li>O servidor não registra endereços IP em logs. O IP é usado apenas em memória, por alguns minutos, para limitar abusos.</li>
+      <li>O servidor não registra endereços IP em logs nem no banco. O IP fica só em memória, por até 24 horas, para limitar abusos.</li>
       <li>Sem Google Fonts, analytics ou qualquer recurso de terceiros: fotos e dados são servidos pelo próprio site.</li>
     </ul>
 
