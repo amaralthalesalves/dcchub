@@ -316,7 +316,7 @@ function viewGate(methods = ['code']) {
       </div>
       <ul class="lp-trust">
         <li><svg class="ico"><use href="#i-shield"/></svg>Anônimo, sem conta</li>
-        <li><svg class="ico"><use href="#i-mail"/></svg>Só para e-mails @ufmg.br</li>
+        ${email ? `<li><svg class="ico"><use href="#i-mail"/></svg>Só para e-mails @ufmg.br</li>` : ''}
         <li><svg class="ico"><use href="#i-github"/></svg>Código aberto</li>
       </ul>
     </div>
@@ -411,15 +411,15 @@ function viewGate(methods = ['code']) {
          <h3>O que o site guarda</h3>
          <ul class="lp-yes">
            <li>A avaliação, publicada sem autoria</li>
-           <li>Um código aleatório do seu navegador, cifrado, para você poder editar o que escreveu</li>
+           <li>Um identificador aleatório do seu navegador (o banco guarda só um hash dele), para você poder editar o que escreveu</li>
          </ul>
        </div>
        <div>
          <h3>O que o site não guarda</h3>
          <ul class="lp-no">
-           <li>Seu e-mail: ele só serve para enviar o código</li>
-           <li>Seu IP: fica alguns minutos na memória, contra abuso, e some</li>
-           <li>Nome, matrícula ou qualquer ligação entre o seu acesso e o que você escreve</li>
+           ${email ? `<li>Seu e-mail: ele só serve para enviar o código</li>` : ''}
+           <li>Seu IP: nunca vai para logs nem para o banco; fica só na memória, por até 24 horas, para limitar abuso</li>
+           <li>Nome, matrícula ou, no banco, qualquer ligação entre o seu acesso e o que você escreve</li>
            <li>Rastreadores, analytics ou anúncios</li>
          </ul>
        </div>
@@ -430,16 +430,18 @@ function viewGate(methods = ['code']) {
      <div>
        <h2>Como entrar</h2>
        <ol class="lp-steps">
-         <li><b>Digite seu e-mail @ufmg.br</b><span>Não precisa criar conta nem senha.</span></li>
-         <li><b>Copie o código de 6 dígitos</b><span>Ele chega no seu e-mail em alguns minutos.</span></li>
+         ${email ? `<li><b>Digite seu e-mail @ufmg.br</b><span>Não precisa criar conta nem senha.</span></li>
+         <li><b>Copie o código de 6 dígitos</b><span>Ele chega no seu e-mail em alguns minutos.</span></li>`
+         : `<li><b>Pegue o código de acesso</b><span>Ele é divulgado nos canais dos estudantes (centro acadêmico, grupos de turma).</span></li>
+           <li><b>Digite o código no cartão</b><span>Não precisa criar conta nem senha.</span></li>`}
          <li><b>Pronto</b><span>Você fica conectado neste navegador.</span></li>
        </ol>
      </div>
      <div class="lp-faq">
        <h2>Perguntas frequentes</h2>
-       <details><summary>Por que só e-mails @ufmg.br?</summary><p>Para que só a comunidade da UFMG leia e escreva avaliações. O e-mail confirma que você é da universidade e depois é descartado.</p></details>
+       ${email ? `<details><summary>Por que só e-mails @ufmg.br?</summary><p>Para que só a comunidade da UFMG leia e escreva avaliações. O e-mail confirma que você é da universidade e depois é descartado.</p></details>` : ''}
        <details><summary>O que posso escrever numa avaliação?</summary><p>Fale da disciplina e das práticas de ensino. Um filtro confere o comentário enquanto você escreve e não deixa publicar ofensas, comentários sobre aparência ou vida pessoal, boatos e dados pessoais.</p></details>
-       <details><summary>O código não chegou.</summary><p>O e-mail da UFMG pode levar alguns minutos, principalmente se é redirecionado para outra caixa. Confira o spam; se pedir outro código, os anteriores continuam valendo.</p></details>
+       ${email ? `<details><summary>O código não chegou.</summary><p>O e-mail da UFMG pode levar alguns minutos, principalmente se é redirecionado para outra caixa. Confira o spam; se pedir outro código, os anteriores continuam valendo.</p></details>` : ''}
        <details><summary>O DCCHub é oficial?</summary><p>Não. É um projeto independente de estudantes, sem vínculo com o DCC ou com a UFMG. Os dados de oferta e de docentes vêm das páginas públicas do DCC.</p></details>
        <details><summary>Sou docente e quero pedir a remoção de uma avaliação.</summary><p>Escreva para <a href="mailto:dcchubufmg@gmail.com">dcchubufmg@gmail.com</a> com o link e o motivo. Cada pedido é lido por uma pessoa; avaliações que violam as regras saem do ar.</p></details>
      </div>
@@ -448,7 +450,7 @@ function viewGate(methods = ['code']) {
    <section class="lp-final">
      <div class="lp-final-bot" aria-hidden="true">${mascotSvg()}</div>
      <h2>Escolha a próxima turma com mais informação.</h2>
-     <button class="btn btn-lg" type="button" data-lp="login">Entrar com e-mail da UFMG</button>
+     <button class="btn btn-lg" type="button" data-lp="login">${email ? 'Entrar com e-mail da UFMG' : 'Entrar'}</button>
    </section>
   </section>`;
   // "Entrar" rola até o cartão e foca o primeiro campo; "Como funciona" rola até as seções (sem href="#…": o hash é do roteador)
@@ -2129,7 +2131,7 @@ async function viewAbout() {
         ? `<li>Sem cadastro e sem conta. O e-mail @ufmg.br serve só para enviar o código de acesso: <b>não é guardado</b> (nem no banco, nem em logs), e o acesso que ele libera não tem nenhuma ligação com as avaliações que você escreve. Não pedimos nome nem matrícula.</li>`
         : '<li>Sem cadastro: não pedimos nome, e-mail ou matrícula.</li>'}
       <li>Seu navegador recebe um identificador aleatório (cookie <code>HttpOnly</code>). O banco guarda apenas um <abbr title="HMAC-SHA256 com chave secreta do servidor">hash</abbr> dele — usado só para impedir avaliações repetidas e permitir edição.</li>
-      <li>O servidor não registra endereços IP em logs. O IP é usado apenas em memória, por alguns minutos, para limitar abusos.</li>
+      <li>O servidor não registra endereços IP em logs nem no banco. O IP fica só em memória, por até 24 horas, para limitar abusos.</li>
       <li>Sem Google Fonts, analytics ou qualquer recurso de terceiros: fotos e dados são servidos pelo próprio site.</li>
     </ul>
 

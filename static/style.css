@@ -790,7 +790,7 @@ body.gated { padding-bottom: 0; }
 @media (max-width: 600px) { .docente-head { flex-wrap: wrap; align-items: flex-start; } .docente-head .avatar-xl { width: 64px; height: 64px; } .docente-head h1 { font-size: 26px; } }
 /* landing de quem chega sem acesso: hero com o cartão de acesso,
    blocos alternados texto + miniatura, faixa escura do anonimato, como entrar + FAQ e chamada final */
-.landing { display: grid; gap: 120px; padding-top: 0; }
+.landing { display: grid; gap: 120px; padding-top: 0; overflow-x: clip; } /* o brilho atrás do cartão não cria rolagem lateral */
 /* no PC o hero ocupa a tela toda, centralizado, com a seta indicando que a página continua */
 .lp-hero { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) 420px; gap: 72px; align-items: center; align-content: center;
   min-height: 100svh; padding: 48px 0 96px; }
